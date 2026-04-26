@@ -12,8 +12,8 @@ const projects = [
   },
   {
     title: "Enterprise Workflow Extension",
-    problem: "Manual navigation, fragmented tools, and inefficient workflows in legacy internal systems.",
-    solution: "Built a suite of browser automation scripts (Tampermonkey) that streamline navigation, automate Jira workflows, and integrate internal tools.",
+    problem: "Manual navigation, fragmented internal tools, and repetitive workflows slowing down development and QA processes.",
+    solution: "Developed a suite of browser-based automation scripts (Tampermonkey) to streamline navigation, automate Jira workflows, and integrate internal tools into a unified workflow.",
     result: "Reduced repetitive manual steps and improved developer and QA efficiency across daily operations.",
     impact: "Independently designed and deployed automation solutions used by the team.",
     tags: ["JavaScript", "Tampermonkey", "DOM Manipulation", "Browser Automation"],

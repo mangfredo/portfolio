@@ -18,7 +18,7 @@ export default function Decalogue() {
         <p className="sel-invert font-mono text-sm uppercase tracking-[0.2em] mb-3" style={{ color: "var(--accent)" }}>Internal Tools</p>
         <h2 className="text-4xl font-bold mb-5">Workflow Automation Systems</h2>
         <p className="text-lg mb-14 max-w-3xl" style={{ color: "var(--muted)" }}>
-          Browser-based automation tools built to eliminate repetitive tasks, reduce manual errors, and speed up internal development and QA workflows.
+          A collection of production-used browser automation scripts that eliminate repetitive QA and development tasks.
         </p>
         <div className="grid sm:grid-cols-2 gap-5">
           {scripts.map((s) => (

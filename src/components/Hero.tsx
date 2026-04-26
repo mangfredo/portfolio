@@ -20,10 +20,10 @@ export default function Hero() {
           I build automation tools and internal systems that reduce manual workflows and improve team efficiency.
         </p>
         <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-12 leading-relaxed" style={{ color: "var(--muted)" }}>
+          5+ years of hands-on development experience (freelance + professional).
           I bridge the gap between complex business logic and high-performance
-          engineering. With 5+ years of full-stack expertise, I specialize in
-          building agentic systems that eliminate operational friction — most
-          recently delivering a{" "}
+          engineering, specializing in building systems that eliminate operational
+          friction — most recently delivering a{" "}
           <span className="font-semibold" style={{ color: "var(--foreground)" }}>97% efficiency surge</span>{" "}
           by transforming a 6-hour manual workflow into a sub-10-minute automated
           reality.
