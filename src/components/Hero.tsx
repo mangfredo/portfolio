@@ -13,9 +13,12 @@ export default function Hero() {
         <p className="sel-invert font-mono text-base mb-5 tracking-widest uppercase" style={{ color: "var(--accent)" }}>
           Product Engineer · Web Developer · Automation Architect · Software Developer
         </p>
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-tight tracking-tight mb-4">
+        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-tight tracking-tight mb-3">
           Tristan Sereño
         </h1>
+        <p className="text-base mb-8 max-w-2xl mx-auto" style={{ color: "var(--muted)" }}>
+          I build automation tools and internal systems that reduce manual workflows and improve team efficiency.
+        </p>
         <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-12 leading-relaxed" style={{ color: "var(--muted)" }}>
           I bridge the gap between complex business logic and high-performance
           engineering. With 5+ years of full-stack expertise, I specialize in
