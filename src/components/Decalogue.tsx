@@ -1,14 +1,14 @@
 const scripts = [
   { num: "01", name: "Strict-Rule Parser", desc: "Core logic behind the Offer Letter Tool — validates and extracts data from unstructured sources with zero margin for error." },
-  { num: "02", name: "Legacy Data Migrator", desc: "Automates transfer of sensitive records from old database schemas to PostgreSQL without data loss." },
-  { num: "03", name: "Offer Lifecycle Automator", desc: "Manages state transitions of documents from generation to digital signature." },
-  { num: "04", name: "Schema Validator", desc: "Ensures all incoming data packets meet strict TypeScript-defined interfaces before hitting the database." },
-  { num: "05", name: "Environment Sync Tool", desc: "Automates configuration of local, staging, and production environments for the engineering team." },
-  { num: "06", name: "Dependency Auditor", desc: "Identifies and flags deprecated or vulnerable packages across multiple microservices." },
-  { num: "07", name: "Auto-Documentation Generator", desc: "Extracts logic patterns from code to generate real-time technical documentation for stakeholders." },
-  { num: "08", name: "Bulk Notification Dispatcher", desc: "High-throughput script for managing asynchronous user communications via API." },
-  { num: "09", name: "Error Log Aggregator", desc: "Parses system logs to identify and categorize recurring production bottlenecks." },
-  { num: "10", name: "Productivity Monitor", desc: "Tracks script execution times and identifies wait-states in the CI/CD pipeline." },
+  { num: "02", name: "Fix 403 Error (Auto URL Cleanup)", desc: "Automatically removes invalid URL parameters, preventing 403 errors and eliminating manual fixes." },
+  { num: "03", name: "Silkroad Folder Navigator", desc: "Instantly locates and highlights files in complex folder structures, reducing navigation time and errors." },
+  { num: "04", name: "Jira to Lifeguard Quick Access", desc: "Opens Lifeguard pre-filled from Jira tickets, cutting down repetitive setup steps." },
+  { num: "05", name: "Jira to QA Tool Quick Access", desc: "Auto-creates QA tickets with pre-filled data, minimizing manual entry and improving accuracy." },
+  { num: "06", name: "Jira Smart Comment Actions", desc: "Automates ticket assignment and status transitions based on comments, speeding up workflows." },
+  { num: "07", name: "ePrise Shortcut Override", desc: "Replaces browser shortcuts with ePrise actions, enabling faster work without session interruptions." },
+  { num: "08", name: "Event Categories Bulk Search", desc: "Returns multiple category IDs instantly, reducing lookup time from 30 minutes to seconds." },
+  { num: "09", name: "ePrise Display Version Badge", desc: "Shows the active form version on-screen, eliminating the need to manually verify versions." },
+  { num: "10", name: "Add Name Verification", desc: "Automates adding fields and required code across ceForm, Includes, and AdditionalIncludesPC, reducing repetitive setup." },
 ];
 
 export default function Decalogue() {
@@ -18,7 +18,7 @@ export default function Decalogue() {
         <p className="sel-invert font-mono text-sm uppercase tracking-[0.2em] mb-3" style={{ color: "var(--accent)" }}>Scripts</p>
         <h2 className="text-4xl font-bold mb-5">The Automation Decalogue</h2>
         <p className="text-lg mb-14 max-w-2xl" style={{ color: "var(--muted)" }}>
-          10 high-impact scripts designed to eliminate manual overhead and optimize system performance.
+          10 high-impact scripts designed to eliminate manual overhead and optimize workflow efficiency.
         </p>
         <div className="grid sm:grid-cols-2 gap-5">
           {scripts.map((s) => (

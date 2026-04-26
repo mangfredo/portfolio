@@ -1,6 +1,6 @@
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-8 pt-20">
+    <section className="relative min-h-screen flex items-center justify-center px-8 pt-28">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[120px]" style={{ background: "color-mix(in srgb, var(--accent) 5%, transparent)" }} />
       </div>
