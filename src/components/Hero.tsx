@@ -11,7 +11,7 @@ export default function Hero() {
         </div>
 
         <p className="sel-invert font-mono text-base mb-5 tracking-widest uppercase" style={{ color: "var(--accent)" }}>
-          Product Engineer · Web Developer · Automation Architect · Software Developer
+          Software Engineer · Web Developer · Automation-Focused
         </p>
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-tight tracking-tight mb-3">
           Tristan Sereño

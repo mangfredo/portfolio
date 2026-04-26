@@ -1,14 +1,14 @@
 const scripts = [
-  { num: "01", name: "Smart Jira Workflow Automation", desc: "Automates ticket transitions and assignments based on comment context, reducing manual status updates and improving workflow consistency." },
+  { num: "01", name: "Smart Jira Workflow Automator", desc: "Automates ticket status transitions and assignee updates based on comment input, reducing manual QA/Dev handoffs." },
   { num: "02", name: "QA Tool Auto-Population", desc: "Extracts data from Jira tickets and pre-fills QA Tool forms, minimizing manual input and reducing data entry errors." },
-  { num: "03", name: "Lifeguard Quick Access Integration", desc: "Adds direct access buttons from Jira to staging/production environments with pre-configured parameters for faster debugging." },
-  { num: "04", name: "Silkroad Folder Navigator", desc: "Simplifies navigation through complex directory structures by highlighting and locating files instantly within the UI." },
-  { num: "05", name: "403 Error Auto-Fix Script", desc: "Automatically cleans malformed URLs to prevent access errors, eliminating manual correction steps." },
+  { num: "03", name: "Jira Quick Access Integration", desc: "Injects shortcuts to open Lifeguard and QA tools with pre-filled ticket data, eliminating repetitive setup steps." },
+  { num: "04", name: "Silkroad Folder Navigator", desc: "Adds direct navigation and persistent highlighting for deeply nested file structures, reducing search time." },
+  { num: "05", name: "403 Error Auto-Fix Script", desc: "Automatically cleans malformed URLs in ePrise to prevent access errors without manual correction." },
   { num: "06", name: "ePrise Workflow Shortcuts", desc: "Overrides default browser actions with system-specific shortcuts (publish, refresh, comment wrapping) to streamline development tasks." },
-  { num: "07", name: "Context-Aware Comment Actions", desc: "Enhances comment workflows by introducing intelligent action triggers based on user input and ticket state." },
-  { num: "08", name: "Targeted Search & Highlight System", desc: "Improves visibility and traceability of elements within large UI structures by dynamically highlighting relevant nodes." },
-  { num: "09", name: "Environment-Aware Navigation Tools", desc: "Adapts behavior based on staging/production context, reducing risk of incorrect environment usage." },
-  { num: "10", name: "UI Behavior Enhancements", desc: "Improves responsiveness and usability of legacy systems through injected UI improvements and interaction optimizations." },
+  { num: "07", name: "Context-Aware Comment Actions", desc: "Adds intelligent action triggers to comment workflows based on user input and ticket state, reducing manual steps." },
+  { num: "08", name: "Targeted Search & Highlight", desc: "Dynamically highlights and locates relevant elements within large UI structures, improving visibility and traceability." },
+  { num: "09", name: "Environment-Aware Navigation", desc: "Adapts tool behavior based on staging/production context, reducing risk of incorrect environment usage." },
+  { num: "10", name: "UI Behavior Enhancements", desc: "Injects UI improvements into legacy systems to improve responsiveness, usability, and interaction speed." },
 ];
 
 export default function Decalogue() {
@@ -18,7 +18,7 @@ export default function Decalogue() {
         <p className="sel-invert font-mono text-sm uppercase tracking-[0.2em] mb-3" style={{ color: "var(--accent)" }}>Internal Tools</p>
         <h2 className="text-4xl font-bold mb-5">Workflow Automation Systems</h2>
         <p className="text-lg mb-14 max-w-3xl" style={{ color: "var(--muted)" }}>
-          A collection of browser-based automation tools designed to eliminate repetitive tasks, reduce manual errors, and accelerate internal development and QA workflows.
+          Browser-based automation tools built to eliminate repetitive tasks, reduce manual errors, and speed up internal development and QA workflows.
         </p>
         <div className="grid sm:grid-cols-2 gap-5">
           {scripts.map((s) => (
@@ -32,7 +32,6 @@ export default function Decalogue() {
           ))}
         </div>
 
-        {/* Impact Summary */}
         <div className="mt-12 p-8 rounded-xl border" style={{ background: "color-mix(in srgb, var(--accent) 5%, var(--card-bg))", borderColor: "color-mix(in srgb, var(--accent) 15%, transparent)" }}>
           <p className="sel-invert font-mono text-xs uppercase tracking-widest mb-4" style={{ color: "var(--accent)" }}>Impact Summary</p>
           <ul className="grid sm:grid-cols-2 gap-3">
