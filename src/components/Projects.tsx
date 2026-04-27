@@ -10,6 +10,7 @@ const projects = [
     metricLabel: "time reduction",
     techNotes: null,
     video: "/offer_letter_tool_demo.mp4",
+    link: null,
   },
   {
     title: "Enterprise Workflow Automation Suite",
@@ -27,10 +28,11 @@ const projects = [
       "Designed for compatibility with existing enterprise tools without backend changes",
     ],
     video: null,
+    link: { href: "#scripts", label: "See all 10 tools →" },
   },
   {
-title: "Smart Quote Replacer — VS Code Extension",
-problem: "Certain client-facing contract and form JavaScript files required strict special formatting rules for quotation marks (straight, curly, and styled single/double quotes). For example, clients like Apple require specific typographic quotation standards, and inconsistencies were causing rendering issues and increasing manual review effort.",
+    title: "Smart Quote Replacer — VS Code Extension",
+    problem: "Certain client-facing contract and form JavaScript files required strict special formatting rules for quotation marks (straight, curly, and styled single/double quotes). For example, clients like Apple require specific typographic quotation standards, and inconsistencies were causing rendering issues and increasing manual review effort.",
 solution: "Developed a VS Code extension that intelligently replaces escaped quotes with context-aware typographic equivalents. It evaluates surrounding characters to determine correct opening and closing quotation marks, and supports preview mode plus right-click context menu actions for quick fixes.",
 result: "Removed the need for manual quote correction across contract files, saving approximately up to an hour per file depending on complexity and number of occurrences. It also improved QA efficiency by enabling validation of missing or incorrect quote replacements directly within the workflow.",
 impact: "Adopted as a multi-role tool used by both developers and QA engineers, and integrated into the team’s daily development and review process.",
@@ -44,6 +46,7 @@ impact: "Adopted as a multi-role tool used by both developers and QA engineers, 
       "Preview mode to review changes before applying",
     ],
     video: "/smart_quote_replacer_demo.mp4",
+    link: null,
   },
 ];
 
@@ -98,6 +101,16 @@ export default function Projects() {
                         <source src={p.video} type="video/mp4" />
                       </video>
                     </div>
+                  )}
+
+                  {p.link && (
+                    <a
+                      href={p.link.href}
+                      className="sel-invert inline-flex items-center gap-1.5 mt-5 text-sm font-medium transition-colors hover:opacity-80"
+                      style={{ color: "var(--accent)" }}
+                    >
+                      {p.link.label}
+                    </a>
                   )}
                 </div>
               </div>
