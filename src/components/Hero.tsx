@@ -6,7 +6,7 @@ export default function Hero() {
       </div>
 
       <div className="relative max-w-4xl text-center">
-        <div className="w-40 h-40 mx-auto mb-8 rounded-full border-2 overflow-hidden select-none pointer-events-none" style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}>
+        <div id="hero-photo" className="w-40 h-40 mx-auto mb-8 rounded-full border-2 overflow-hidden select-none pointer-events-none" style={{ background: "var(--card-bg)", borderColor: "var(--photo-border)", boxShadow: "0 4px 20px color-mix(in srgb, var(--photo-border) 30%, transparent)" }}>
           <img src="/profile.jpg" alt="Tristan Sereño" className="w-full h-full object-cover select-none" draggable="false" />
         </div>
 

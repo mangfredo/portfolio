@@ -6,7 +6,7 @@ const infra = [
 
 export default function Infrastructure() {
   return (
-    <section id="infrastructure" className="py-28 px-8" style={{ background: "color-mix(in srgb, var(--card-bg) 30%, transparent)" }}>
+    <section id="infrastructure" className="py-28 px-8">
       <div className="max-w-6xl mx-auto">
         <p className="sel-invert font-mono text-sm uppercase tracking-[0.2em] mb-3" style={{ color: "var(--accent)" }}>Infrastructure</p>
         <h2 className="text-4xl font-bold mb-14">Technical Setup</h2>

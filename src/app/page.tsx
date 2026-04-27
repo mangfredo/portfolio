@@ -7,11 +7,13 @@ import Decalogue from "@/components/Decalogue";
 import Infrastructure from "@/components/Infrastructure";
 import Footer from "@/components/Footer";
 import SelectionInverter from "@/components/SelectionInverter";
+import StickyPhoto from "@/components/StickyPhoto";
 
 export default function Home() {
   return (
     <>
       <SelectionInverter />
+      <StickyPhoto />
       <Navbar />
       <main className="flex-1">
         <Hero />
