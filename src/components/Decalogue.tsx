@@ -17,9 +17,16 @@ export default function Decalogue() {
       <div className="max-w-6xl mx-auto">
         <p className="sel-invert font-mono text-sm uppercase tracking-[0.2em] mb-3" style={{ color: "var(--accent)" }}>Internal Tools</p>
         <h2 className="text-4xl font-bold mb-5">Workflow Automation Systems</h2>
-        <p className="text-lg mb-14 max-w-3xl" style={{ color: "var(--muted)" }}>
+        <p className="text-lg mb-8 max-w-3xl" style={{ color: "var(--muted)" }}>
           A collection of production-used browser automation scripts that eliminate repetitive QA and development tasks.
         </p>
+
+        <div className="mb-14 flex items-start gap-3 p-5 rounded-lg border" style={{ borderColor: "color-mix(in srgb, var(--muted) 20%, transparent)", background: "color-mix(in srgb, var(--card-bg) 60%, var(--background))" }}>
+          <span className="text-base select-none" style={{ color: "var(--muted)" }}>🔒</span>
+          <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
+            These tools were developed under NDA for internal use. Source code and live demos cannot be shared publicly. They are actively used across the team and contributed to a near-100% improvement in workflow productivity.
+          </p>
+        </div>
         <div className="grid sm:grid-cols-2 gap-5">
           {scripts.map((s) => (
             <div key={s.num} className="flex gap-5 p-6 rounded-lg border transition-colors" style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}>
