@@ -9,6 +9,7 @@ const projects = [
     metric: "97%+",
     metricLabel: "time reduction",
     techNotes: null,
+    video: "/offer_letter_tool_demo.mp4",
   },
   {
     title: "Enterprise Workflow Extension",
@@ -25,6 +26,7 @@ const projects = [
       "Handles lazy-loaded elements and dynamic content rendering",
       "Designed for compatibility with existing enterprise tools without backend changes",
     ],
+    video: null,
   },
 ];
 
@@ -72,6 +74,14 @@ export default function Projects() {
                       </span>
                     ))}
                   </div>
+
+                  {p.video && (
+                    <div className="mt-6 rounded-lg overflow-hidden border" style={{ borderColor: "var(--card-border)" }}>
+                      <video autoPlay muted loop playsInline className="w-full">
+                        <source src={p.video} type="video/mp4" />
+                      </video>
+                    </div>
+                  )}
                 </div>
               </div>
             </article>
