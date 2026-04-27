@@ -1,5 +1,16 @@
 const projects = [
   {
+    title: "YWCIMS",
+    platform: "Web Platform",
+    mission:
+      "A case and information management system for a non-profit organization.",
+    story:
+      "Worked on the admin and employer side of the platform, building interfaces for case management, employer workflows, and internal data handling. The system is live and actively used.",
+    impact: null,
+    tags: ["Web App", "Admin Panel", "Client Work"],
+    link: "https://ywcims.com/home.html",
+  },
+  {
     title: "Zamora Gym Ecosystem",
     platform: "Mobile — iOS/Android",
     mission:
@@ -131,6 +142,18 @@ export default function PersonalProjects() {
                   </span>
                 ))}
               </div>
+
+              {"link" in p && p.link && (
+                <a
+                  href={p.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="sel-invert inline-flex items-center gap-1.5 mt-4 text-sm font-medium transition-colors hover:opacity-80"
+                  style={{ color: "var(--accent)" }}
+                >
+                  Visit Site →
+                </a>
+              )}
             </article>
           ))}
         </div>
