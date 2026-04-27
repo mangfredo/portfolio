@@ -3,11 +3,11 @@ const projects = [
     title: "YWCIMS",
     platform: "Web Platform",
     mission:
-      "A case and information management system for a non-profit organization.",
+      "An internal management system for YWCI Manpower Services — handling recruitment, workforce management, and operational support.",
     story:
-      "Worked on the admin and employer side of the platform, building interfaces for case management, employer workflows, and internal data handling. The system is live and actively used.",
+      "Built the admin and employer-facing sides of the platform, covering workforce onboarding, attendance tracking, payroll processing, compliance management, and government benefit reporting. The system supports end-to-end manpower operations for the company's clients.",
     impact: null,
-    tags: ["Web App", "Admin Panel", "Client Work"],
+    tags: ["Web App", "Admin Panel", "Workforce Management", "Client Work"],
     link: "https://ywcims.com/home.html",
   },
   {
