@@ -12,7 +12,7 @@ const projects = [
     video: "/offer_letter_tool_demo.mp4",
   },
   {
-    title: "Enterprise Workflow Extension",
+    title: "Enterprise Workflow Automation Suite",
     problem: "Manual navigation, fragmented internal tools, and repetitive workflows slowing down development and QA processes.",
     solution: "Developed a suite of browser-based automation scripts (Tampermonkey) to streamline navigation, automate Jira workflows, and integrate internal tools into a unified workflow.",
     result: "Reduced repetitive manual steps and improved developer and QA efficiency across daily operations.",
@@ -27,6 +27,23 @@ const projects = [
       "Designed for compatibility with existing enterprise tools without backend changes",
     ],
     video: null,
+  },
+  {
+    title: "Smart Quote Replacer — VS Code Extension",
+    problem: "jQuery-based contract and form JS files contained inconsistent quote characters (straight vs curly), causing rendering issues and manual correction overhead.",
+    solution: "Built a VS Code extension that performs context-aware replacement of escaped quotes with proper typographic equivalents. Analyzes surrounding characters to determine open vs close positioning, with preview mode and right-click context menu support.",
+    result: "Eliminated manual quote correction across contract files, reducing formatting errors to zero.",
+    impact: "Published and actively used within the team's daily development workflow.",
+    tags: ["VS Code Extension", "JavaScript", "Regex", "Developer Tooling"],
+    metric: "v2.2",
+    metricLabel: "current",
+    techNotes: [
+      "Context-aware single quote replacement (open vs close detection)",
+      "Double quote replacement inside .html() jQuery calls",
+      "Right-click context menu for wrap/replace operations",
+      "Preview mode to review changes before applying",
+    ],
+    video: "/smart_quote_replacer_demo.mp4",
   },
 ];
 
