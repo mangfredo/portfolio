@@ -20,6 +20,7 @@ const projects = [
     impact:
       "Replaced a paper-based tracking system with a unified digital experience, increasing member retention and operational transparency.",
     tags: ["React Native", "Mobile", "Dashboard", "Fitness"],
+    link: "https://github.com/mangfredo/Zamora-Gym-App",
   },
   {
     title: "JOBSearch",
@@ -29,6 +30,7 @@ const projects = [
       "A web application developed for a client to streamline the job-matching process and presented as their capstone project. The focus was on building an intuitive user interface that minimizes time-to-apply, ensuring a seamless bridge between talent and opportunity.",
     impact: null,
     tags: ["Web App", "UI/UX", "Recruitment", "Client Work"],
+    link: "https://github.com/mangfredo/JOBSearch",
   },
   {
     title: "Fix Me: The IT Odyssey",
@@ -39,6 +41,7 @@ const projects = [
       "This project follows the journey of an IT Specialist navigating the high-pressure environment of a corporate headquarters. The player must diagnose and resolve real-world technical bottlenecks, hardware failures, and security vulnerabilities under strict time constraints — a tribute to the unsung heroes of tech.",
     impact: null,
     tags: ["Simulation", "Gamification", "IT Support", "Capstone"],
+    link: "https://github.com/mangfredo/Fix-Me-Game",
   },
   {
     title: "TaskManagementApp",
@@ -48,6 +51,7 @@ const projects = [
       "Built to a client's requirements for a lightweight, secure, and offline-capable task management system. Optimized for speed and native Windows integration, allowing the client to manage sensitive workflows with zero external latency.",
     impact: null,
     tags: ["Windows Forms", "C#", "Desktop", "Offline"],
+    link: "https://github.com/mangfredo/Task-Management-App",
   },
   {
     title: "Exotech",
@@ -58,6 +62,7 @@ const projects = [
       "Born from the realization that standard retail POS systems aren't designed for the unique inventory and pricing models of exotic food markets. Exotech offers a specialized Windows Forms interface that manages high-value, rare-stock items with the precision of an enterprise retail engine.",
     impact: null,
     tags: ["POS", "Windows Forms", "C#", "Inventory"],
+    link: "https://github.com/mangfredo/Exotech",
   },
 ];
 
@@ -151,7 +156,7 @@ export default function PersonalProjects() {
                   className="sel-invert inline-flex items-center gap-1.5 mt-4 text-sm font-medium transition-colors hover:opacity-80"
                   style={{ color: "var(--accent)" }}
                 >
-                  Visit Site →
+                  {p.link.includes("github.com") ? "GitHub →" : "Visit Site →"}
                 </a>
               )}
             </article>
