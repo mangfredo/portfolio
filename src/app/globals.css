@@ -25,10 +25,10 @@
 [data-theme="light"] body {
   background-color: #f8f9fa;
   background-image:
-    radial-gradient(ellipse 100% 60% at 50% -10%, color-mix(in srgb, #2563eb 15%, transparent), transparent 70%),
-    radial-gradient(ellipse 80% 50% at 100% 50%, color-mix(in srgb, #2563eb 8%, transparent), transparent 70%),
-    radial-gradient(ellipse 70% 60% at 0% 80%, color-mix(in srgb, #2563eb 6%, transparent), transparent 70%),
-    linear-gradient(180deg, color-mix(in srgb, #2563eb 4%, #f8f9fa) 0%, #f8f9fa 40%, #f8f9fa 100%);
+    radial-gradient(ellipse 100% 60% at 50% -10%, color-mix(in srgb, #2563eb 30%, transparent), transparent 70%),
+    radial-gradient(ellipse 80% 50% at 100% 50%, color-mix(in srgb, #2563eb 18%, transparent), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 0% 80%, color-mix(in srgb, #2563eb 14%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, #2563eb 10%, #f8f9fa) 0%, #f8f9fa 50%, #f8f9fa 100%);
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
