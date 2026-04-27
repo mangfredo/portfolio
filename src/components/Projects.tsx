@@ -52,7 +52,7 @@ export default function Projects() {
     <section id="projects" className="py-28 px-8" style={{ background: "color-mix(in srgb, var(--card-bg) 30%, transparent)" }}>
       <div className="max-w-6xl mx-auto">
         <p className="sel-invert font-mono text-sm uppercase tracking-[0.2em] mb-3" style={{ color: "var(--accent)" }}>Projects</p>
-        <h2 className="text-4xl font-bold mb-14">Core Enterprise Work</h2>
+        <h2 className="text-4xl font-bold mb-14">Core Enterprise Initiatives</h2>
 
         <div className="grid gap-10">
           {projects.map((p) => (
