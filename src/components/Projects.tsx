@@ -1,10 +1,10 @@
 const projects = [
   {
     title: "The Offer Letter Automation Engine",
-    problem: "A 6-hour manual documentation and offer letter process prone to human error.",
-    solution: "Built a high-precision parsing engine with Node.js and PostgreSQL. Implemented strict-rule validation logic to handle complex edge cases in employment contracts.",
-    result: "Reduced execution time from 6 hours to under 10 minutes.",
-    impact: "Built with such high integrity that the CTO and Director of Engineering adopted the core logic for integration into the company's flagship self-service product.",
+    problem: "Offer letter development was a 6-hour manual process, repetitive and prone to human error.",
+    solution: "Built a parsing engine in Node.js backed by PostgreSQL that takes a Word document containing contract details, extracts the content, applies strict validation rules, and generates production-ready JavaScript — handling complex edge cases across multiple countries and employment types.",
+    result: "Code generation completes in roughly 10 seconds. The full end-to-end process — from template input to deployable output — takes under 10 minutes, down from 6 hours.",
+    impact: "The company's CTO and Director of Engineering adopted the core logic for integration into the flagship self-service product.",
     tags: ["Node.js", "PostgreSQL", "Parsing Engine", "Validation"],
     metric: "97%+",
     metricLabel: "time reduction",
@@ -28,7 +28,7 @@ const projects = [
       "Designed for compatibility with existing enterprise tools without backend changes",
     ],
     video: null,
-    link: { href: "#scripts", label: "See all 10 tools →" },
+    link: { href: "#scripts", label: "See all tools →" },
   },
   {
     title: "Smart Quote Replacer — VS Code Extension",
