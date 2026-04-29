@@ -42,7 +42,7 @@ export default function About() {
               {skills.map((s) => (
                 <div
                   key={s.name}
-                  className="hover-zoom flex items-center gap-3 px-4 py-3 rounded-lg border"
+                  className="hover-zoom flex items-center gap-3 px-4 py-3 rounded-lg border select-none"
                   style={{ background: "var(--card-bg)", borderColor: "var(--card-border)", color: "var(--muted)" }}
                 >
                   {s.icon ? (
