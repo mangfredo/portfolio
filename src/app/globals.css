@@ -117,6 +117,12 @@ img, svg, button {
   transform: scale(1.05);
 }
 
+/* Skill card brand-color hover */
+.skill-card:hover {
+  background: var(--skill-hover-bg) !important;
+  border-color: var(--skill-hover-border) !important;
+}
+
 /* Shake + zoom on hover (phone) */
 .hover-shake-zoom {
   display: inline-flex;

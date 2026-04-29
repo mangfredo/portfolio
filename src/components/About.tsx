@@ -1,24 +1,24 @@
 const skills = [
-  { name: "HTML", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" },
-  { name: "CSS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" },
-  { name: "JavaScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" },
-  { name: "TypeScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" },
-  { name: "Java", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" },
-  { name: "C#", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg" },
-  { name: "Python", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
-  { name: "React", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
-  { name: "Next.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" },
-  { name: "Node.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
-  { name: "PostgreSQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" },
-  { name: "TDD", icon: null },
-  { name: "Clean Architecture", icon: null },
-  { name: "REST APIs", icon: null },
-  { name: "CI/CD", icon: null },
-  { name: "AI-Native Dev", icon: null },
-  { name: "PHP", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" },
-  { name: "SQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azuresqldatabase/azuresqldatabase-original.svg" },
-  { name: "Firebase", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-original.svg" },
-  { name: "MySQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" },
+  { name: "HTML", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg", hoverColor: "#E34F26" },
+  { name: "CSS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg", hoverColor: "#1572B6" },
+  { name: "JavaScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg", hoverColor: "#F7DF1E" },
+  { name: "TypeScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg", hoverColor: "#3178C6" },
+  { name: "Java", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg", hoverColor: "#ED8B00" },
+  { name: "C#", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg", hoverColor: "#68217A" },
+  { name: "Python", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg", hoverColor: "#3776AB" },
+  { name: "React", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg", hoverColor: "#61DAFB" },
+  { name: "Next.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg", hoverColor: "#808080" },
+  { name: "Node.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg", hoverColor: "#339933" },
+  { name: "PostgreSQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg", hoverColor: "#336791" },
+    { name: "PHP", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg", hoverColor: "#777BB4" },
+  { name: "SQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azuresqldatabase/azuresqldatabase-original.svg", hoverColor: "#CC2927" },
+  { name: "Firebase", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-original.svg", hoverColor: "#FFCA28" },
+  { name: "MySQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg", hoverColor: "#4479A1" },
+  { name: "TDD", icon: null, hoverColor: "#E5534B" },
+  { name: "Clean Architecture", icon: null, hoverColor: "#6C63FF" },
+  { name: "REST APIs", icon: null, hoverColor: "#009688" },
+  { name: "CI/CD", icon: null, hoverColor: "#FC6D26" },
+  { name: "AI-Native Dev", icon: null, hoverColor: "#10A37F" },
 ];
 
 export default function About() {
@@ -46,8 +46,14 @@ export default function About() {
               {skills.map((s) => (
                 <div
                   key={s.name}
-                  className="hover-zoom flex items-center gap-3 px-4 py-3 rounded-lg border select-none"
-                  style={{ background: "var(--card-bg)", borderColor: "var(--card-border)", color: "var(--muted)" }}
+                  className="skill-card hover-zoom flex items-center gap-3 px-4 py-3 rounded-lg border select-none transition-colors duration-200"
+                  style={{
+                    background: "var(--card-bg)",
+                    borderColor: "var(--card-border)",
+                    color: "var(--muted)",
+                    ["--skill-hover-bg" as string]: `color-mix(in srgb, ${s.hoverColor} 12%, var(--card-bg))`,
+                    ["--skill-hover-border" as string]: `color-mix(in srgb, ${s.hoverColor} 30%, var(--card-border))`,
+                  }}
                 >
                   {s.icon ? (
                     <img src={s.icon} alt={s.name} className="w-6 h-6 select-none" draggable="false" />
