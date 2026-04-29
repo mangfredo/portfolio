@@ -28,12 +28,10 @@ export default function About() {
               Engineer who ships <span className="sel-invert" style={{ color: "var(--accent)" }}>real impact</span>
             </h2>
             <p className="text-lg leading-relaxed mb-5" style={{ color: "var(--muted)" }}>
-              I specialize in AI-native development and full-stack TypeScript, building systems that transform operational friction into competitive advantages. My work sits at the intersection of product engineering and automation — designing tools that are precise, maintainable, and fast.
+              I work across the full stack with TypeScript, Node.js, and React, with a strong focus on automation and internal tooling. I enjoy turning slow, repetitive processes into fast, reliable systems — and I bring that same precision to every feature I build.
             </p>
             <p className="text-lg leading-relaxed" style={{ color: "var(--muted)" }}>
-              Based in the Philippines, I work remotely with global teams across
-              multiple timezones, bringing a disciplined, async-first approach to
-              every engagement.
+              Based in the Philippines, I collaborate remotely with teams across different timezones. I'm comfortable working async, communicating clearly, and keeping things moving without hand-holding.
             </p>
           </div>
           <div>

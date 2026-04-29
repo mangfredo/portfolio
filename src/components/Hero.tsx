@@ -17,16 +17,15 @@ export default function Hero() {
           Tristan Sereño
         </h1>
         <p className="text-base mb-8 max-w-2xl mx-auto" style={{ color: "var(--muted)" }}>
-          I build automation tools and internal systems that reduce manual workflows and improve team efficiency.
+          I design and build internal tools and automation systems that cut hours off manual work and help teams move faster.
         </p>
         <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-12 leading-relaxed" style={{ color: "var(--muted)" }}>
-          5+ years of hands-on development experience (freelance + professional).
-          I bridge the gap between complex business logic and high-performance
-          engineering, specializing in building systems that eliminate operational
-          friction — most recently delivering a{" "}
-          <span className="font-semibold" style={{ color: "var(--foreground)" }}>97% efficiency surge</span>{" "}
-          by transforming a 6-hour manual workflow into a sub-10-minute automated
-          reality.
+          5+ years building software across freelance and professional roles.
+          I take complex business problems and turn them into clean, performant
+          systems — with a focus on automation that actually saves time. One
+          recent project cut a 6-hour manual process down to under 10 minutes, a{" "}
+          <span className="font-semibold" style={{ color: "var(--foreground)" }}>97% efficiency gain</span>{" "}
+          that freed the team to focus on higher-value work.
         </p>
         <div className="flex flex-wrap gap-5 justify-center mb-8">
           <a href="#projects" className="sel-btn sel-invert hover-zoom px-8 py-4 text-white text-base font-medium rounded-lg transition-all select-none" style={{ background: "var(--accent)" }}>
