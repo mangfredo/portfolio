@@ -9,6 +9,7 @@ const projects = [
     metric: "97%+",
     metricLabel: "time reduction",
     techNotes: null,
+    nda: "Due to confidentiality, only a demonstration of the tool's workflow is shown — illustrating how it converts document specs into production-ready code.",
     video: "/offer_letter_tool_demo.mp4",
     link: null,
   },
@@ -27,6 +28,7 @@ const projects = [
       "Handles lazy-loaded elements and dynamic content rendering",
       "Designed for compatibility with existing enterprise tools without backend changes",
     ],
+    nda: null,
     video: null,
     link: { href: "#scripts", label: "See all tools →" },
   },
@@ -45,6 +47,7 @@ impact: "Adopted as a multi-role tool used by both developers and QA engineers, 
       "Right-click context menu for wrap/replace operations",
       "Preview mode to review changes before applying",
     ],
+    nda: null,
     video: "/smart_quote_replacer_demo.mp4",
     link: null,
   },
@@ -94,6 +97,13 @@ export default function Projects() {
                       </span>
                     ))}
                   </div>
+
+                  {p.nda && (
+                    <div className="mt-5 flex items-start gap-3 p-4 rounded-lg border" style={{ borderColor: "color-mix(in srgb, var(--muted) 20%, transparent)", background: "color-mix(in srgb, var(--card-bg) 60%, var(--background))" }}>
+                      <span className="text-base select-none" style={{ color: "var(--muted)" }}>🔒</span>
+                      <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>{p.nda}</p>
+                    </div>
+                  )}
 
                   {p.video && (
                     <div className="mt-6 rounded-lg overflow-hidden border" style={{ borderColor: "var(--card-border)" }}>
