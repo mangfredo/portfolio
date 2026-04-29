@@ -9,8 +9,7 @@ const scripts = [
   { num: "08", name: "Targeted Search & Highlight", desc: "Dynamically highlights and locates relevant elements within large UI structures, improving visibility and traceability." },
   { num: "09", name: "Environment-Aware Navigation", desc: "Adapts tool behavior based on staging/production context, reducing risk of incorrect environment usage." },
   { num: "10", name: "UI Behavior Enhancements", desc: "Injects UI improvements into legacy systems to improve responsiveness, usability, and interaction speed." },
-  { num: "11", name: "Corporate Site Replicator", desc: "Deep-crawls a client's corporate site and replicates its full layout into the onboarding platform, used when clients request their branding carried over to their portal." },
-  { num: "12", name: "Database Batch Uploader", desc: "Automates bulk page uploads to the internal database. Handled a 300-page upload in under an hour — a task that would have taken an entire shift if done manually." },
+  { num: "11", name: "Database Batch Uploader", desc: "Automates bulk page uploads to the internal database. Handled a 300-page upload in under an hour — a task that would have taken an entire shift if done manually." },
 ];
 
 export default function Decalogue() {
