@@ -18,7 +18,7 @@ export default function Decalogue() {
     <section id="scripts" className="py-28 px-8">
       <div className="max-w-6xl mx-auto">
         <p className="sel-invert font-mono text-sm uppercase tracking-[0.2em] mb-3" style={{ color: "var(--accent)" }}>Internal Tools</p>
-        <h2 className="text-4xl font-bold mb-5">Workflow Automation Systems</h2>
+        <h2 className="text-4xl font-bold mb-5">Workflow Automation Systems <span className="text-lg font-normal" style={{ color: "var(--muted)" }}>— Built at Rival HR</span></h2>
         <p className="text-lg mb-8 max-w-3xl" style={{ color: "var(--muted)" }}>
           A collection of production-used browser automation scripts that eliminate repetitive QA and development tasks.
         </p>
