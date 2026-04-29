@@ -8,12 +8,14 @@ import Infrastructure from "@/components/Infrastructure";
 import Footer from "@/components/Footer";
 import SelectionInverter from "@/components/SelectionInverter";
 import StickyPhoto from "@/components/StickyPhoto";
+import FadeInObserver from "@/components/FadeInObserver";
 
 export default function Home() {
   return (
     <>
       <SelectionInverter />
       <StickyPhoto />
+      <FadeInObserver />
       <Navbar />
       <main className="flex-1">
         <Hero />

@@ -31,7 +31,8 @@ export default function StickyPhoto() {
 
   return (
     <div
-      className="fixed z-40 bottom-6 right-6 select-none pointer-events-none"
+      className="fixed z-40 bottom-6 right-6 select-none pointer-events-auto cursor-pointer"
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       style={{
         width: "56px",
         height: "56px",

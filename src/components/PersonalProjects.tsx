@@ -84,7 +84,7 @@ export default function PersonalProjects() {
           {projects.map((p) => (
             <article
               key={p.title}
-              className="rounded-xl p-10 border transition-colors"
+              className="fade-in-up rounded-xl p-10 border transition-colors"
               style={{
                 background: "var(--card-bg)",
                 borderColor: "var(--card-border)",

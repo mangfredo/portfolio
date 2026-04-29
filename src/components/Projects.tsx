@@ -59,7 +59,7 @@ export default function Projects() {
 
         <div className="grid gap-10">
           {projects.map((p) => (
-            <article key={p.title} className="rounded-xl p-10 border transition-colors" style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}>
+            <article key={p.title} className="fade-in-up rounded-xl p-10 border transition-colors" style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}>
               <div className="flex flex-col md:flex-row md:items-start gap-8">
                 <div className="shrink-0 w-28 h-28 rounded-xl flex flex-col items-center justify-center border" style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)", borderColor: "color-mix(in srgb, var(--accent) 20%, transparent)" }}>
                   <span className="sel-invert text-3xl font-bold" style={{ color: "var(--accent)" }}>{p.metric}</span>

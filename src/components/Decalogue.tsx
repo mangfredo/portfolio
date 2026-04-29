@@ -29,7 +29,7 @@ export default function Decalogue() {
         </div>
         <div className="grid sm:grid-cols-2 gap-5">
           {scripts.map((s) => (
-            <div key={s.num} className="flex gap-5 p-6 rounded-lg border transition-colors" style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}>
+            <div key={s.num} className="fade-in-up flex gap-5 p-6 rounded-lg border transition-colors" style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}>
               <span className="sel-invert font-mono text-3xl font-bold leading-none" style={{ color: "color-mix(in srgb, var(--accent) 30%, transparent)" }}>{s.num}</span>
               <div>
                 <h3 className="font-semibold text-base mb-2">{s.name}</h3>
