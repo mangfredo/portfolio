@@ -123,6 +123,14 @@ img, svg, button {
   border-color: var(--skill-hover-border) !important;
 }
 
+/* Invert dark icons (GitHub, Next.js) in dark mode */
+.dark-invert {
+  filter: invert(1);
+}
+[data-theme="light"] .dark-invert {
+  filter: none;
+}
+
 /* Shake + zoom on hover (phone) */
 .hover-shake-zoom {
   display: inline-flex;

@@ -12,7 +12,7 @@ const skills = [
   { name: "PostgreSQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg", hoverColor: "#336791" },
   { name: "Tailwind CSS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg", hoverColor: "#06B6D4" },
   { name: "Git", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg", hoverColor: "#F05032" },
-  { name: "GitHub", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg", hoverColor: "#808080" },
+  { name: "GitHub", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg", hoverColor: "#808080", invertDark: true },
   { name: "PHP", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg", hoverColor: "#777BB4" },
   { name: "SQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azuresqldatabase/azuresqldatabase-original.svg", hoverColor: "#CC2927" },
   { name: "Firebase", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-original.svg", hoverColor: "#FFCA28" },
@@ -59,7 +59,7 @@ export default function About() {
                   }}
                 >
                   {s.icon ? (
-                    <img src={s.icon} alt={s.name} className="w-6 h-6 select-none" draggable="false" />
+                    <img src={s.icon} alt={s.name} className={`w-6 h-6 select-none${s.invertDark ? " dark-invert" : ""}`} draggable="false" />
                   ) : (
                     <span className="w-6 h-6 flex items-center justify-center text-xs font-bold rounded" style={{ background: "var(--accent)", color: "white" }}>
                       {s.name.charAt(0)}
