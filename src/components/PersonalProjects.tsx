@@ -1,4 +1,25 @@
+import ScreenshotCarousel from "./ScreenshotCarousel";
+
 const projects = [
+  {
+    title: "Numerra",
+    platform: "Microsoft Store — Windows",
+    mission:
+      "A powerful all-in-one calculator designed for students, professionals, engineers, and programmers.",
+    story:
+      "Built and published a full-featured Windows calculator app combining Standard, Scientific, Programmer, and RPN modes into a single clean interface. Includes measurement and currency converters — supporting 180+ currencies with real-time rates and expression-based computation directly in the converter — along with financial tools (loan, compound interest, tip, discount), a scientific constants library, and formula references. Programmer mode supports HEX, DEC, OCT, BIN with full bitwise operations. Designed for usability across everyday calculations and advanced engineering workflows.",
+    impact:
+      "Published on the Microsoft Store and actively maintained with user-driven updates.",
+    tags: ["WinUI 3", "C#", "Windows App SDK", "Published"],
+    link: "https://apps.microsoft.com/detail/9npwb2bk246z",
+    screenshots: [
+      "/numerra_1.png",
+      "/numerra_2.png",
+      "/numerra_3.png",
+      "/numerra_4.png",
+      "/numerra_5.png",
+    ],
+  },
   {
     title: "YWCIMS",
     platform: "Web Platform",
@@ -130,6 +151,13 @@ export default function PersonalProjects() {
                 </p>
               )}
 
+              {"screenshots" in p && p.screenshots && (
+                <ScreenshotCarousel
+                  screenshots={p.screenshots as string[]}
+                  title={p.title}
+                />
+              )}
+
               <div className="flex flex-wrap gap-3 mt-2">
                 {p.tags.map((t) => (
                   <span
@@ -156,7 +184,7 @@ export default function PersonalProjects() {
                   className="sel-invert inline-flex items-center gap-1.5 mt-4 text-sm font-medium transition-colors hover:opacity-80"
                   style={{ color: "var(--accent)" }}
                 >
-                  {p.link.includes("github.com") ? "GitHub →" : "Visit Site →"}
+                  {p.link.includes("github.com") ? "GitHub →" : p.link.includes("apps.microsoft.com") ? "Microsoft Store →" : "Visit Site →"}
                 </a>
               )}
             </article>
