@@ -294,6 +294,41 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
 
   const theme = themes[themeIndex];
 
+  // Contain text selection within terminal body
+  // Make surrounding content unselectable while selecting inside terminal
+  useEffect(() => {
+    const body = bodyRef.current;
+    if (!body) return;
+
+    function onMouseDown(e: MouseEvent) {
+      if (body!.contains(e.target as Node)) {
+        // Started selecting inside terminal — disable selection on everything else
+        document.body.style.userSelect = "none";
+        document.body.style.webkitUserSelect = "none";
+        body!.style.userSelect = "text";
+        body!.style.webkitUserSelect = "text";
+      }
+    }
+
+    function onMouseUp() {
+      // Re-enable selection everywhere
+      document.body.style.userSelect = "";
+      document.body.style.webkitUserSelect = "";
+      body!.style.userSelect = "";
+      body!.style.webkitUserSelect = "";
+    }
+
+    document.addEventListener("mousedown", onMouseDown);
+    document.addEventListener("mouseup", onMouseUp);
+    return () => {
+      document.removeEventListener("mousedown", onMouseDown);
+      document.removeEventListener("mouseup", onMouseUp);
+      // Cleanup in case component unmounts mid-select
+      document.body.style.userSelect = "";
+      document.body.style.webkitUserSelect = "";
+    };
+  }, []);
+
   // Auto-scroll to bottom when history changes
   useEffect(() => {
     if (bodyRef.current) {

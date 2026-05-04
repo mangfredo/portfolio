@@ -28,7 +28,7 @@ export default function CursorGlow() {
       pos.current.y += (target.current.y - pos.current.y) * 0.08;
 
       if (glow) {
-        glow.style.transform = `translate(${pos.current.x - 200}px, ${pos.current.y - 200}px)`;
+        glow.style.transform = `translate(${pos.current.x - 250}px, ${pos.current.y - 250}px)`;
       }
       raf = requestAnimationFrame(animate);
     }
@@ -45,13 +45,11 @@ export default function CursorGlow() {
   return (
     <div
       ref={glowRef}
-      className="fixed top-0 left-0 pointer-events-none z-0"
+      className="fixed top-0 left-0 pointer-events-none z-0 cursor-glow"
       style={{
-        width: 400,
-        height: 400,
+        width: 500,
+        height: 500,
         borderRadius: "50%",
-        background:
-          "radial-gradient(circle, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 70%)",
         willChange: "transform",
       }}
       aria-hidden="true"
