@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-export default function FadeInObserver() {
+export default function RevealObserver() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -12,10 +12,10 @@ export default function FadeInObserver() {
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
     );
 
-    document.querySelectorAll(".fade-in-up").forEach((el) => observer.observe(el));
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
   }, []);

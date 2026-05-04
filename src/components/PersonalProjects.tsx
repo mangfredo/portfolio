@@ -3,13 +3,9 @@ import ScreenshotCarousel from "./ScreenshotCarousel";
 const projects = [
   {
     title: "Numerra",
-    platform: "Microsoft Store — Windows",
-    mission:
-      "A powerful all-in-one calculator designed for students, professionals, engineers, and programmers.",
+    platform: "Microsoft Store",
     story:
-      "Built and published a full-featured Windows calculator app combining Standard, Scientific, Programmer, and RPN modes into a single clean interface. Includes measurement and currency converters — supporting 180+ currencies with real-time rates and expression-based computation directly in the converter — along with financial tools (loan, compound interest, tip, discount), a scientific constants library, and formula references. Programmer mode supports HEX, DEC, OCT, BIN with full bitwise operations. Designed for usability across everyday calculations and advanced engineering workflows.",
-    impact:
-      "Published on the Microsoft Store and actively maintained with user-driven updates.",
+      "I wanted a calculator that didn't make me switch between five different apps. Standard, Scientific, Programmer, RPN — all in one place. Added measurement and currency converters (180+ currencies, real-time rates), financial tools, a scientific constants library, and formula references. Programmer mode supports HEX, DEC, OCT, BIN with full bitwise operations.",
     tags: ["WinUI 3", "C#", "Windows App SDK", "Published"],
     link: "https://apps.microsoft.com/detail/9npwb2bk246z",
     screenshots: [
@@ -23,172 +19,149 @@ const projects = [
   {
     title: "YWCIMS",
     platform: "Web Platform",
-    mission:
-      "An internal management system for YWCI Manpower Services — handling recruitment, workforce management, and operational support.",
     story:
-      "Built the admin and employer-facing sides of the platform, covering workforce onboarding, attendance tracking, payroll processing, compliance management, and government benefit reporting. The system supports end-to-end manpower operations for the company's clients.",
-    impact: null,
-    tags: ["Web App", "Admin Panel", "Workforce Management", "Client Work"],
+      "Built the admin and employer-facing sides of an internal management system for YWCI Manpower Services — covering workforce onboarding, attendance tracking, payroll processing, compliance management, and government benefit reporting.",
+    tags: ["Web App", "Admin Panel", "Workforce Management"],
     link: "https://ywcims.com/home.html",
   },
   {
     title: "Zamora Gym Ecosystem",
     platform: "Mobile — iOS/Android",
-    mission:
-      "A dual-purpose fitness management platform bridging gym operations and athlete performance.",
     story:
-      "Developed for a private client to modernize a manual membership system. For the owner, it's a high-integrity management dashboard for membership tracking and revenue stability. For the user, it's a high-performance training partner featuring a custom-built interval timer, curated video tutorials, and a persistent daily checklist for athlete accountability.",
-    impact:
-      "Replaced a paper-based tracking system with a unified digital experience, increasing member retention and operational transparency.",
+      "A private client needed to replace their paper-based membership system. Built a dual-purpose platform: management dashboard for the owner (membership tracking, revenue), and a training companion for members (custom interval timer, video tutorials, daily checklist). Replaced the entire manual workflow.",
     tags: ["React Native", "Mobile", "Dashboard", "Fitness"],
     link: "https://github.com/mangfredo/Zamora-Gym-App",
   },
   {
     title: "JOBSearch",
     platform: "Web Platform",
-    mission: "A high-speed recruitment portal built for a client's capstone presentation.",
     story:
-      "A web application developed for a client to streamline the job-matching process and presented as their capstone project. The focus was on building an intuitive user interface that minimizes time-to-apply, ensuring a seamless bridge between talent and opportunity.",
-    impact: null,
-    tags: ["Web App", "UI/UX", "Recruitment", "Client Work"],
+      "A recruitment portal built for a client's capstone presentation. Focused on minimizing time-to-apply with an intuitive interface that bridges talent and opportunity.",
+    tags: ["Web App", "UI/UX", "Recruitment"],
     link: "https://github.com/mangfredo/JOBSearch",
   },
   {
     title: "Fix Me: The IT Odyssey",
-    platform: "Interactive Capstone",
-    mission:
-      "A narrative-driven simulation designed to gamify the complexities of Enterprise IT Support.",
+    platform: "Interactive Simulation",
     story:
-      "This project follows the journey of an IT Specialist navigating the high-pressure environment of a corporate headquarters. The player must diagnose and resolve real-world technical bottlenecks, hardware failures, and security vulnerabilities under strict time constraints — a tribute to the unsung heroes of tech.",
-    impact: null,
-    tags: ["Simulation", "Gamification", "IT Support", "Capstone"],
+      "A narrative-driven simulation where you play as an IT Specialist navigating a corporate headquarters. Diagnose hardware failures, resolve security vulnerabilities, and fix technical bottlenecks under time pressure. A tribute to the unsung heroes of tech support.",
+    tags: ["Simulation", "Gamification", "Capstone"],
     link: "https://github.com/mangfredo/Fix-Me-Game",
   },
   {
     title: "TaskManagementApp",
-    platform: "Enterprise Windows Forms",
-    mission: "A specialized desktop solution for complex internal task tracking.",
+    platform: "Desktop — Windows",
     story:
-      "Built to a client's requirements for a lightweight, secure, and offline-capable task management system. Optimized for speed and native Windows integration, allowing the client to manage sensitive workflows with zero external latency.",
-    impact: null,
-    tags: ["Windows Forms", "C#", "Desktop", "Offline"],
+      "A lightweight, offline-capable task management system built to a client's requirements. Optimized for speed and native Windows integration — no external latency, no cloud dependency.",
+    tags: ["Windows Forms", "C#", "Desktop"],
     link: "https://github.com/mangfredo/Task-Management-App",
   },
   {
     title: "Exotech",
-    platform: "Specialized POS System",
-    mission:
-      "A niche Point-of-Sale system architected for the exotic food industry.",
+    platform: "Specialized POS",
     story:
-      "Born from the realization that standard retail POS systems aren't designed for the unique inventory and pricing models of exotic food markets. Exotech offers a specialized Windows Forms interface that manages high-value, rare-stock items with the precision of an enterprise retail engine.",
-    impact: null,
-    tags: ["POS", "Windows Forms", "C#", "Inventory"],
+      "Standard POS systems aren't built for exotic food markets. Exotech handles high-value, rare-stock items with specialized inventory and pricing models that generic retail software can't touch.",
+    tags: ["POS", "Windows Forms", "C#"],
     link: "https://github.com/mangfredo/Exotech",
   },
 ];
 
 export default function PersonalProjects() {
   return (
-    <section id="personal" className="py-28 px-8">
-      <div className="max-w-6xl mx-auto">
-        <p
-          className="sel-invert font-mono text-sm uppercase tracking-[0.2em] mb-3"
-          style={{ color: "var(--accent)" }}
+    <section id="projects" className="relative py-28 sm:py-36 px-6 sm:px-10">
+      <div className="max-w-7xl mx-auto">
+        <p className="sel-invert annotation mb-4">Projects</p>
+        <h2
+          className="text-3xl sm:text-4xl font-bold leading-tight mb-6"
+          style={{ fontFamily: "var(--font-playfair), serif" }}
         >
-          Client &amp; Personal Projects
-        </p>
-        <h2 className="text-4xl font-bold mb-14">
-          Full-Stack Development
+          Client &amp; Personal Work
         </h2>
+        <p
+          className="text-lg max-w-2xl mb-16 leading-relaxed"
+          style={{ color: "var(--fg-muted)" }}
+        >
+          Freelance builds, published apps, and side projects — each one
+          started because something needed to exist and didn&apos;t.
+        </p>
 
-        <div className="grid gap-8">
-          {projects.map((p) => (
-            <article
-              key={p.title}
-              className="fade-in-up rounded-xl p-10 border transition-colors"
-              style={{
-                background: "var(--card-bg)",
-                borderColor: "var(--card-border)",
-              }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-2xl font-semibold">{p.title}</h3>
-                <span
-                  className="sel-invert text-xs font-mono px-2.5 py-1 rounded border"
-                  style={{
-                    color: "var(--accent)",
-                    borderColor: "color-mix(in srgb, var(--accent) 20%, transparent)",
-                    background: "color-mix(in srgb, var(--accent) 5%, transparent)",
-                  }}
-                >
-                  {p.platform}
-                </span>
-              </div>
+        {/* Asymmetric grid — not uniform cards */}
+        <div className="grid md:grid-cols-2 gap-6 reveal-stagger">
+          {projects.map((p, i) => {
+            // First project spans full width
+            const isWide = i === 0;
 
-              <p
-                className="sel-invert text-base font-medium mb-3"
-                style={{ color: "var(--accent)" }}
+            return (
+              <article
+                key={p.title}
+                className={`reveal war-story rounded-xl border p-7 sm:p-8 flex flex-col ${
+                  isWide ? "md:col-span-2" : ""
+                }`}
+                style={{
+                  background: "var(--card-bg)",
+                  borderColor: "var(--card-border)",
+                }}
               >
-                {p.mission}
-              </p>
-
-              <p
-                className="text-base leading-relaxed mb-4"
-                style={{ color: "var(--muted)" }}
-              >
-                {p.story}
-              </p>
-
-              {p.impact && (
-                <p className="text-base leading-relaxed mb-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <h3 className="text-xl font-bold">{p.title}</h3>
                   <span
-                    className="font-medium"
-                    style={{ color: "var(--foreground)" }}
-                  >
-                    Impact:
-                  </span>{" "}
-                  <span style={{ color: "var(--muted)" }}>{p.impact}</span>
-                </p>
-              )}
-
-              {"screenshots" in p && p.screenshots && (
-                <ScreenshotCarousel
-                  screenshots={p.screenshots as string[]}
-                  title={p.title}
-                />
-              )}
-
-              <div className="flex flex-wrap gap-3 mt-2">
-                {p.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="sel-invert px-3 py-1.5 text-sm font-mono rounded border"
+                    className="font-mono text-[0.65rem] px-2 py-0.5 rounded border uppercase tracking-wider"
                     style={{
-                      color: "var(--accent)",
-                      background:
-                        "color-mix(in srgb, var(--accent) 5%, transparent)",
-                      borderColor:
-                        "color-mix(in srgb, var(--accent) 10%, transparent)",
+                      color: "var(--accent-bright)",
+                      borderColor: "color-mix(in srgb, var(--accent) 20%, transparent)",
+                      background: "color-mix(in srgb, var(--accent) 5%, transparent)",
                     }}
                   >
-                    {t}
+                    {p.platform}
                   </span>
-                ))}
-              </div>
+                </div>
 
-              {"link" in p && p.link && (
-                <a
-                  href={p.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="sel-invert inline-flex items-center gap-1.5 mt-4 text-sm font-medium transition-colors hover:opacity-80"
-                  style={{ color: "var(--accent)" }}
+                <p
+                  className="text-sm leading-relaxed mb-4 flex-1"
+                  style={{ color: "var(--fg-muted)" }}
                 >
-                  {p.link.includes("github.com") ? "GitHub →" : p.link.includes("apps.microsoft.com") ? "Microsoft Store →" : "Visit Site →"}
-                </a>
-              )}
-            </article>
-          ))}
+                  {p.story}
+                </p>
+
+                {"screenshots" in p && p.screenshots && (
+                  <ScreenshotCarousel
+                    screenshots={p.screenshots}
+                    title={p.title}
+                  />
+                )}
+
+                <div className="flex flex-wrap items-center gap-2 mt-auto pt-4">
+                  {p.tags.map((t) => (
+                    <span
+                      key={t}
+                      className="px-2.5 py-1 text-xs font-mono rounded border"
+                      style={{
+                        color: "var(--fg-muted)",
+                        borderColor: "var(--card-border)",
+                      }}
+                    >
+                      {t}
+                    </span>
+                  ))}
+                  {p.link && (
+                    <a
+                      href={p.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-auto font-mono text-xs transition-colors hover:text-[var(--accent-bright)]"
+                      style={{ color: "var(--accent)" }}
+                    >
+                      {p.link.includes("github.com")
+                        ? "GitHub ↗"
+                        : p.link.includes("apps.microsoft.com")
+                        ? "Store ↗"
+                        : "Visit ↗"}
+                    </a>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -1,21 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
+const inter = Inter({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Tristan Sereño | Product Engineer · Web Developer · Automation Architect · Software Developer",
+  title: "Tristan Sereño — Software Engineer",
   description:
-    "5+ years of experience in AI-Native Development, Full-Stack TypeScript, and High-Performance Automation. Proven track record of reducing manual workflows by 97%+.",
+    "I build internal tools and automation systems that cut hours off manual work. 5+ years across full-stack TypeScript, Node.js, and high-performance automation.",
 };
 
 export default function RootLayout({
@@ -26,9 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-theme="dark"
-      suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${geistMono.variable} ${playfair.variable} h-full`}
     >
       <body className="min-h-full flex flex-col">
         <script

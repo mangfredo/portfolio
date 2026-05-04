@@ -4,18 +4,17 @@ import About from "@/components/About";
 import Projects from "@/components/Projects";
 import PersonalProjects from "@/components/PersonalProjects";
 import Decalogue from "@/components/Decalogue";
-import Infrastructure from "@/components/Infrastructure";
 import Footer from "@/components/Footer";
+import RevealObserver from "@/components/RevealObserver";
+import CursorGlow from "@/components/CursorGlow";
 import SelectionInverter from "@/components/SelectionInverter";
-import StickyPhoto from "@/components/StickyPhoto";
-import FadeInObserver from "@/components/FadeInObserver";
 
 export default function Home() {
   return (
     <>
       <SelectionInverter />
-      <StickyPhoto />
-      <FadeInObserver />
+      <RevealObserver />
+      <CursorGlow />
       <Navbar />
       <main className="flex-1">
         <Hero />
@@ -23,7 +22,6 @@ export default function Home() {
         <Projects />
         <PersonalProjects />
         <Decalogue />
-        <Infrastructure />
       </main>
       <Footer />
     </>

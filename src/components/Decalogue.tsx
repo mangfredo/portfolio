@@ -9,51 +9,77 @@ const scripts = [
   { num: "08", name: "Targeted Search & Highlight", desc: "Dynamically highlights and locates relevant elements within large UI structures, improving visibility and traceability." },
   { num: "09", name: "Environment-Aware Navigation", desc: "Adapts tool behavior based on staging/production context, reducing risk of incorrect environment usage." },
   { num: "10", name: "UI Behavior Enhancements", desc: "Injects UI improvements into legacy systems to improve responsiveness, usability, and interaction speed." },
-  { num: "11", name: "Database Batch Uploader", desc: "Automates bulk page uploads to the internal database. Handled a 300-page upload in under an hour — a task that would have taken an entire shift if done manually." },
+  { num: "11", name: "Database Batch Uploader", desc: "Automates bulk page uploads to the internal database. Handled a 300-page upload in under an hour — a task that would have taken an entire shift manually." },
 ];
 
 export default function Decalogue() {
   return (
-    <section id="scripts" className="py-28 px-8">
-      <div className="max-w-6xl mx-auto">
-        <p className="sel-invert font-mono text-sm uppercase tracking-[0.2em] mb-3" style={{ color: "var(--accent)" }}>Internal Tools</p>
-        <h2 className="text-4xl font-bold mb-5">Workflow Automation Systems <span className="text-lg font-normal" style={{ color: "var(--muted)" }}>— Built at Rival HR</span></h2>
-        <p className="text-lg mb-8 max-w-3xl" style={{ color: "var(--muted)" }}>
-          A collection of production-used browser automation scripts that eliminate repetitive QA and development tasks.
+    <section id="automation" className="relative py-28 sm:py-36 px-6 sm:px-10">
+      <div className="max-w-7xl mx-auto">
+        <p className="sel-invert annotation mb-4">Automation</p>
+        <h2
+          className="text-3xl sm:text-4xl font-bold leading-tight mb-3"
+          style={{ fontFamily: "var(--font-playfair), serif" }}
+        >
+          Workflow Automation Systems
+        </h2>
+        <p className="text-base mb-4" style={{ color: "var(--fg-muted)" }}>
+          Built at Rival HR — a collection of production-used browser automation
+          scripts that eliminate repetitive QA and development tasks.
         </p>
 
-        <div className="mb-14 flex items-start gap-3 p-5 rounded-lg border" style={{ borderColor: "color-mix(in srgb, var(--muted) 20%, transparent)", background: "color-mix(in srgb, var(--card-bg) 60%, var(--background))" }}>
-          <span className="text-base select-none" style={{ color: "var(--muted)" }}>🔒</span>
-          <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>
-            These tools were developed under NDA for internal use. Source code and live demos cannot be shared publicly. They are actively used across the team and contributed to a near-100% improvement in workflow productivity.
+        {/* NDA notice */}
+        <div
+          className="flex items-start gap-3 p-4 rounded-lg border mb-12"
+          style={{
+            borderColor: "color-mix(in srgb, var(--fg-muted) 15%, transparent)",
+            background: "color-mix(in srgb, var(--bg) 60%, var(--card-bg))",
+          }}
+        >
+          <span className="text-sm select-none" style={{ color: "var(--fg-muted)" }}>
+            🔒
+          </span>
+          <p className="text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>
+            These tools were developed under NDA for internal use. Source code
+            and live demos cannot be shared publicly.
           </p>
         </div>
-        <div className="grid sm:grid-cols-2 gap-5">
+
+        {/* Two-column list — not cards, more like a manifest */}
+        <div className="grid sm:grid-cols-2 gap-x-10 gap-y-8 reveal-stagger">
           {scripts.map((s) => (
-            <div key={s.num} className="fade-in-up flex gap-5 p-6 rounded-lg border transition-colors" style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}>
-              <span className="sel-invert font-mono text-3xl font-bold leading-none" style={{ color: "color-mix(in srgb, var(--accent) 30%, transparent)" }}>{s.num}</span>
+            <div key={s.num} className="reveal flex gap-4">
+              <span
+                className="shrink-0 font-mono text-xs mt-1.5"
+                style={{ color: "var(--accent)" }}
+              >
+                {s.num}
+              </span>
               <div>
-                <h3 className="font-semibold text-base mb-2">{s.name}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>{s.desc}</p>
+                <h3 className="text-base font-medium mb-1">{s.name}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>
+                  {s.desc}
+                </p>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 p-8 rounded-xl border" style={{ background: "color-mix(in srgb, var(--accent) 5%, var(--card-bg))", borderColor: "color-mix(in srgb, var(--accent) 15%, transparent)" }}>
-          <p className="sel-invert font-mono text-xs uppercase tracking-widest mb-4" style={{ color: "var(--accent)" }}>Impact Summary</p>
-          <ul className="grid sm:grid-cols-2 gap-3">
+        {/* Impact — horizontal rule style */}
+        <div className="mt-16">
+          <div className="hr-char font-mono text-xs tracking-wider">IMPACT</div>
+          <div className="grid sm:grid-cols-2 gap-4 mt-6">
             {[
               "Reduced repetitive manual steps across multiple workflows",
               "Improved speed of ticket handling and QA preparation",
               "Minimized human error in navigation, data entry, and status updates",
               "Tools actively used within team workflows",
             ].map((item) => (
-              <li key={item} className="flex gap-2 text-sm" style={{ color: "var(--muted)" }}>
-                <span style={{ color: "var(--accent)" }}>✓</span> {item}
-              </li>
+              <p key={item} className="flex gap-2 text-sm" style={{ color: "var(--fg-muted)" }}>
+                <span style={{ color: "var(--accent-bright)" }}>✓</span> {item}
+              </p>
             ))}
-          </ul>
+          </div>
         </div>
       </div>
     </section>

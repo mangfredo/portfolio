@@ -1,175 +1,229 @@
 @import "tailwindcss";
 
-:root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --accent: #3b82f6;
-  --accent-hover: #60a5fa;
-  --card-bg: #111111;
-  --card-border: #1e1e1e;
-  --muted: #888888;
-  --photo-border: #3b82f6;
-}
-
-[data-theme="light"] {
-  --background: #f8f9fa;
-  --foreground: #1a1a1a;
-  --accent: #2563eb;
-  --accent-hover: #3b82f6;
-  --card-bg: #ffffff;
-  --card-border: #e2e2e2;
-  --muted: #6b7280;
-  --photo-border: #1a1a1a;
-}
-
-[data-theme="light"] body {
-  background-color: #f8f9fa;
-  background-image:
-    radial-gradient(ellipse 100% 60% at 50% -10%, rgba(37, 99, 235, 0.35), transparent 70%),
-    radial-gradient(ellipse 80% 50% at 100% 50%, rgba(37, 99, 235, 0.2), transparent 70%),
-    radial-gradient(ellipse 70% 60% at 0% 80%, rgba(37, 99, 235, 0.15), transparent 70%),
-    linear-gradient(180deg, rgba(37, 99, 235, 0.08) 0%, #f8f9fa 50%, #f8f9fa 100%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: 200% 200%;
-  animation: gradientDrift 20s ease-in-out infinite;
-}
-
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-playfair);
 }
 
-body {
-  background-color: var(--background);
-  background-image:
-    radial-gradient(ellipse 100% 60% at 50% -10%, color-mix(in srgb, var(--accent) 40%, transparent), transparent 70%),
-    radial-gradient(ellipse 80% 50% at 100% 50%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 70%),
-    radial-gradient(ellipse 70% 60% at 0% 80%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
-    linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, var(--background)) 0%, var(--background) 40%, var(--background) 100%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: 200% 200%;
-  animation: gradientDrift 20s ease-in-out infinite;
-  color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-  font-size: 18px;
-  line-height: 1.6;
-  transition: background-color 0.3s, color 0.3s;
+:root {
+  --bg: #0b0f0e;
+  --fg: #e8e4df;
+  --fg-muted: #8a8578;
+  --accent: #4a7c6f;
+  --accent-bright: #6aad9a;
+  --terracotta: #c4705a;
+  --terracotta-muted: #a85d4a;
+  --card-bg: #111614;
+  --card-border: #1e2723;
+  --grain-opacity: 0.035;
 }
 
-@keyframes gradientDrift {
-  0% { background-position: 0% 0%; }
-  25% { background-position: 100% 50%; }
-  50% { background-position: 50% 100%; }
-  75% { background-position: 0% 50%; }
-  100% { background-position: 0% 0%; }
+[data-theme="light"] {
+  --bg: #f5f2ed;
+  --fg: #1a1d1c;
+  --fg-muted: #6b6560;
+  --accent: #3d6b5e;
+  --accent-bright: #2f5a4e;
+  --terracotta: #b5604b;
+  --terracotta-muted: #9a5040;
+  --card-bg: #ffffff;
+  --card-border: #ddd8d2;
+  --grain-opacity: 0.02;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-img, svg, button {
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Film grain overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--terracotta);
+  color: var(--fg);
+}
+
+::-moz-selection {
+  background-color: var(--terracotta);
+  color: var(--fg);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 3px;
+}
+
+img, svg, button, video {
   user-select: none;
   -webkit-user-select: none;
 }
 
-/* Selection: invert — white/light text becomes blue, blue text becomes white, no visible box */
-*::selection {
-  background-color: transparent !important;
-  color: var(--accent) !important;
-}
-
-*::-moz-selection {
-  background-color: transparent !important;
-  color: var(--accent) !important;
-}
-
-.sel-invert::selection {
-  background-color: transparent !important;
-  color: var(--foreground) !important;
-}
-
-.sel-invert::-moz-selection {
-  background-color: transparent !important;
-  color: var(--foreground) !important;
-}
-
 /* Fade-in on scroll */
-.fade-in-up {
+.reveal {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: translateY(32px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.fade-in-up.visible {
+.reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Zoom on hover */
-.hover-zoom {
-  transition: transform 0.2s ease;
+/* Stagger children */
+.reveal-stagger > .reveal:nth-child(1) { transition-delay: 0ms; }
+.reveal-stagger > .reveal:nth-child(2) { transition-delay: 80ms; }
+.reveal-stagger > .reveal:nth-child(3) { transition-delay: 160ms; }
+.reveal-stagger > .reveal:nth-child(4) { transition-delay: 240ms; }
+.reveal-stagger > .reveal:nth-child(5) { transition-delay: 320ms; }
+.reveal-stagger > .reveal:nth-child(6) { transition-delay: 400ms; }
+.reveal-stagger > .reveal:nth-child(7) { transition-delay: 480ms; }
+.reveal-stagger > .reveal:nth-child(8) { transition-delay: 560ms; }
+.reveal-stagger > .reveal:nth-child(9) { transition-delay: 640ms; }
+.reveal-stagger > .reveal:nth-child(10) { transition-delay: 720ms; }
+.reveal-stagger > .reveal:nth-child(11) { transition-delay: 800ms; }
+
+/* Bleed section divider */
+.section-bleed {
+  position: relative;
 }
 
-.hover-zoom:hover {
-  transform: scale(1.05);
+.section-bleed::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, var(--bg), transparent);
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* Skill card brand-color hover */
-.skill-card:hover {
-  background: var(--skill-hover-bg) !important;
-  border-color: var(--skill-hover-border) !important;
+/* Annotation style */
+.annotation {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
 }
 
-/* Invert dark icons (GitHub, Next.js) in dark mode */
-.dark-invert {
-  filter: invert(1);
-}
-[data-theme="light"] .dark-invert {
-  filter: none;
+/* War story card hover */
+.war-story {
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
 }
 
-/* Shake + zoom on hover (phone) */
-.hover-shake-zoom {
-  display: inline-flex;
-  transition: transform 0.15s ease;
-}
-
-.hover-shake-zoom:hover {
-  animation: shakeZoom 0.5s ease;
-}
-
-@keyframes shakeZoom {
-  0% { transform: scale(1) rotate(0deg); }
-  15% { transform: scale(1.1) rotate(-3deg); }
-  30% { transform: scale(1.1) rotate(3deg); }
-  45% { transform: scale(1.1) rotate(-2deg); }
-  60% { transform: scale(1.1) rotate(2deg); }
-  75% { transform: scale(1.1) rotate(-1deg); }
-  100% { transform: scale(1.05) rotate(0deg); }
-}
-.sel-btn.sel-btn-active {
-  background: var(--foreground) !important;
-  color: var(--accent) !important;
-  border-color: var(--foreground) !important;
-}
-
-/* Outline/transparent buttons — only invert text, keep bg */
-.sel-btn-outline.sel-btn-active {
-  background: transparent !important;
-  color: var(--accent) !important;
+.war-story:hover {
+  transform: translateY(-4px);
   border-color: var(--accent) !important;
 }
 
-[data-theme="light"] .sel-btn.sel-btn-active {
-  background: var(--foreground) !important;
-  color: var(--accent) !important;
-  border-color: var(--foreground) !important;
+.war-story::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%);
+  pointer-events: none;
 }
 
-[data-theme="light"] .sel-btn-outline.sel-btn-active {
+.war-story:hover::after {
+  opacity: 1;
+}
+
+/* Terminal blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Magnetic button */
+.magnetic-btn {
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Horizontal rule with character */
+.hr-char {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  color: var(--card-border);
+}
+
+.hr-char::before,
+.hr-char::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--card-border);
+}
+
+/* Number marker */
+.num-marker {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+/* Selection invert — accent-colored text inverts on select, white text becomes accent */
+.sel-invert::selection {
+  background-color: transparent !important;
+  color: var(--fg) !important;
+}
+
+.sel-invert::-moz-selection {
+  background-color: transparent !important;
+  color: var(--fg) !important;
+}
+
+/* Button selection invert */
+.sel-btn.sel-btn-active {
+  background: var(--fg) !important;
+  color: var(--accent) !important;
+  border-color: var(--fg) !important;
+}
+
+.sel-btn-outline.sel-btn-active {
   background: transparent !important;
   color: var(--accent) !important;
   border-color: var(--accent) !important;

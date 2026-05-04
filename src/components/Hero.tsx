@@ -1,60 +1,182 @@
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-8 pt-28">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[120px]" style={{ background: "color-mix(in srgb, var(--accent) 5%, transparent)" }} />
-      </div>
+    <section className="relative min-h-screen flex items-end pb-20 sm:pb-28 px-6 sm:px-10 pt-24 overflow-hidden">
+      {/* Subtle gradient wash — asymmetric, not centered */}
+      <div
+        className="absolute top-0 right-0 w-[70%] h-[80%] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 70% at 80% 20%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 70%)",
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute bottom-0 left-0 w-[50%] h-[40%] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 80% at 20% 90%, color-mix(in srgb, var(--terracotta) 5%, transparent), transparent 70%)",
+        }}
+        aria-hidden="true"
+      />
 
-      <div className="relative max-w-4xl text-center">
-        <div id="hero-photo" className="w-40 h-40 mx-auto mb-8 rounded-full border-2 overflow-hidden select-none pointer-events-none" style={{ background: "var(--card-bg)", borderColor: "var(--photo-border)", boxShadow: "0 4px 20px color-mix(in srgb, var(--photo-border) 30%, transparent)" }}>
-          <img src="/profile.jpg" alt="Tristan Sereño" className="w-full h-full object-cover select-none" draggable="false" />
-        </div>
-
-        <p className="sel-invert font-mono text-base mb-5 tracking-widest uppercase" style={{ color: "var(--accent)" }}>
-          Software Engineer · Web Developer · Automation-Focused
-        </p>
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-tight tracking-tight mb-3">
-          Tristan Sereño
-        </h1>
-        <p className="text-base mb-8 max-w-2xl mx-auto" style={{ color: "var(--muted)" }}>
-          I design and build internal tools and automation systems that cut hours off manual work and help teams move faster.
-        </p>
-        <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-12 leading-relaxed" style={{ color: "var(--muted)" }}>
-          5+ years building software across freelance and professional roles.
-          I take complex business problems and turn them into clean, performant
-          systems — with a focus on automation that actually saves time. One
-          recent project cut a 6-hour manual process down to under 10 minutes, a{" "}
-          <span className="font-semibold" style={{ color: "var(--foreground)" }}>97% efficiency gain</span>{" "}
-          that freed the team to focus on higher-value work.
-        </p>
-        <div className="flex flex-wrap gap-5 justify-center mb-8">
-          <a href="#projects" className="sel-btn sel-invert hover-zoom px-8 py-4 text-white text-base font-medium rounded-lg transition-all select-none" style={{ background: "var(--accent)" }}>
-            View Projects
-          </a>
-          <a href="#scripts" className="sel-btn sel-btn-outline hover-zoom px-8 py-4 border text-base font-medium rounded-lg transition-all select-none" style={{ borderColor: "var(--card-border)" }}>
-            Explore Scripts
-          </a>
-        </div>
-
-        <div className="flex items-center justify-center gap-8 text-base" style={{ color: "var(--muted)" }}>
-          <a
-            href="https://www.linkedin.com/in/tristan-sere%C3%B1o-9b1b662a3/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="sel-invert flex items-center gap-2 transition-colors hover:opacity-80"
-            style={{ color: "var(--accent)" }}
+      <div className="relative max-w-7xl mx-auto w-full grid md:grid-cols-[1.1fr_0.9fr] gap-12 md:gap-20 items-end">
+        {/* Left — Text heavy, asymmetric */}
+        <div>
+          <p
+            className="sel-invert font-mono text-xs tracking-[0.25em] uppercase mb-6"
+            style={{ color: "var(--accent-bright)" }}
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-            </svg>
-            LinkedIn
-          </a>
-          <span className="hover-shake-zoom flex items-center gap-2 cursor-default" style={{ color: "var(--muted)" }}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
-            </svg>
-            09919036289
-          </span>
+            Software Engineer · Full-Stack Developer
+          </p>
+
+          <h1
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight mb-8"
+            style={{ fontFamily: "var(--font-playfair), serif" }}
+          >
+            I build the tools
+            <br />
+            that build the
+            <br />
+            <span style={{ color: "var(--terracotta)" }}>product.</span>
+          </h1>
+
+          <p
+            className="text-lg sm:text-xl leading-relaxed max-w-xl mb-10"
+            style={{ color: "var(--fg-muted)" }}
+          >
+            5+ years turning complex business problems into clean, fast systems.
+            One recent project cut a 6-hour manual process down to under 10
+            minutes — a{" "}
+            <span className="font-medium" style={{ color: "var(--fg)" }}>
+              97% efficiency gain
+            </span>{" "}
+            that freed the team to focus on work that actually matters.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-4">
+            <a
+              href="#work"
+              className="sel-btn sel-invert magnetic-btn inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-md transition-colors"
+              style={{
+                background: "var(--accent)",
+                color: "var(--bg)",
+              }}
+            >
+              See the work
+              <svg
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M7 17L17 7M17 7H7M17 7v10" />
+              </svg>
+            </a>
+            <a
+              href="#automation"
+              className="magnetic-btn inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-md border transition-colors hover:border-[var(--accent)]"
+              style={{
+                borderColor: "var(--card-border)",
+                color: "var(--fg-muted)",
+              }}
+            >
+              Automation suite
+            </a>
+          </div>
+        </div>
+
+        {/* Right — Photo + Terminal */}
+        <div className="hidden md:flex flex-col items-center justify-between gap-6 relative w-full h-full">
+          {/* Profile photo */}
+          <div
+            className="w-48 h-48 rounded-full overflow-hidden border-2 select-none pointer-events-none shrink-0"
+            style={{
+              borderColor: "var(--accent)",
+              boxShadow: "0 0 24px color-mix(in srgb, var(--accent) 25%, transparent)",
+            }}
+          >
+            <img
+              src="/profile.jpg"
+              alt="Tristan Sereño"
+              className="w-full h-full object-cover"
+              draggable="false"
+            />
+          </div>
+
+          {/* Terminal */}
+          <div
+            className="rounded-lg border overflow-hidden w-full"
+            style={{
+              background: "var(--card-bg)",
+              borderColor: "var(--card-border)",
+            }}
+          >
+            {/* Terminal header */}
+            <div
+              className="flex items-center gap-2 px-4 py-3 border-b"
+              style={{ borderColor: "var(--card-border)" }}
+            >
+              <span
+                className="w-3 h-3 rounded-full"
+                style={{ background: "#ff5f57" }}
+              />
+              <span
+                className="w-3 h-3 rounded-full"
+                style={{ background: "#febc2e" }}
+              />
+              <span
+                className="w-3 h-3 rounded-full"
+                style={{ background: "#28c840" }}
+              />
+              <span
+                className="ml-3 font-mono text-xs"
+                style={{ color: "var(--fg-muted)" }}
+              >
+                ~/projects/offer-letter-engine
+              </span>
+            </div>
+
+            {/* Terminal body */}
+            <div className="p-5 font-mono text-sm leading-relaxed">
+              <p style={{ color: "var(--fg-muted)" }}>
+                <span style={{ color: "var(--accent-bright)" }}>$</span> node
+                generate --template WD_SWE_Contract
+              </p>
+              <p className="mt-2" style={{ color: "var(--fg-muted)" }}>
+                <span style={{ color: "var(--accent)" }}>→</span> Parsing
+                document structure...
+              </p>
+              <p style={{ color: "var(--fg-muted)" }}>
+                <span style={{ color: "var(--accent)" }}>→</span> Extracting
+                conditions (47 rules)
+              </p>
+              <p style={{ color: "var(--fg-muted)" }}>
+                <span style={{ color: "var(--accent)" }}>→</span> Compiling
+                placeholders...
+              </p>
+              <p style={{ color: "var(--fg-muted)" }}>
+                <span style={{ color: "var(--accent)" }}>→</span> Validating
+                output against schema
+              </p>
+              <p className="mt-2" style={{ color: "var(--accent-bright)" }}>
+                ✓ Generated production-ready JS in 8.2s
+              </p>
+              <p style={{ color: "var(--fg-muted)" }}>
+                <span style={{ color: "var(--accent-bright)" }}>$</span>{" "}
+                <span className="cursor-blink">▊</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Annotation — hand-drawn feel */}
+          <div
+            className="absolute -bottom-8 -left-4 font-mono text-xs rotate-[-2deg]"
+            style={{ color: "var(--fg-muted)" }}
+          >
+            ↑ this used to take 6 hours by hand
+          </div>
         </div>
       </div>
     </section>
