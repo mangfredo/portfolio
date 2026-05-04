@@ -190,6 +190,14 @@ export default function Hero() {
           >
             ↑ this used to take 6 hours by hand
           </div>
+
+          {/* Try it annotation — appears shortly after */}
+          <div
+            className={`absolute -bottom-8 right-0 font-mono text-xs rotate-[1.5deg] hero-fade ${showAnnotation ? "visible" : ""}`}
+            style={{ color: "var(--accent)", transitionDelay: "600ms" }}
+          >
+            try typing &quot;help&quot; ↑
+          </div>
         </div>
       </div>
     </section>

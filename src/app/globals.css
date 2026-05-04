@@ -295,3 +295,16 @@ img, svg, button, video {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Terminal text selection — visible highlight instead of invisible */
+.terminal-body::selection,
+.terminal-body *::selection {
+  background-color: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+  color: inherit !important;
+}
+
+.terminal-body::-moz-selection,
+.terminal-body *::-moz-selection {
+  background-color: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+  color: inherit !important;
+}
