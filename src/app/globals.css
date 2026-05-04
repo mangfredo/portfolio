@@ -319,15 +319,32 @@ img, svg, button, video {
   transform: translateY(0);
 }
 
-/* Terminal text selection — visible highlight instead of invisible */
+/* Terminal text selection — visible highlight */
+.terminal-body {
+  -webkit-user-select: contain;
+  user-select: contain;
+}
+
 .terminal-body::selection,
 .terminal-body *::selection {
-  background-color: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+  background-color: rgba(74, 124, 111, 0.45) !important;
   color: inherit !important;
 }
 
 .terminal-body::-moz-selection,
 .terminal-body *::-moz-selection {
-  background-color: color-mix(in srgb, var(--accent) 30%, transparent) !important;
+  background-color: rgba(74, 124, 111, 0.45) !important;
+  color: inherit !important;
+}
+
+[data-theme="light"] .terminal-body::selection,
+[data-theme="light"] .terminal-body *::selection {
+  background-color: rgba(61, 107, 94, 0.35) !important;
+  color: inherit !important;
+}
+
+[data-theme="light"] .terminal-body::-moz-selection,
+[data-theme="light"] .terminal-body *::-moz-selection {
+  background-color: rgba(61, 107, 94, 0.35) !important;
   color: inherit !important;
 }
