@@ -5,7 +5,7 @@ const projects = [
     title: "Numerra",
     platform: "Microsoft Store",
     story:
-      "I wanted a calculator that didn't make me switch between five different apps. Standard, Scientific, Programmer, RPN — all in one place. Added measurement and currency converters (180+ currencies, real-time rates), financial tools, a scientific constants library, and formula references. Programmer mode supports HEX, DEC, OCT, BIN with full bitwise operations.",
+      "I wanted a calculator that didn't make me switch between five different apps. Standard, Scientific, Programmer, RPN — all in one place. Added measurement and currency converters supporting 180+ currencies with real-time rates — you can type full expressions directly in the converter, it parses and evaluates the input, then converts the result. Includes financial tools, a scientific constants library, and formula references. Programmer mode supports HEX, DEC, OCT, BIN with full bitwise operations.",
     tags: ["WinUI 3", "C#", "Windows App SDK", "Published"],
     link: "https://apps.microsoft.com/detail/9npwb2bk246z",
     screenshots: [
