@@ -246,3 +246,52 @@ img, svg, button, video {
   background-color: transparent !important;
   color: #4C7D70 !important;
 }
+
+/* Hero text blur-to-sharp reveal */
+@keyframes heroWordReveal {
+  0% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+}
+
+.hero-word {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(12px);
+  transform: translateY(8px);
+}
+
+.hero-word.revealed {
+  animation: heroWordReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Stagger delays for each word */
+.hero-word:nth-child(1).revealed { animation-delay: 0ms; }
+.hero-word:nth-child(2).revealed { animation-delay: 80ms; }
+.hero-word:nth-child(3).revealed { animation-delay: 160ms; }
+.hero-word:nth-child(4).revealed { animation-delay: 240ms; }
+.hero-word:nth-child(5).revealed { animation-delay: 320ms; }
+.hero-word:nth-child(6).revealed { animation-delay: 400ms; }
+.hero-word:nth-child(7).revealed { animation-delay: 480ms; }
+.hero-word:nth-child(8).revealed { animation-delay: 560ms; }
+.hero-word:nth-child(9).revealed { animation-delay: 640ms; }
+.hero-word:nth-child(10).revealed { animation-delay: 720ms; }
+
+/* Hero section staggered fade-in for non-heading elements */
+.hero-fade {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-fade.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 const themes = [
   {
@@ -113,12 +113,113 @@ const themes = [
   },
 ];
 
-export default function Terminal() {
+const COMMAND_TEXT = "node generate --template WD_SWE_Contract";
+
+const outputLines = [
+  { arrow: true, text: "Parsing document structure...", delay: 2800 },
+  { arrow: true, text: "Extracting conditions (47 rules)", delay: 2400 },
+  { arrow: true, text: "Compiling placeholders...", delay: 1200 },
+  { arrow: true, text: "Validating output against schema", delay: 1800 },
+];
+
+const SUCCESS_TEXT = "✓ Generated production-ready JS in 8.2s";
+
+// Phases: idle -> typing -> output -> done
+type Phase = "idle" | "typing" | "output" | "done";
+
+interface TerminalProps {
+  startTyping?: boolean;
+  onComplete?: () => void;
+}
+
+export default function Terminal({ startTyping = true, onComplete }: TerminalProps) {
   const [themeIndex, setThemeIndex] = useState(0);
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [typedChars, setTypedChars] = useState(0);
+  const [visibleOutputs, setVisibleOutputs] = useState(0);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showFinalPrompt, setShowFinalPrompt] = useState(false);
+  const cancelRef = useRef(false);
+
   const theme = themes[themeIndex];
 
+  const runAnimation = useCallback(() => {
+    cancelRef.current = false;
+    setPhase("typing");
+    setTypedChars(0);
+    setVisibleOutputs(0);
+    setShowSuccess(false);
+    setShowFinalPrompt(false);
+
+    // Phase 1: Typewriter for command
+    let charIdx = 0;
+    function typeNext() {
+      if (cancelRef.current) return;
+      charIdx++;
+      setTypedChars(charIdx);
+      if (charIdx < COMMAND_TEXT.length) {
+        setTimeout(typeNext, 10 + Math.random() * 15);
+      } else {
+        // Command done, pause then show outputs
+        setTimeout(showOutputs, 400);
+      }
+    }
+
+    // Phase 2: Output lines appear with realistic delays (totaling ~8.2s)
+    function showOutputs() {
+      if (cancelRef.current) return;
+      setPhase("output");
+      let lineIdx = 0;
+
+      function nextLine() {
+        if (cancelRef.current) return;
+        lineIdx++;
+        setVisibleOutputs(lineIdx);
+        if (lineIdx < outputLines.length) {
+          // Use the current line's delay before showing the next one
+          setTimeout(nextLine, outputLines[lineIdx].delay);
+        } else {
+          // All outputs shown, show success after a beat
+          setTimeout(() => {
+            if (cancelRef.current) return;
+            setShowSuccess(true);
+            setTimeout(() => {
+              if (cancelRef.current) return;
+              setShowFinalPrompt(true);
+              setPhase("done");
+              onComplete?.();
+            }, 300);
+          }, 350);
+        }
+      }
+
+      // Show first line immediately, then wait its delay before the next
+      setTimeout(() => {
+        if (cancelRef.current) return;
+        nextLine();
+        // Wait the first line's processing time before showing line 2
+      }, 100);
+    }
+
+    setTimeout(typeNext, 200);
+  }, []);
+
+  // Start animation when startTyping becomes true
+  useEffect(() => {
+    if (startTyping && phase === "idle") {
+      runAnimation();
+    }
+  }, [startTyping, phase, runAnimation]);
+
   function cycleTheme() {
+    cancelRef.current = true;
     setThemeIndex((prev) => (prev + 1) % themes.length);
+    // Show everything instantly — no replay animation
+    setTypedChars(COMMAND_TEXT.length);
+    setVisibleOutputs(outputLines.length);
+    setShowSuccess(true);
+    setShowFinalPrompt(true);
+    setPhase("done");
   }
 
   return (
@@ -149,46 +250,62 @@ export default function Terminal() {
         {/* Header */}
         <div
           className="flex items-center gap-3 px-4 py-2.5 border-b transition-all duration-300"
-          style={{
-            background: theme.headerBg,
-            borderColor: theme.headerBorder,
-          }}
+          style={{ background: theme.headerBg, borderColor: theme.headerBorder }}
         >
           {theme.titleBar}
-          <span
-            className="ml-1 font-mono text-xs truncate transition-colors duration-300"
-            style={{ color: theme.textColor }}
-          >
+          <span className="ml-1 font-mono text-xs truncate transition-colors duration-300" style={{ color: theme.textColor }}>
             {theme.titleText}
           </span>
         </div>
 
         {/* Body */}
-        <div className="p-5 font-mono text-sm leading-relaxed transition-colors duration-300">
-          <p style={{ color: theme.textColor }}>
-            <span style={{ color: theme.promptColor }}>{theme.prompt}</span>{" "}
-            node generate --template WD_SWE_Contract
+        <div className="p-5 font-mono text-sm leading-relaxed transition-colors duration-300" style={{ minHeight: "200px" }}>
+          {/* Command line with typewriter */}
+          {phase !== "idle" && (
+            <p style={{ color: theme.textColor }}>
+              <span style={{ color: theme.promptColor }}>{theme.prompt}</span>{" "}
+              {COMMAND_TEXT.slice(0, typedChars)}
+              {phase === "typing" && <span className="cursor-blink">▊</span>}
+            </p>
+          )}
+
+          {/* Output lines */}
+          {outputLines.map((line, i) => (
+            <p
+              key={i}
+              style={{
+                color: theme.textColor,
+                opacity: i < visibleOutputs ? 1 : 0,
+                transform: i < visibleOutputs ? "translateY(0)" : "translateY(6px)",
+                transition: "opacity 0.25s ease, transform 0.25s ease",
+                marginTop: i === 0 ? "0.5rem" : undefined,
+              }}
+            >
+              <span style={{ color: theme.arrowColor }}>→</span> {line.text}
+            </p>
+          ))}
+
+          {/* Success line */}
+          <p
+            className="mt-2"
+            style={{
+              color: theme.successColor,
+              opacity: showSuccess ? 1 : 0,
+              transform: showSuccess ? "translateY(0)" : "translateY(6px)",
+              transition: "opacity 0.3s ease, transform 0.3s ease",
+            }}
+          >
+            {SUCCESS_TEXT}
           </p>
-          <p className="mt-2" style={{ color: theme.textColor }}>
-            <span style={{ color: theme.arrowColor }}>→</span> Parsing
-            document structure...
-          </p>
-          <p style={{ color: theme.textColor }}>
-            <span style={{ color: theme.arrowColor }}>→</span> Extracting
-            conditions (47 rules)
-          </p>
-          <p style={{ color: theme.textColor }}>
-            <span style={{ color: theme.arrowColor }}>→</span> Compiling
-            placeholders...
-          </p>
-          <p style={{ color: theme.textColor }}>
-            <span style={{ color: theme.arrowColor }}>→</span> Validating
-            output against schema
-          </p>
-          <p className="mt-2" style={{ color: theme.successColor }}>
-            ✓ Generated production-ready JS in 8.2s
-          </p>
-          <p style={{ color: theme.textColor }}>
+
+          {/* Final prompt with cursor */}
+          <p
+            style={{
+              color: theme.textColor,
+              opacity: showFinalPrompt ? 1 : 0,
+              transition: "opacity 0.2s ease",
+            }}
+          >
             <span style={{ color: theme.promptColor }}>{theme.prompt}</span>{" "}
             <span className="cursor-blink">▊</span>
           </p>

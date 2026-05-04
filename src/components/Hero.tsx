@@ -1,6 +1,36 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Terminal from "./Terminal";
 
 export default function Hero() {
+  const [revealed, setRevealed] = useState(false);
+  const [terminalReady, setTerminalReady] = useState(false);
+  const [showAnnotation, setShowAnnotation] = useState(false);
+
+  useEffect(() => {
+    // Small delay so the page renders first, then trigger animation
+    const timer = setTimeout(() => setRevealed(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Start terminal typing after heading animation completes
+  useEffect(() => {
+    if (!revealed) return;
+    const timer = setTimeout(() => setTerminalReady(true), 900);
+    return () => clearTimeout(timer);
+  }, [revealed]);
+
+  // Words for the heading with their line breaks
+  const lines = [
+    { words: ["I", "build", "the", "tools"], color: undefined },
+    { words: ["that", "build", "the"], color: undefined },
+    { words: ["product."], color: "var(--terracotta)" },
+  ];
+
+  // Calculate global word index for stagger
+  let globalIndex = 0;
+
   return (
     <section className="relative min-h-screen flex items-center px-6 sm:px-10 pt-20 pb-12 overflow-hidden">
       {/* Subtle gradient wash — asymmetric, not centered */}
@@ -26,10 +56,11 @@ export default function Hero() {
         <div className="text-center md:text-left">
           {/* Mobile-only photo */}
           <div
-            className="md:hidden w-28 h-28 rounded-full overflow-hidden border-2 select-none pointer-events-none mb-6 mx-auto"
+            className={`md:hidden w-28 h-28 rounded-full overflow-hidden border-2 select-none pointer-events-none mb-6 mx-auto hero-fade ${revealed ? "visible" : ""}`}
             style={{
               borderColor: "var(--accent)",
               boxShadow: "0 0 24px color-mix(in srgb, var(--accent) 25%, transparent)",
+              transitionDelay: "0ms",
             }}
           >
             <img
@@ -41,8 +72,8 @@ export default function Hero() {
           </div>
 
           <p
-            className="sel-invert font-mono text-xs tracking-[0.25em] uppercase mb-6"
-            style={{ color: "var(--accent-bright)" }}
+            className={`sel-invert font-mono text-xs tracking-[0.25em] uppercase mb-6 hero-fade ${revealed ? "visible" : ""}`}
+            style={{ color: "var(--accent-bright)", transitionDelay: "50ms" }}
           >
             Software Engineer · Full-Stack Developer
           </p>
@@ -51,16 +82,33 @@ export default function Hero() {
             className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.05] tracking-tight mb-8"
             style={{ fontFamily: "var(--font-playfair), serif" }}
           >
-            I build the tools
-            <br />
-            that build the
-            <br />
-            <span className="sel-invert" style={{ color: "var(--terracotta)" }}>product.</span>
+            {lines.map((line, lineIdx) => (
+              <span key={lineIdx}>
+                {line.words.map((word) => {
+                  const idx = globalIndex++;
+                  return (
+                    <span
+                      key={`${lineIdx}-${word}-${idx}`}
+                      className={`hero-word ${revealed ? "revealed" : ""} ${line.color ? "sel-invert" : ""}`}
+                      style={{
+                        color: line.color || undefined,
+                        animationDelay: revealed ? `${idx * 90}ms` : undefined,
+                      }}
+                    >
+                      {word}
+                      {/* Add space after each word except last in line */}
+                      {word !== line.words[line.words.length - 1] ? "\u00A0" : ""}
+                    </span>
+                  );
+                })}
+                {lineIdx < lines.length - 1 && <br />}
+              </span>
+            ))}
           </h1>
 
           <p
-            className="text-lg sm:text-xl leading-relaxed max-w-xl mb-10 mx-auto md:mx-0"
-            style={{ color: "var(--fg-muted)" }}
+            className={`text-lg sm:text-xl leading-relaxed max-w-xl mb-10 mx-auto md:mx-0 hero-fade ${revealed ? "visible" : ""}`}
+            style={{ color: "var(--fg-muted)", transitionDelay: "800ms" }}
           >
             5+ years turning complex business problems into clean, fast systems.
             One recent project cut a 6-hour manual process down to under 10
@@ -71,7 +119,10 @@ export default function Hero() {
             that freed the team to focus on work that actually matters.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+          <div
+            className={`flex flex-wrap items-center justify-center md:justify-start gap-4 hero-fade ${revealed ? "visible" : ""}`}
+            style={{ transitionDelay: "1000ms" }}
+          >
             <a
               href="#work"
               className="sel-btn magnetic-btn inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-md transition-colors"
@@ -109,10 +160,11 @@ export default function Hero() {
         <div className="hidden md:flex flex-col items-center justify-between gap-6 relative w-full h-full">
           {/* Profile photo */}
           <div
-            className="w-48 h-48 rounded-full overflow-hidden border-2 select-none pointer-events-none shrink-0"
+            className={`w-48 h-48 rounded-full overflow-hidden border-2 select-none pointer-events-none shrink-0 hero-fade ${revealed ? "visible" : ""}`}
             style={{
               borderColor: "var(--accent)",
               boxShadow: "0 0 24px color-mix(in srgb, var(--accent) 25%, transparent)",
+              transitionDelay: "400ms",
             }}
           >
             <img
@@ -124,12 +176,17 @@ export default function Hero() {
           </div>
 
           {/* Terminal with theme switcher */}
-          <Terminal />
-
-          {/* Annotation — hand-drawn feel */}
           <div
-            className="absolute -bottom-8 -left-4 font-mono text-xs rotate-[-2deg]"
-            style={{ color: "var(--fg-muted)" }}
+            className={`w-full hero-fade ${revealed ? "visible" : ""}`}
+            style={{ transitionDelay: "700ms" }}
+          >
+            <Terminal startTyping={terminalReady} onComplete={() => setShowAnnotation(true)} />
+          </div>
+
+          {/* Annotation — appears after terminal animation completes */}
+          <div
+            className={`absolute -bottom-8 -left-4 font-mono text-xs rotate-[-2deg] hero-fade ${showAnnotation ? "visible" : ""}`}
+            style={{ color: "var(--fg-muted)", transitionDelay: "0ms" }}
           >
             ↑ this used to take 6 hours by hand
           </div>
