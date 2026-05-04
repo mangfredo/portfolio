@@ -113,16 +113,17 @@ const themes = [
   },
 ];
 
-const COMMAND_TEXT = "node generate --template WD_SWE_Contract";
+const COMMAND_TEXT = "node server/index.js --generate WD_SWE_Contract_Retail.docx";
 
 const outputLines = [
-  { arrow: true, text: "Parsing document structure...", delay: 2800 },
-  { arrow: true, text: "Extracting conditions (47 rules)", delay: 2400 },
-  { arrow: true, text: "Compiling placeholders...", delay: 1200 },
-  { arrow: true, text: "Validating output against schema", delay: 1800 },
+  { arrow: true, text: "Extracting .docx content (tables, paragraphs)...", delay: 1800 },
+  { arrow: true, text: "Mapping profile fields + event categories...", delay: 1400 },
+  { arrow: true, text: "Parsing contract body → AST (53 condition blocks)", delay: 2200 },
+  { arrow: true, text: "Compiling placeholders + rendering to JS...", delay: 1200 },
+  { arrow: true, text: "Validating output against schema...", delay: 1600 },
 ];
 
-const SUCCESS_TEXT = "✓ Generated production-ready JS in 8.2s";
+const SUCCESS_TEXT = "✓ Generated WD_SWE_Contract_Retail.js in 8.2s";
 
 // Phases: idle -> typing -> output -> done
 type Phase = "idle" | "typing" | "output" | "done";
