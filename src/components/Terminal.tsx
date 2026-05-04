@@ -735,6 +735,9 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
                   style={{ color: theme.textColor }}
                   spellCheck={false}
                   autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  data-form-type="other"
                   aria-label="Terminal input"
                 />
                 {/* Custom cursor that follows actual caret position */}
