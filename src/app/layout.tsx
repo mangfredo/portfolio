@@ -35,6 +35,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${geistMono.variable} ${playfair.variable} h-full`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
         <script

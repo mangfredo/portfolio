@@ -1,3 +1,5 @@
+import Terminal from "./Terminal";
+
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-end pb-20 sm:pb-28 px-6 sm:px-10 pt-24 overflow-hidden">
@@ -37,7 +39,7 @@ export default function Hero() {
             <br />
             that build the
             <br />
-            <span style={{ color: "var(--terracotta)" }}>product.</span>
+            <span className="sel-invert" style={{ color: "var(--terracotta)" }}>product.</span>
           </h1>
 
           <p
@@ -56,7 +58,7 @@ export default function Hero() {
           <div className="flex flex-wrap items-center gap-4">
             <a
               href="#work"
-              className="sel-btn sel-invert magnetic-btn inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-md transition-colors"
+              className="sel-btn magnetic-btn inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-md transition-colors"
               style={{
                 background: "var(--accent)",
                 color: "var(--bg)",
@@ -76,7 +78,7 @@ export default function Hero() {
             </a>
             <a
               href="#automation"
-              className="magnetic-btn inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-md border transition-colors hover:border-[var(--accent)]"
+              className="sel-btn sel-btn-outline magnetic-btn inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-md border transition-colors hover:border-[var(--accent)]"
               style={{
                 borderColor: "var(--card-border)",
                 color: "var(--fg-muted)",
@@ -105,70 +107,8 @@ export default function Hero() {
             />
           </div>
 
-          {/* Terminal */}
-          <div
-            className="rounded-lg border overflow-hidden w-full"
-            style={{
-              background: "var(--card-bg)",
-              borderColor: "var(--card-border)",
-            }}
-          >
-            {/* Terminal header */}
-            <div
-              className="flex items-center gap-2 px-4 py-3 border-b"
-              style={{ borderColor: "var(--card-border)" }}
-            >
-              <span
-                className="w-3 h-3 rounded-full"
-                style={{ background: "#ff5f57" }}
-              />
-              <span
-                className="w-3 h-3 rounded-full"
-                style={{ background: "#febc2e" }}
-              />
-              <span
-                className="w-3 h-3 rounded-full"
-                style={{ background: "#28c840" }}
-              />
-              <span
-                className="ml-3 font-mono text-xs"
-                style={{ color: "var(--fg-muted)" }}
-              >
-                ~/projects/offer-letter-engine
-              </span>
-            </div>
-
-            {/* Terminal body */}
-            <div className="p-5 font-mono text-sm leading-relaxed">
-              <p style={{ color: "var(--fg-muted)" }}>
-                <span style={{ color: "var(--accent-bright)" }}>$</span> node
-                generate --template WD_SWE_Contract
-              </p>
-              <p className="mt-2" style={{ color: "var(--fg-muted)" }}>
-                <span style={{ color: "var(--accent)" }}>→</span> Parsing
-                document structure...
-              </p>
-              <p style={{ color: "var(--fg-muted)" }}>
-                <span style={{ color: "var(--accent)" }}>→</span> Extracting
-                conditions (47 rules)
-              </p>
-              <p style={{ color: "var(--fg-muted)" }}>
-                <span style={{ color: "var(--accent)" }}>→</span> Compiling
-                placeholders...
-              </p>
-              <p style={{ color: "var(--fg-muted)" }}>
-                <span style={{ color: "var(--accent)" }}>→</span> Validating
-                output against schema
-              </p>
-              <p className="mt-2" style={{ color: "var(--accent-bright)" }}>
-                ✓ Generated production-ready JS in 8.2s
-              </p>
-              <p style={{ color: "var(--fg-muted)" }}>
-                <span style={{ color: "var(--accent-bright)" }}>$</span>{" "}
-                <span className="cursor-blink">▊</span>
-              </p>
-            </div>
-          </div>
+          {/* Terminal with theme switcher */}
+          <Terminal />
 
           {/* Annotation — hand-drawn feel */}
           <div

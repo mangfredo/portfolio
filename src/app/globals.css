@@ -60,15 +60,15 @@ body::before {
   background-size: 256px 256px;
 }
 
-/* Selection */
+/* Selection — invisible background, white text turns terracotta */
 ::selection {
-  background-color: var(--terracotta);
-  color: var(--fg);
+  background-color: transparent !important;
+  color: #C4715C !important;
 }
 
 ::-moz-selection {
-  background-color: var(--terracotta);
-  color: var(--fg);
+  background-color: transparent !important;
+  color: #C4715C !important;
 }
 
 /* Scrollbar */
@@ -205,7 +205,7 @@ img, svg, button, video {
   letter-spacing: 0.1em;
 }
 
-/* Selection invert — accent-colored text inverts on select, white text becomes accent */
+/* Selection invert — terracotta/accent text flips to white on select */
 .sel-invert::selection {
   background-color: transparent !important;
   color: var(--fg) !important;
@@ -216,15 +216,33 @@ img, svg, button, video {
   color: var(--fg) !important;
 }
 
-/* Button selection invert */
-.sel-btn.sel-btn-active {
+/* Button selection invert — filled buttons swap bg/text, outline buttons just flip text */
+.sel-btn.sel-btn-active,
+.sel-btn.sel-btn-active * {
   background: var(--fg) !important;
-  color: var(--accent) !important;
+  color: #4C7D70 !important;
   border-color: var(--fg) !important;
 }
 
-.sel-btn-outline.sel-btn-active {
+.sel-btn.sel-btn-active::selection,
+.sel-btn.sel-btn-active *::selection,
+.sel-btn.sel-btn-active::-moz-selection,
+.sel-btn.sel-btn-active *::-moz-selection {
+  background-color: transparent !important;
+  color: #4C7D70 !important;
+}
+
+.sel-btn-outline.sel-btn-active,
+.sel-btn-outline.sel-btn-active * {
   background: transparent !important;
-  color: var(--accent) !important;
-  border-color: var(--accent) !important;
+  color: #4C7D70 !important;
+  border-color: #4C7D70 !important;
+}
+
+.sel-btn-outline.sel-btn-active::selection,
+.sel-btn-outline.sel-btn-active *::selection,
+.sel-btn-outline.sel-btn-active::-moz-selection,
+.sel-btn-outline.sel-btn-active *::-moz-selection {
+  background-color: transparent !important;
+  color: #4C7D70 !important;
 }

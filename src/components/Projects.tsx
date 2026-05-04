@@ -87,7 +87,7 @@ export default function Projects() {
                   </h3>
                   <div className="flex items-center gap-3 mt-2">
                     <span
-                      className="font-mono text-2xl font-bold"
+                      className="sel-invert font-mono text-2xl font-bold"
                       style={{ color: "var(--terracotta)" }}
                     >
                       {p.metric}

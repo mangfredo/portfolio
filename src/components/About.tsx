@@ -20,7 +20,7 @@ export default function About() {
             >
               Engineer who ships
               <br />
-              <em className="not-italic" style={{ color: "var(--terracotta)" }}>
+              <em className="sel-invert not-italic" style={{ color: "var(--terracotta)" }}>
                 real impact
               </em>
             </h2>
