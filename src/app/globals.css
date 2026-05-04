@@ -45,6 +45,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease, color 0.3s ease;
+  transition: var(--theme-transition, background-color 0.3s ease, color 0.3s ease);
 }
 
 /* Film grain overlay */
@@ -351,4 +352,11 @@ img, svg, button, video {
 
 [data-theme="light"] .cursor-glow {
   background: radial-gradient(circle, rgba(61, 107, 94, 0.25) 0%, transparent 70%);
+}
+
+/* View Transitions — disable default crossfade, we use custom clip-path */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }

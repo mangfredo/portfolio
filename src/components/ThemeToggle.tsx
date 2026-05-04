@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 export default function ThemeToggle() {
   const [dark, setDark] = useState(true);
+  const [pulling, setPulling] = useState(false);
+  const [animating, setAnimating] = useState(false);
+  const bulbRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("theme");
@@ -12,30 +15,144 @@ export default function ThemeToggle() {
     document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
   }, []);
 
-  function toggle() {
+  const toggle = useCallback(() => {
+    if (animating) return;
+
+    // Check if View Transitions API is available
+    const doc = document as Document & {
+      startViewTransition?: (cb: () => void) => { ready: Promise<void> };
+    };
+
     const next = !dark;
-    setDark(next);
-    document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
-    localStorage.setItem("theme", next ? "dark" : "light");
-  }
+    const bulb = bulbRef.current;
+    if (!bulb) return;
+
+    const rect = bulb.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height;
+
+    setPulling(true);
+    setAnimating(true);
+
+    // Hide cursor glow during transition
+    const cursorGlow = document.querySelector(".cursor-glow") as HTMLElement;
+    if (cursorGlow) cursorGlow.style.visibility = "hidden";
+
+    setTimeout(() => {
+      setPulling(false);
+
+      if (doc.startViewTransition) {
+        // Use View Transitions API — the browser handles the snapshot + animation
+        const transition = doc.startViewTransition(() => {
+          setDark(next);
+          document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
+          localStorage.setItem("theme", next ? "dark" : "light");
+        });
+
+        transition.ready.then(() => {
+          const maxX = Math.max(cx, window.innerWidth - cx);
+          const maxY = Math.max(cy, window.innerHeight - cy);
+          const maxRadius = Math.sqrt(maxX * maxX + maxY * maxY) + 50;
+
+          if (next) {
+            // Going DARK → old light view shrinks INTO the bulb
+            document.documentElement.animate(
+              {
+                clipPath: [
+                  `circle(${maxRadius}px at ${cx}px ${cy}px)`,
+                  `circle(0px at ${cx}px ${cy}px)`,
+                ],
+              },
+              {
+                duration: 600,
+                easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+                pseudoElement: "::view-transition-old(root)",
+              }
+            );
+          } else {
+            // Going LIGHT → new light view expands FROM the bulb
+            document.documentElement.animate(
+              {
+                clipPath: [
+                  `circle(0px at ${cx}px ${cy}px)`,
+                  `circle(${maxRadius}px at ${cx}px ${cy}px)`,
+                ],
+              },
+              {
+                duration: 600,
+                easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+                pseudoElement: "::view-transition-new(root)",
+              }
+            );
+          }
+
+          setTimeout(() => {
+            setAnimating(false);
+            if (cursorGlow) cursorGlow.style.visibility = "";
+          }, 650);
+        });
+      } else {
+        // Fallback: just switch instantly with CSS transition
+        setDark(next);
+        document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
+        localStorage.setItem("theme", next ? "dark" : "light");
+
+        setTimeout(() => {
+          setAnimating(false);
+          if (cursorGlow) cursorGlow.style.visibility = "";
+        }, 350);
+      }
+    }, 280);
+  }, [dark, animating]);
 
   return (
     <button
+      ref={bulbRef}
       onClick={toggle}
       type="button"
-      className="p-2.5 rounded-lg border transition-colors cursor-pointer"
-      style={{ color: "var(--fg-muted)", borderColor: "var(--card-border)" }}
+      className="relative flex flex-col items-center cursor-pointer select-none group"
+      style={{ width: "32px" }}
       aria-label={`Switch to ${dark ? "light" : "dark"} mode`}
     >
-      {dark ? (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
-        </svg>
-      ) : (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-        </svg>
-      )}
+      {/* String / cord */}
+      <div
+        className="w-px transition-all duration-300 ease-out"
+        style={{
+          height: pulling ? "28px" : "16px",
+          background: "var(--fg-muted)",
+          opacity: 0.4,
+        }}
+      />
+
+      {/* Bulb */}
+      <div
+        className={`relative transition-all duration-300 ease-out ${pulling ? "translate-y-1 scale-95" : "group-hover:translate-y-0.5"}`}
+      >
+        {/* Bulb base / socket */}
+        <div
+          className="w-3 h-1.5 mx-auto rounded-t-sm"
+          style={{ background: "var(--fg-muted)", opacity: 0.5 }}
+        />
+        {/* Bulb glass */}
+        <div
+          className="w-5 h-5 rounded-full mx-auto -mt-0.5 transition-all duration-300"
+          style={{
+            background: dark ? "var(--fg-muted)" : "#fbbf24",
+            opacity: dark ? 0.3 : 1,
+            boxShadow: dark
+              ? "none"
+              : "0 0 12px rgba(251, 191, 36, 0.6), 0 0 24px rgba(251, 191, 36, 0.3)",
+          }}
+        />
+      </div>
+
+      {/* Pull indicator on hover */}
+      <div
+        className="absolute -bottom-4 font-mono text-[0.5rem] uppercase tracking-wider opacity-0 group-hover:opacity-50 transition-opacity"
+        style={{ color: "var(--fg-muted)" }}
+      >
+        pull
+      </div>
     </button>
   );
 }
