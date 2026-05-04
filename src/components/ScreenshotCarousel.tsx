@@ -13,12 +13,20 @@ export default function ScreenshotCarousel({ screenshots, title }: ScreenshotCar
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    function check() {
-      setIsMobile(window.innerWidth < 768);
+    const mq = window.matchMedia("(max-width: 767px)");
+
+    function update() {
+      // matchMedia is primary, innerWidth is fallback
+      setIsMobile(mq.matches || window.innerWidth < 768);
     }
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
+
+    update();
+    mq.addEventListener("change", update);
+    window.addEventListener("resize", update);
+    return () => {
+      mq.removeEventListener("change", update);
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   const next = useCallback(() => {
