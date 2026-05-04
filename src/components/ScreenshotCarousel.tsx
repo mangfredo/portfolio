@@ -10,6 +10,16 @@ interface ScreenshotCarouselProps {
 export default function ScreenshotCarousel({ screenshots, title }: ScreenshotCarouselProps) {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    function check() {
+      setIsMobile(window.innerWidth < 768);
+    }
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   const next = useCallback(() => {
     setActive((prev) => (prev + 1) % screenshots.length);
@@ -25,6 +35,97 @@ export default function ScreenshotCarousel({ screenshots, title }: ScreenshotCar
     return () => clearInterval(timer);
   }, [paused, next]);
 
+  // Mobile: vertical sliding carousel
+  if (isMobile) {
+    return (
+      <div className="my-4">
+        {/* Vertical slide container */}
+        <div
+          className="relative w-full overflow-hidden rounded-lg border-2"
+          style={{
+            height: "420px",
+            borderColor: "var(--accent)",
+            boxShadow: "0 0 20px color-mix(in srgb, var(--accent) 20%, transparent)",
+          }}
+        >
+          {screenshots.map((src, i) => {
+            let offset = i - active;
+            // Wrap around
+            if (offset > screenshots.length / 2) offset -= screenshots.length;
+            if (offset < -screenshots.length / 2) offset += screenshots.length;
+
+            return (
+              <div
+                key={i}
+                className="absolute inset-0 flex items-center justify-center transition-all duration-500 ease-out"
+                style={{
+                  transform: `translateY(${offset * 100}%)`,
+                  opacity: offset === 0 ? 1 : 0.3,
+                  zIndex: offset === 0 ? 2 : 1,
+                }}
+              >
+                <img
+                  src={src}
+                  alt={`${title} screenshot ${i + 1}`}
+                  className="w-auto max-w-full max-h-[400px] object-contain"
+                  draggable={false}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Controls below */}
+        <div className="flex items-center justify-center gap-6 mt-4">
+          <button
+            onClick={prev}
+            aria-label="Previous screenshot"
+            className="w-10 h-10 rounded-full flex items-center justify-center border font-mono text-lg transition-all active:scale-95"
+            style={{
+              background: "color-mix(in srgb, var(--accent) 8%, transparent)",
+              borderColor: "color-mix(in srgb, var(--accent) 20%, transparent)",
+              color: "var(--accent)",
+            }}
+          >
+            ‹
+          </button>
+
+          <div className="flex items-center gap-2">
+            {screenshots.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setActive(i)}
+                aria-label={`Go to screenshot ${i + 1}`}
+                className="rounded-full transition-all duration-300"
+                style={{
+                  width: i === active ? "20px" : "6px",
+                  height: "6px",
+                  background: i === active
+                    ? "var(--accent)"
+                    : "color-mix(in srgb, var(--fg-muted) 30%, transparent)",
+                }}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={next}
+            aria-label="Next screenshot"
+            className="w-10 h-10 rounded-full flex items-center justify-center border font-mono text-lg transition-all active:scale-95"
+            style={{
+              background: "color-mix(in srgb, var(--accent) 8%, transparent)",
+              borderColor: "color-mix(in srgb, var(--accent) 20%, transparent)",
+              color: "var(--accent)",
+            }}
+          >
+            ›
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop: horizontal strip with focus effect
   return (
     <div
       className="my-4"
