@@ -27,9 +27,13 @@ export default function Footer() {
             >
               LinkedIn ↗
             </a>
-            <span className="font-mono text-sm" style={{ color: "var(--fg-muted)" }}>
-              09919036289
-            </span>
+            <a
+              href="mailto:tristansereno@gmail.com"
+              className="font-mono text-sm transition-colors hover:text-[var(--accent-bright)]"
+              style={{ color: "var(--fg-muted)" }}
+            >
+              tristansereno@gmail.com
+            </a>
           </div>
         </div>
 

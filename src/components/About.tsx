@@ -8,7 +8,7 @@ const stack = [
 
 export default function About() {
   return (
-    <section id="about" className="relative py-28 sm:py-36 px-6 sm:px-10">
+    <section id="about" className="relative py-20 sm:py-36 px-6 sm:px-10">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-[1fr_1.2fr] gap-16 md:gap-24">
           {/* Left — narrative */}

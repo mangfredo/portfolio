@@ -68,7 +68,7 @@ const projects = [
 
 export default function PersonalProjects() {
   return (
-    <section id="projects" className="relative py-28 sm:py-36 px-6 sm:px-10">
+    <section id="projects" className="relative py-20 sm:py-36 px-6 sm:px-10">
       <div className="max-w-7xl mx-auto">
         <p className="sel-invert annotation mb-4">Projects</p>
         <h2

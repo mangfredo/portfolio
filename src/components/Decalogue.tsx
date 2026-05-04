@@ -14,7 +14,7 @@ const scripts = [
 
 export default function Decalogue() {
   return (
-    <section id="automation" className="relative py-28 sm:py-36 px-6 sm:px-10">
+    <section id="automation" className="relative py-20 sm:py-36 px-6 sm:px-10">
       <div className="max-w-7xl mx-auto">
         <p className="sel-invert annotation mb-4">Automation</p>
         <h2

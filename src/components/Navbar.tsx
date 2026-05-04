@@ -110,6 +110,9 @@ export default function Navbar() {
               {l.label}
             </a>
           ))}
+          <div className="pt-2">
+            <ThemeToggle />
+          </div>
         </div>
       )}
     </nav>

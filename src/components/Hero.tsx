@@ -2,7 +2,7 @@ import Terminal from "./Terminal";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-end pb-20 sm:pb-28 px-6 sm:px-10 pt-24 overflow-hidden">
+    <section className="relative min-h-screen flex items-center px-6 sm:px-10 pt-20 pb-12 overflow-hidden">
       {/* Subtle gradient wash — asymmetric, not centered */}
       <div
         className="absolute top-0 right-0 w-[70%] h-[80%] pointer-events-none"
@@ -24,6 +24,22 @@ export default function Hero() {
       <div className="relative max-w-7xl mx-auto w-full grid md:grid-cols-[1.1fr_0.9fr] gap-12 md:gap-20 items-end">
         {/* Left — Text heavy, asymmetric */}
         <div>
+          {/* Mobile-only photo */}
+          <div
+            className="md:hidden w-28 h-28 rounded-full overflow-hidden border-2 select-none pointer-events-none mb-6"
+            style={{
+              borderColor: "var(--accent)",
+              boxShadow: "0 0 24px color-mix(in srgb, var(--accent) 25%, transparent)",
+            }}
+          >
+            <img
+              src="/profile.jpg"
+              alt="Tristan Sereño"
+              className="w-full h-full object-cover"
+              draggable="false"
+            />
+          </div>
+
           <p
             className="sel-invert font-mono text-xs tracking-[0.25em] uppercase mb-6"
             style={{ color: "var(--accent-bright)" }}
@@ -32,7 +48,7 @@ export default function Hero() {
           </p>
 
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight mb-8"
+            className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.05] tracking-tight mb-8"
             style={{ fontFamily: "var(--font-playfair), serif" }}
           >
             I build the tools
