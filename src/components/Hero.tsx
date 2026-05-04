@@ -22,11 +22,11 @@ export default function Hero() {
       />
 
       <div className="relative max-w-7xl mx-auto w-full grid md:grid-cols-[1.1fr_0.9fr] gap-12 md:gap-20 items-end">
-        {/* Left — Text heavy, asymmetric */}
-        <div>
+        {/* Left — Text heavy, asymmetric on desktop, centered on mobile */}
+        <div className="text-center md:text-left">
           {/* Mobile-only photo */}
           <div
-            className="md:hidden w-28 h-28 rounded-full overflow-hidden border-2 select-none pointer-events-none mb-6"
+            className="md:hidden w-28 h-28 rounded-full overflow-hidden border-2 select-none pointer-events-none mb-6 mx-auto"
             style={{
               borderColor: "var(--accent)",
               boxShadow: "0 0 24px color-mix(in srgb, var(--accent) 25%, transparent)",
@@ -59,7 +59,7 @@ export default function Hero() {
           </h1>
 
           <p
-            className="text-lg sm:text-xl leading-relaxed max-w-xl mb-10"
+            className="text-lg sm:text-xl leading-relaxed max-w-xl mb-10 mx-auto md:mx-0"
             style={{ color: "var(--fg-muted)" }}
           >
             5+ years turning complex business problems into clean, fast systems.
@@ -71,7 +71,7 @@ export default function Hero() {
             that freed the team to focus on work that actually matters.
           </p>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
             <a
               href="#work"
               className="sel-btn magnetic-btn inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-md transition-colors"

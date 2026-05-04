@@ -72,21 +72,24 @@ export default function Navbar() {
           </li>
         </ul>
 
-        {/* Mobile toggle */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="md:hidden p-2"
-          style={{ color: "var(--fg-muted)" }}
-          aria-label="Toggle menu"
-        >
-          <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            {open ? (
-              <path d="M6 6l12 12M6 18L18 6" />
-            ) : (
-              <path d="M4 8h16M4 16h16" />
-            )}
-          </svg>
-        </button>
+        {/* Mobile: theme toggle + burger */}
+        <div className="flex md:hidden items-center gap-3">
+          <ThemeToggle />
+          <button
+            onClick={() => setOpen(!open)}
+            className="p-2"
+            style={{ color: "var(--fg-muted)" }}
+            aria-label="Toggle menu"
+          >
+            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              {open ? (
+                <path d="M6 6l12 12M6 18L18 6" />
+              ) : (
+                <path d="M4 8h16M4 16h16" />
+              )}
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -110,9 +113,6 @@ export default function Navbar() {
               {l.label}
             </a>
           ))}
-          <div className="pt-2">
-            <ThemeToggle />
-          </div>
         </div>
       )}
     </nav>
