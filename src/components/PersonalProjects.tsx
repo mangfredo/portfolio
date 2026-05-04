@@ -78,7 +78,7 @@ export default function PersonalProjects() {
           Client &amp; Personal Work
         </h2>
         <p
-          className="text-lg max-w-2xl mb-16 leading-relaxed"
+          className="sel-muted text-lg max-w-2xl mb-16 leading-relaxed"
           style={{ color: "var(--fg-muted)" }}
         >
           Freelance builds, published apps, and side projects — each one
@@ -105,7 +105,7 @@ export default function PersonalProjects() {
                 <div className="flex items-center gap-3 mb-4">
                   <h3 className="text-xl font-bold">{p.title}</h3>
                   <span
-                    className="font-mono text-[0.65rem] px-2 py-0.5 rounded border uppercase tracking-wider"
+                    className="sel-accent font-mono text-[0.65rem] px-2 py-0.5 rounded border uppercase tracking-wider"
                     style={{
                       color: "var(--accent-bright)",
                       borderColor: "color-mix(in srgb, var(--accent) 20%, transparent)",
@@ -117,7 +117,7 @@ export default function PersonalProjects() {
                 </div>
 
                 <p
-                  className="text-sm leading-relaxed mb-4 flex-1"
+                  className="sel-muted text-sm leading-relaxed mb-4 flex-1"
                   style={{ color: "var(--fg-muted)" }}
                 >
                   {p.story}
@@ -134,7 +134,7 @@ export default function PersonalProjects() {
                   {p.tags.map((t) => (
                     <span
                       key={t}
-                      className="px-2.5 py-1 text-xs font-mono rounded border"
+                      className="sel-muted px-2.5 py-1 text-xs font-mono rounded border"
                       style={{
                         color: "var(--fg-muted)",
                         borderColor: "var(--card-border)",
@@ -148,7 +148,7 @@ export default function PersonalProjects() {
                       href={p.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-auto font-mono text-xs transition-colors hover:text-[var(--accent-bright)]"
+                      className="sel-accent ml-auto font-mono text-xs transition-colors hover:text-[var(--accent-bright)]"
                       style={{ color: "var(--accent)" }}
                     >
                       {p.link.includes("github.com")

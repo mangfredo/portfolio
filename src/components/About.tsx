@@ -25,7 +25,7 @@ export default function About() {
               </em>
             </h2>
 
-            <div className="space-y-5 text-base leading-relaxed" style={{ color: "var(--fg-muted)" }}>
+            <div className="sel-muted space-y-5 text-base leading-relaxed" style={{ color: "var(--fg-muted)" }}>
               <p>
                 I work across the full stack with TypeScript, Node.js, and React — but my real focus is automation and internal tooling. I like finding the slow, repetitive process that everyone just accepts, and replacing it with something that runs in seconds.
               </p>
@@ -45,7 +45,7 @@ export default function About() {
               {stack.map((group) => (
                 <div key={group.category} className="reveal">
                   <h3
-                    className="font-mono text-xs uppercase tracking-[0.15em] mb-3"
+                    className="sel-accent font-mono text-xs uppercase tracking-[0.15em] mb-3"
                     style={{ color: "var(--accent-bright)" }}
                   >
                     {group.category}
@@ -54,7 +54,7 @@ export default function About() {
                     {group.items.map((item) => (
                       <span
                         key={item}
-                        className="px-3 py-1.5 text-sm font-mono rounded border transition-colors hover:border-[var(--accent)]"
+                        className="sel-muted px-3 py-1.5 text-sm font-mono rounded border transition-colors hover:border-[var(--accent)]"
                         style={{
                           background: "var(--card-bg)",
                           borderColor: "var(--card-border)",

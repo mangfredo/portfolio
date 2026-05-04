@@ -60,7 +60,7 @@ export default function Projects() {
           War Stories
         </h2>
         <p
-          className="text-lg max-w-2xl mb-16 leading-relaxed"
+          className="sel-muted text-lg max-w-2xl mb-16 leading-relaxed"
           style={{ color: "var(--fg-muted)" }}
         >
           Not a list of features. These are the problems I found, the systems I
@@ -93,7 +93,7 @@ export default function Projects() {
                       {p.metric}
                     </span>
                     <span
-                      className="font-mono text-xs uppercase tracking-wider"
+                      className="sel-muted font-mono text-xs uppercase tracking-wider"
                       style={{ color: "var(--fg-muted)" }}
                     >
                       {p.metricLabel}
@@ -104,7 +104,7 @@ export default function Projects() {
 
               {/* The "why" — personal motivation */}
               <blockquote
-                className="border-l-2 pl-5 mb-6 text-base italic leading-relaxed"
+                className="sel-muted border-l-2 pl-5 mb-6 text-base italic leading-relaxed"
                 style={{
                   borderColor: "var(--terracotta)",
                   color: "var(--fg-muted)",
@@ -115,7 +115,7 @@ export default function Projects() {
 
               {/* Story */}
               <p
-                className="text-base leading-relaxed mb-4"
+                className="sel-muted text-base leading-relaxed mb-4"
                 style={{ color: "var(--fg-muted)" }}
               >
                 {p.story}
@@ -124,12 +124,12 @@ export default function Projects() {
               {/* Aftermath */}
               <p className="text-base leading-relaxed mb-6">
                 <span
-                  className="font-mono text-xs uppercase tracking-wider mr-2"
+                  className="sel-accent font-mono text-xs uppercase tracking-wider mr-2"
                   style={{ color: "var(--accent-bright)" }}
                 >
                   Aftermath:
                 </span>
-                <span style={{ color: "var(--fg-muted)" }}>{p.aftermath}</span>
+                <span className="sel-muted" style={{ color: "var(--fg-muted)" }}>{p.aftermath}</span>
               </p>
 
               {/* NDA notice */}
@@ -141,10 +141,10 @@ export default function Projects() {
                     background: "color-mix(in srgb, var(--bg) 60%, var(--card-bg))",
                   }}
                 >
-                  <span className="text-sm select-none" style={{ color: "var(--fg-muted)" }}>
+                  <span className="sel-muted text-sm select-none" style={{ color: "var(--fg-muted)" }}>
                     🔒
                   </span>
-                  <p className="text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>
+                  <p className="sel-muted text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>
                     {p.nda}
                   </p>
                 </div>
@@ -167,7 +167,7 @@ export default function Projects() {
                 {p.tags.map((t) => (
                   <span
                     key={t}
-                    className="px-3 py-1 text-xs font-mono rounded border"
+                    className="sel-accent px-3 py-1 text-xs font-mono rounded border"
                     style={{
                       color: "var(--accent-bright)",
                       background: "color-mix(in srgb, var(--accent) 5%, transparent)",
@@ -180,7 +180,7 @@ export default function Projects() {
                 {p.link && (
                   <a
                     href={p.link.href}
-                    className="ml-auto font-mono text-xs uppercase tracking-wider transition-colors hover:text-[var(--accent-bright)]"
+                    className="sel-accent ml-auto font-mono text-xs uppercase tracking-wider transition-colors hover:text-[var(--accent-bright)]"
                     style={{ color: "var(--accent)" }}
                   >
                     {p.link.label} →

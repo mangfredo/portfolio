@@ -60,7 +60,8 @@ body::before {
   background-size: 256px 256px;
 }
 
-/* Selection — invisible background, white text turns terracotta */
+/* Selection — invisible background, text inverts based on brightness */
+/* Bright/white text (--fg) → full terracotta */
 ::selection {
   background-color: transparent !important;
   color: #C4715C !important;
@@ -69,6 +70,28 @@ body::before {
 ::-moz-selection {
   background-color: transparent !important;
   color: #C4715C !important;
+}
+
+/* Muted/dim text → lighter, softer terracotta */
+.sel-muted::selection {
+  background-color: transparent !important;
+  color: #d4967e !important;
+}
+
+.sel-muted::-moz-selection {
+  background-color: transparent !important;
+  color: #d4967e !important;
+}
+
+/* Accent-colored text (green) → even softer terracotta */
+.sel-accent::selection {
+  background-color: transparent !important;
+  color: #dba48f !important;
+}
+
+.sel-accent::-moz-selection {
+  background-color: transparent !important;
+  color: #dba48f !important;
 }
 
 /* Scrollbar */

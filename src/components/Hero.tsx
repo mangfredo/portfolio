@@ -107,7 +107,7 @@ export default function Hero() {
           </h1>
 
           <p
-            className={`text-lg sm:text-xl leading-relaxed max-w-xl mb-10 mx-auto md:mx-0 hero-fade ${revealed ? "visible" : ""}`}
+            className={`text-lg sm:text-xl leading-relaxed max-w-xl mb-10 mx-auto md:mx-0 sel-muted hero-fade ${revealed ? "visible" : ""}`}
             style={{ color: "var(--fg-muted)", transitionDelay: "800ms" }}
           >
             5+ years turning complex business problems into clean, fast systems.
@@ -185,7 +185,7 @@ export default function Hero() {
 
           {/* Annotation — appears after terminal animation completes */}
           <div
-            className={`absolute -bottom-8 -left-4 font-mono text-xs rotate-[-2deg] hero-fade ${showAnnotation ? "visible" : ""}`}
+            className={`sel-muted absolute -bottom-8 -left-4 font-mono text-xs rotate-[-2deg] hero-fade ${showAnnotation ? "visible" : ""}`}
             style={{ color: "var(--fg-muted)", transitionDelay: "0ms" }}
           >
             ↑ this used to take 6 hours by hand
@@ -193,7 +193,7 @@ export default function Hero() {
 
           {/* Try it annotation — appears shortly after */}
           <div
-            className={`absolute -bottom-8 right-0 font-mono text-xs rotate-[1.5deg] hero-fade ${showAnnotation ? "visible" : ""}`}
+            className={`sel-accent absolute -bottom-8 right-0 font-mono text-xs rotate-[1.5deg] hero-fade ${showAnnotation ? "visible" : ""}`}
             style={{ color: "var(--accent)", transitionDelay: "600ms" }}
           >
             try typing &quot;help&quot; ↑

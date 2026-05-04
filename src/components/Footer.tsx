@@ -10,7 +10,7 @@ export default function Footer() {
             >
               Let&apos;s build something.
             </h2>
-            <p className="text-base leading-relaxed max-w-md" style={{ color: "var(--fg-muted)" }}>
+            <p className="sel-muted text-base leading-relaxed max-w-md" style={{ color: "var(--fg-muted)" }}>
               I&apos;m open to full-time roles, contract work, and interesting
               freelance projects. If you have a problem that needs solving,
               I&apos;d like to hear about it.
@@ -22,14 +22,14 @@ export default function Footer() {
               href="https://www.linkedin.com/in/tristan-sere%C3%B1o-9b1b662a3/"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-sm transition-colors hover:text-[var(--accent-bright)]"
+              className="sel-accent font-mono text-sm transition-colors hover:text-[var(--accent-bright)]"
               style={{ color: "var(--accent)" }}
             >
               LinkedIn ↗
             </a>
             <a
               href="mailto:tristansereno@gmail.com"
-              className="font-mono text-sm transition-colors hover:text-[var(--accent-bright)]"
+              className="sel-muted font-mono text-sm transition-colors hover:text-[var(--accent-bright)]"
               style={{ color: "var(--fg-muted)" }}
             >
               tristansereno@gmail.com
@@ -41,10 +41,10 @@ export default function Footer() {
           className="mt-12 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-3"
           style={{ borderColor: "var(--card-border)" }}
         >
-          <p className="font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
+          <p className="sel-muted font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
             &copy; {new Date().getFullYear()} Tristan Sereño
           </p>
-          <p className="font-mono text-xs" style={{ color: "color-mix(in srgb, var(--fg-muted) 50%, transparent)" }}>
+          <p className="sel-muted font-mono text-xs" style={{ color: "color-mix(in srgb, var(--fg-muted) 50%, transparent)" }}>
             Next.js · Tailwind · Deployed on Vercel
           </p>
         </div>

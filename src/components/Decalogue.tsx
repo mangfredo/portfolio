@@ -23,7 +23,7 @@ export default function Decalogue() {
         >
           Workflow Automation Systems
         </h2>
-        <p className="text-base mb-4" style={{ color: "var(--fg-muted)" }}>
+        <p className="sel-muted text-base mb-4" style={{ color: "var(--fg-muted)" }}>
           Built at Rival HR — a collection of production-used browser automation
           scripts that eliminate repetitive QA and development tasks.
         </p>
@@ -36,10 +36,10 @@ export default function Decalogue() {
             background: "color-mix(in srgb, var(--bg) 60%, var(--card-bg))",
           }}
         >
-          <span className="text-sm select-none" style={{ color: "var(--fg-muted)" }}>
+          <span className="sel-muted text-sm select-none" style={{ color: "var(--fg-muted)" }}>
             🔒
           </span>
-          <p className="text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>
+          <p className="sel-muted text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>
             These tools were developed under NDA for internal use. Source code
             and live demos cannot be shared publicly.
           </p>
@@ -50,14 +50,14 @@ export default function Decalogue() {
           {scripts.map((s) => (
             <div key={s.num} className="reveal flex gap-4">
               <span
-                className="shrink-0 font-mono text-xs mt-1.5"
+                className="sel-accent shrink-0 font-mono text-xs mt-1.5"
                 style={{ color: "var(--accent)" }}
               >
                 {s.num}
               </span>
               <div>
                 <h3 className="text-base font-medium mb-1">{s.name}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>
+                <p className="sel-muted text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>
                   {s.desc}
                 </p>
               </div>
@@ -75,8 +75,8 @@ export default function Decalogue() {
               "Minimized human error in navigation, data entry, and status updates",
               "Tools actively used within team workflows",
             ].map((item) => (
-              <p key={item} className="flex gap-2 text-sm" style={{ color: "var(--fg-muted)" }}>
-                <span style={{ color: "var(--accent-bright)" }}>✓</span> {item}
+              <p key={item} className="sel-muted flex gap-2 text-sm" style={{ color: "var(--fg-muted)" }}>
+                <span className="sel-accent" style={{ color: "var(--accent-bright)" }}>✓</span> {item}
               </p>
             ))}
           </div>
