@@ -168,7 +168,7 @@ function getCommands(themeId: string): Record<string, string[]> {
     skills: [
       "Languages:  TypeScript, JavaScript, C#, Python, Java, PHP, Ruby",
       "Frontend:   React, Next.js, Tailwind CSS",
-      "Backend:    Node.js, PostgreSQL, MySQL, Firebase",
+      "Backend:    Node.js, PostgreSQL, MySQL, MongoDB, NoSQL, Firebase",
       "Tooling:    Git, Docker, Kubernetes, VS Code Extensions",
     ],
     contact: [

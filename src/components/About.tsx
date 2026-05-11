@@ -1,7 +1,7 @@
 const stack = [
   { category: "Languages", items: ["TypeScript", "JavaScript", "C#", "Python", "Java", "PHP", "Ruby"] },
   { category: "Frontend", items: ["React", "Next.js", "Tailwind CSS", "HTML/CSS"] },
-  { category: "Backend", items: ["Node.js", "REST APIs", "PostgreSQL", "MySQL", "Firebase"] },
+  { category: "Backend", items: ["Node.js", "REST APIs", "PostgreSQL", "MySQL", "MongoDB", "NoSQL", "Firebase"] },
   { category: "Tooling", items: ["Git", "Docker", "Kubernetes", "VS Code Extensions", "CI/CD", "TDD", "Clean Architecture"] },
   { category: "Approach", items: ["AI-Native Development", "Automation-First", "Async Remote"] },
 ];
