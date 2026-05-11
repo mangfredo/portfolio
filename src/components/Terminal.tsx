@@ -145,7 +145,6 @@ function getCommands(themeId: string): Record<string, string[]> {
       "  cls             Clear terminal",
       "  whoami          Current user",
       "  dir             List files",
-      "  type resume     View resume summary",
       "  experience      Career timeline",
       "  runas /hire me  You know what to do",
     ] : [
@@ -158,7 +157,6 @@ function getCommands(themeId: string): Record<string, string[]> {
       "  clear           Clear terminal",
       "  whoami          Current user",
       "  ls              List files",
-      "  cat resume      View resume summary",
       "  experience      Career timeline",
       "  sudo hire me    You know what to do",
     ],
@@ -217,18 +215,8 @@ function getCommands(themeId: string): Record<string, string[]> {
       " 05/05/2026  08:30 AM             1,204 package.json",
       " 05/05/2026  08:30 AM               342 README.md",
     ] : ["dir: command not found. Did you mean 'ls'?"],
-    "cat resume": [
-      "# Tristan Sereño",
-      "Software Engineer | 5+ years experience",
-      "Focus: Automation, Internal Tooling, Full-Stack TypeScript",
-      "Notable: Built a system that cut 6-hour processes to 10 minutes",
-    ],
-    "type resume": isWindows ? [
-      "# Tristan Sereño",
-      "Software Engineer | 5+ years experience",
-      "Focus: Automation, Internal Tooling, Full-Stack TypeScript",
-      "Notable: Built a system that cut 6-hour processes to 10 minutes",
-    ] : ["type: command not found. Did you mean 'cat'?"],
+    "cat resume": ["command not found: cat resume. Try 'about' or 'experience'."],
+    "type resume": ["command not found: type resume. Try 'about' or 'experience'."],
     "sudo hire me": isWindows
       ? ["'sudo' is not recognized as an internal or external command.", "Try: runas /hire me"]
       : ["✓ Excellent choice. Sending offer letter... just kidding.", "  But seriously — let's talk. tristansereno@gmail.com"],
