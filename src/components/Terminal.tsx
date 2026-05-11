@@ -166,7 +166,7 @@ function getCommands(themeId: string): Record<string, string[]> {
       "# Status: Open to work",
     ],
     skills: [
-      "Languages:  TypeScript, JavaScript, C#, Python, Java, PHP",
+      "Languages:  TypeScript, JavaScript, C#, Python, Java, PHP, Ruby",
       "Frontend:   React, Next.js, Tailwind CSS",
       "Backend:    Node.js, PostgreSQL, MySQL, Firebase",
       "Tooling:    Git, Docker, Kubernetes, VS Code Extensions",

@@ -1,5 +1,5 @@
 const stack = [
-  { category: "Languages", items: ["TypeScript", "JavaScript", "C#", "Python", "Java", "PHP"] },
+  { category: "Languages", items: ["TypeScript", "JavaScript", "C#", "Python", "Java", "PHP", "Ruby"] },
   { category: "Frontend", items: ["React", "Next.js", "Tailwind CSS", "HTML/CSS"] },
   { category: "Backend", items: ["Node.js", "REST APIs", "PostgreSQL", "MySQL", "Firebase"] },
   { category: "Tooling", items: ["Git", "Docker", "Kubernetes", "VS Code Extensions", "CI/CD", "TDD", "Clean Architecture"] },
