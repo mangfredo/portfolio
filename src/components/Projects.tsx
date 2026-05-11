@@ -8,7 +8,7 @@ const projects = [
     story:
       "Built a parsing engine in Node.js backed by PostgreSQL that takes a Word document containing contract details, extracts the content, applies strict validation rules, and generates production-ready JavaScript — handling complex edge cases across multiple countries and employment types. Code generation completes in roughly 10 seconds. The full end-to-end process takes under 10 minutes, down from 6 hours.",
     aftermath:
-      "The company's CTO and Director of Engineering adopted the core logic for integration into the flagship self-service product.",
+      "The company's CTO and Director of Engineering is planning the core logic for integration into the flagship self-service product.",
     tags: ["Node.js", "PostgreSQL", "Parsing Engine", "Validation"],
     metric: "97%+",
     metricLabel: "time saved",
