@@ -23,7 +23,7 @@ const projects = [
     story:
       "Developed a suite of browser-based automation scripts (Tampermonkey) to streamline navigation, automate Jira workflows, and integrate internal tools into a unified workflow. DOM manipulation, event interception, handling lazy-loaded elements and dynamic content — all designed to work with existing enterprise tools without any backend changes.",
     aftermath:
-      "Independently designed and deployed. The tools are actively used across the team and contributed to a near-100% improvement in workflow productivity.",
+      "Independently designed and deployed. Actively used across the team — saving an estimated 2–3 hours of dev time per day when used consistently.",
     tags: ["JavaScript", "Tampermonkey", "DOM Manipulation", "Browser Automation"],
     metric: "10+",
     metricLabel: "tools built",
