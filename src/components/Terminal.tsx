@@ -146,6 +146,7 @@ function getCommands(themeId: string): Record<string, string[]> {
       "  whoami          Current user",
       "  dir             List files",
       "  type resume     View resume summary",
+      "  experience      Career timeline",
       "  runas /hire me  You know what to do",
     ] : [
       "Available commands:",
@@ -158,12 +159,13 @@ function getCommands(themeId: string): Record<string, string[]> {
       "  whoami          Current user",
       "  ls              List files",
       "  cat resume      View resume summary",
+      "  experience      Career timeline",
       "  sudo hire me    You know what to do",
     ],
     about: [
-      "Tristan Sereño — Software Engineer",
-      "5+ years building automation systems and internal tools.",
-      "Based in the Philippines, working remotely across timezones.",
+      "# 5+ years of full-stack development.",
+      "# Based in the Philippines; specialized in seamless remote collaboration.",
+      "# Status: Open to work",
     ],
     skills: [
       "Languages:  TypeScript, JavaScript, C#, Python, Java, PHP",
@@ -173,13 +175,19 @@ function getCommands(themeId: string): Record<string, string[]> {
     ],
     contact: [
       "Email:    tristansereno@gmail.com",
-      "LinkedIn: linkedin.com/in/tristan-sereño-9b1b662a3",
+      "LinkedIn: https://www.linkedin.com/in/tristan-sere%C3%B1o-9b1b662a3/",
     ],
     projects: [
-      "01  Offer Letter Automation Engine    97%+ time reduction",
-      "02  Enterprise Workflow Suite         10+ tools built",
-      "03  Smart Quote Replacer             VS Code Extension v2.2",
-      "04  Numerra Calculator               Published on MS Store",
+      "01  Offer Letter Automation Engine     #work",
+      "02  Enterprise Automation Suite        #automation",
+      "03  Smart Quote Replacer              #work",
+      "04  Numerra Calculator                https://apps.microsoft.com/detail/9npwb2bk246z",
+      "05  ywcims.com                        https://ywcims.com/home.html",
+      "06  Zamora Gym App                    https://github.com/mangfredo/Zamora-Gym-App",
+      "07  FixME: Capstone Project           https://github.com/mangfredo/Fix-Me-Game",
+      "08  ExoTECH                           https://github.com/mangfredo/Exotech",
+      "09  JOBSearch                         https://github.com/mangfredo/JOBSearch",
+      "10  Task Management App              https://github.com/mangfredo/Task-Management-App",
     ],
     whoami: isWindows
       ? ["DESKTOP-TRISTAN\\tristan"]
@@ -236,6 +244,12 @@ function getCommands(themeId: string): Record<string, string[]> {
     date: [new Date().toUTCString()],
     echo: ["Usage: echo <message>"],
     cls: ["__CLEAR__"],
+    experience: [
+      "2025 - Present    Software Engineer (Technical Solutions)",
+      "2021 - Present    Full-Stack Engineer (Freelance/Contract)",
+      "2025              Graduated STI College Caloocan",
+      '2021              > console.log("Hello World")',
+    ],
     neofetch: isWindows ? [
       "  tristan@DESKTOP-TRISTAN",
       "  ─────────────────────────",
@@ -264,6 +278,71 @@ function getCommands(themeId: string): Record<string, string[]> {
 }
 
 type Phase = "idle" | "typing" | "output" | "done" | "interactive";
+
+// Render text with auto-linked URLs, emails, and #anchors
+function renderLinkedText(text: string, theme: typeof themes[0]) {
+  // Match URLs, emails, and #section anchors
+  const linkRegex = /(https?:\/\/[^\s]+)|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})|(#[a-z]+)/g;
+  const parts: (string | { type: "url" | "email" | "anchor"; value: string })[] = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = linkRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    if (match[1]) {
+      parts.push({ type: "url", value: match[1] });
+    } else if (match[2]) {
+      parts.push({ type: "email", value: match[2] });
+    } else if (match[3]) {
+      parts.push({ type: "anchor", value: match[3] });
+    }
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  // If no links found, return plain text
+  if (parts.length === 1 && typeof parts[0] === "string") {
+    return text;
+  }
+
+  return parts.map((part, i) => {
+    if (typeof part === "string") return <span key={i}>{part}</span>;
+    if (part.type === "anchor") {
+      return (
+        <a
+          key={i}
+          href={part.value}
+          className="underline decoration-dotted underline-offset-2 transition-colors hover:opacity-80"
+          style={{ color: theme.successColor }}
+        >
+          {part.value}
+        </a>
+      );
+    }
+    const href = part.type === "email" ? `mailto:${part.value}` : part.value;
+    // Shorten display for long URLs
+    let display = part.value;
+    if (part.type === "url" && display.length > 45) {
+      display = display.slice(0, 42) + "...";
+    }
+    return (
+      <a
+        key={i}
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline decoration-dotted underline-offset-2 transition-colors hover:opacity-80"
+        style={{ color: theme.successColor }}
+      >
+        {display}
+      </a>
+    );
+  });
+}
 
 interface HistoryLine {
   type: "command" | "output" | "success" | "error" | "arrow";
@@ -704,7 +783,7 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
                 <><span style={{ color: theme.promptColor }}>{theme.prompt}</span>{" "}</>
               )}
               {line.type === "error" && <span style={{ color: theme.errorColor }}>{line.text}</span>}
-              {line.type === "output" && line.text}
+              {line.type === "output" && renderLinkedText(line.text, theme)}
               {line.type === "command" && line.text}
             </p>
           ))}
