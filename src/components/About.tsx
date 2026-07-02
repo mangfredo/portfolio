@@ -1,9 +1,9 @@
 const stack = [
-  { category: "Languages", items: ["TypeScript", "JavaScript", "C#", "Python", "Java", "PHP", "Ruby"] },
-  { category: "Frontend", items: ["React", "Next.js", "Tailwind CSS", "HTML/CSS"] },
-  { category: "Backend", items: ["Node.js", "REST APIs", "PostgreSQL", "MySQL", "MongoDB", "NoSQL", "Firebase"] },
-  { category: "Tooling", items: ["Git", "Docker", "Kubernetes", "VS Code Extensions", "CI/CD", "TDD", "Clean Architecture"] },
-  { category: "Approach", items: ["AI-Native Development", "Automation-First", "Async Remote"] },
+  { category: "// LANGUAGES & RUNTIMES", items: ["TypeScript", "JavaScript", "Python", "C#", "PHP", "Node.js"] },
+  { category: "// VIEW LAYERS & DESIGN", items: ["React", "Next.js", "Tailwind CSS", "HTML/CSS", "React Native"] },
+  { category: "// BACKEND & DATA", items: ["Express", "Django", "REST APIs", "PostgreSQL", "MS SQL", "MySQL", "MongoDB", "Firebase"] },
+  { category: "// INFRASTRUCTURE & TOOLING", items: ["Docker", "Kubernetes", "Git", "CI/CD", "VS Code Extensions", "Jira"] },
+  { category: "// APPROACH", items: ["AI-Native Development", "Automation-First", "Clean Architecture", "TDD", "Async Remote"] },
 ];
 
 export default function About() {

@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
+import Experience from "@/components/Experience";
 import Projects from "@/components/Projects";
 import PersonalProjects from "@/components/PersonalProjects";
 import Decalogue from "@/components/Decalogue";
@@ -19,6 +20,7 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <About />
+        <Experience />
         <Projects />
         <PersonalProjects />
         <Decalogue />
