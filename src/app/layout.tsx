@@ -21,17 +21,31 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Tristan Sereño — Software Engineer",
+  title: "Tristan Sereño — Software Engineer | Full-Stack Developer Portfolio",
   description:
-    "I build internal tools and automation systems that cut hours off manual work. 5+ years across full-stack TypeScript, Node.js, and high-performance automation.",
+    "Tristan Sereño is a Software Engineer specializing in internal tools, automation systems, and full-stack development. 5+ years experience with TypeScript, Node.js, React, and Next.js.",
+  keywords: [
+    "Tristan Sereño",
+    "Tristan Sereno",
+    "Software Engineer",
+    "Full-Stack Developer",
+    "TypeScript Developer",
+    "Node.js Developer",
+    "React Developer",
+    "Web Developer Portfolio",
+    "Frontend Developer",
+    "Backend Developer",
+  ],
+  authors: [{ name: "Tristan Sereño", url: "https://tristansereno.vercel.app" }],
+  creator: "Tristan Sereño",
   metadataBase: new URL("https://tristansereno.vercel.app"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Tristan Sereño — Software Engineer",
+    title: "Tristan Sereño — Software Engineer | Full-Stack Developer Portfolio",
     description:
-      "I build internal tools and automation systems that cut hours off manual work. 5+ years across full-stack TypeScript, Node.js, and high-performance automation.",
+      "Tristan Sereño is a Software Engineer specializing in internal tools, automation systems, and full-stack development. 5+ years experience with TypeScript, Node.js, React, and Next.js.",
     url: "https://tristansereno.vercel.app",
     siteName: "Tristan Sereño Portfolio",
     locale: "en_US",
@@ -41,7 +55,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Tristan Sereño — Software Engineer",
     description:
-      "I build internal tools and automation systems that cut hours off manual work. 5+ years across full-stack TypeScript, Node.js, and high-performance automation.",
+      "Software Engineer specializing in internal tools, automation systems, and full-stack development with TypeScript, Node.js, React.",
   },
   robots: {
     index: true,
@@ -49,7 +63,13 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
+  },
+  verification: {
+    google: "google0fd61d0c93817dcf",
   },
 };
 
@@ -65,6 +85,35 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: "Tristan Sereño",
+              alternateName: "Tristan Sereno",
+              url: "https://tristansereno.vercel.app",
+              jobTitle: "Software Engineer",
+              description:
+                "Software Engineer specializing in internal tools, automation systems, and full-stack development with TypeScript, Node.js, React, and Next.js.",
+              knowsAbout: [
+                "TypeScript",
+                "JavaScript",
+                "Node.js",
+                "React",
+                "Next.js",
+                "Full-Stack Development",
+                "Automation",
+                "Web Development",
+              ],
+              sameAs: [
+                "https://www.linkedin.com/in/tristansereno",
+                "https://github.com/mangfredo",
+              ],
+            }),
+          }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `

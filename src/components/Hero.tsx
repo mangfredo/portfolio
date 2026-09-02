@@ -75,13 +75,14 @@ export default function Hero() {
             className={`sel-invert font-mono text-xs tracking-[0.25em] uppercase mb-6 hero-fade ${revealed ? "visible" : ""}`}
             style={{ color: "var(--accent-bright)", transitionDelay: "50ms" }}
           >
-            Software Engineer · Full-Stack Developer
+            <span className="sr-only">Tristan Sereño — </span>Software Engineer · Full-Stack Developer
           </p>
 
           <h1
             className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.05] tracking-tight mb-8"
             style={{ fontFamily: "var(--font-playfair), serif" }}
           >
+            <span className="sr-only">Tristan Sereño: </span>
             {lines.map((line, lineIdx) => (
               <span key={lineIdx}>
                 {line.words.map((word) => {
