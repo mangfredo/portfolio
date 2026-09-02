@@ -24,6 +24,33 @@ export const metadata: Metadata = {
   title: "Tristan Sereño — Software Engineer",
   description:
     "I build internal tools and automation systems that cut hours off manual work. 5+ years across full-stack TypeScript, Node.js, and high-performance automation.",
+  metadataBase: new URL("https://tristansereno.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Tristan Sereño — Software Engineer",
+    description:
+      "I build internal tools and automation systems that cut hours off manual work. 5+ years across full-stack TypeScript, Node.js, and high-performance automation.",
+    url: "https://tristansereno.vercel.app",
+    siteName: "Tristan Sereño Portfolio",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tristan Sereño — Software Engineer",
+    description:
+      "I build internal tools and automation systems that cut hours off manual work. 5+ years across full-stack TypeScript, Node.js, and high-performance automation.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
 };
 
 export default function RootLayout({
