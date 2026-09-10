@@ -296,6 +296,37 @@ img, svg, button, video {
   animation: heroWordReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Reduced motion: skip blur for performance */
+@media (prefers-reduced-motion: reduce) {
+  .hero-word {
+    filter: none;
+    transform: none;
+  }
+  
+  .hero-word.revealed {
+    animation: none;
+    opacity: 1;
+  }
+  
+  .reveal {
+    transition: none;
+  }
+  
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+  
+  .hero-fade {
+    transition: none;
+  }
+  
+  .hero-fade.visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Stagger delays for each word */
 .hero-word:nth-child(1).revealed { animation-delay: 0ms; }
 .hero-word:nth-child(2).revealed { animation-delay: 80ms; }

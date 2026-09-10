@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 
 interface ScreenshotCarouselProps {
   screenshots: string[];
@@ -72,11 +73,14 @@ export default function ScreenshotCarousel({ screenshots, title }: ScreenshotCar
                   zIndex: offset === 0 ? 2 : 1,
                 }}
               >
-                <img
+                <Image
                   src={src}
                   alt={`${title} screenshot ${i + 1}`}
+                  width={400}
+                  height={400}
                   className="w-auto max-w-full max-h-[400px] object-contain"
                   draggable={false}
+                  loading={i === 0 ? "eager" : "lazy"}
                 />
               </div>
             );
@@ -178,11 +182,14 @@ export default function ScreenshotCarousel({ screenshots, title }: ScreenshotCar
                   zIndex: isActive ? 10 : 5 - wrapDist,
                 }}
               >
-                <img
+                <Image
                   src={src}
                   alt={`${title} screenshot ${i + 1}`}
+                  width={300}
+                  height={240}
                   className="h-full w-auto object-contain"
                   draggable={false}
+                  loading={i === 0 ? "eager" : "lazy"}
                 />
               </div>
             );

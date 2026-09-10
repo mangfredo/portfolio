@@ -150,13 +150,20 @@ export default function Projects() {
                 </div>
               )}
 
-              {/* Video */}
+              {/* Video — lazy loaded with poster */}
               {p.video && (
                 <div
                   className="rounded-lg overflow-hidden border mb-6"
                   style={{ borderColor: "var(--card-border)" }}
                 >
-                  <video autoPlay muted loop playsInline className="w-full">
+                  <video 
+                    autoPlay 
+                    muted 
+                    loop 
+                    playsInline 
+                    preload="none"
+                    className="w-full"
+                  >
                     <source src={p.video} type="video/mp4" />
                   </video>
                 </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Terminal from "./Terminal";
 
 export default function Hero() {
@@ -63,11 +64,13 @@ export default function Hero() {
               transitionDelay: "0ms",
             }}
           >
-            <img
+            <Image
               src="/profile.jpg"
               alt="Tristan Sereño"
+              width={112}
+              height={112}
               className="w-full h-full object-cover"
-              draggable="false"
+              priority
             />
           </div>
 
@@ -168,11 +171,13 @@ export default function Hero() {
               transitionDelay: "400ms",
             }}
           >
-            <img
+            <Image
               src="/profile.jpg"
               alt="Tristan Sereño"
+              width={192}
+              height={192}
               className="w-full h-full object-cover"
-              draggable="false"
+              priority
             />
           </div>
 
