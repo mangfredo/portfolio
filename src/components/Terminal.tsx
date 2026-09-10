@@ -623,8 +623,7 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
                       setDemoCursorPos(null);
                       setDemoActive(false);
 
-                      // Restart idle timer for next demo
-                      startIdleTimer();
+                      // Demo finished — no restart
                     }, 400);
                   }
                 }
@@ -645,18 +644,13 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
   // Start idle timer when terminal becomes interactive
   useEffect(() => {
     if (phase === "interactive") {
-      // Give a moment after the initial animation before starting idle timer
-      const delay = setTimeout(() => {
-        if (!userInteractedRef.current) {
-          startIdleTimer();
-        }
-      }, 1000);
-      return () => clearTimeout(delay);
+      // Idle demo disabled — user can explore on their own
+      return () => {};
     }
     return () => {
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
     };
-  }, [phase, startIdleTimer]);
+  }, [phase]);
 
   // Cancel demo on any real user interaction with the terminal
   useEffect(() => {
