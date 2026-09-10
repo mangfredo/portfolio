@@ -9,11 +9,11 @@ const projects = [
     tags: ["WinUI 3", "C#", "Windows App SDK", "Published"],
     link: "https://apps.microsoft.com/detail/9npwb2bk246z",
     screenshots: [
-      "/numerra_1.png",
-      "/numerra_2.png",
-      "/numerra_3.png",
-      "/numerra_4.png",
-      "/numerra_5.png",
+      "/numerra_1.webp",
+      "/numerra_2.webp",
+      "/numerra_3.webp",
+      "/numerra_4.webp",
+      "/numerra_5.webp",
     ],
   },
   {

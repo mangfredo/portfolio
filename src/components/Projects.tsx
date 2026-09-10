@@ -1,4 +1,5 @@
 import ScreenshotCarousel from "./ScreenshotCarousel";
+import LazyVideo from "./LazyVideo";
 
 const projects = [
   {
@@ -150,23 +151,12 @@ export default function Projects() {
                 </div>
               )}
 
-              {/* Video — lazy loaded with poster */}
+              {/* Video — lazy loaded only when visible */}
               {p.video && (
-                <div
+                <LazyVideo
+                  src={p.video}
                   className="rounded-lg overflow-hidden border mb-6"
-                  style={{ borderColor: "var(--card-border)" }}
-                >
-                  <video 
-                    autoPlay 
-                    muted 
-                    loop 
-                    playsInline 
-                    preload="none"
-                    className="w-full"
-                  >
-                    <source src={p.video} type="video/mp4" />
-                  </video>
-                </div>
+                />
               )}
 
               {/* Tags + link */}
