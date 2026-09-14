@@ -292,7 +292,7 @@ export default function PeriodDetail({ id }: Props) {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(v: number) => [`₱${fmt(v)}`, ""]}
+                    formatter={(value: number, name: string) => [`₱${fmt(value)}`, name]}
                     contentStyle={{
                       background: "#FFFFFF",
                       border: "1px solid #E2E8F0",
