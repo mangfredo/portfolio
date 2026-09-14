@@ -36,7 +36,7 @@ function buildCashflowData(budget: number, expenses: { name: string; amount: num
 export default function PeriodDetail({ id }: Props) {
   const router = useRouter();
   const { periods, updateBudget, deletePeriod } = usePeriods();
-  const { expenses, addExpense, updateExpense, deleteExpense, total } = useExpenses(id);
+  const { expenses, addExpense, updateExpense, deleteExpense, togglePaid, total } = useExpenses(id);
 
   useSwipeToClose("/budget-tracker");
 
@@ -369,12 +369,25 @@ export default function PeriodDetail({ id }: Props) {
                     gridTemplateColumns: "1fr auto",
                     borderBottom: idx < expenses.length - 1 ? "1px solid #F1F5F9" : "none",
                     textAlign: "left",
+                    opacity: e.paid ? 0.5 : 1,
                   }}
                 >
-                  <span className="truncate pr-4 font-medium" style={{ color: "#0F172A" }}>
+                  <span
+                    className="truncate pr-4 font-medium"
+                    style={{
+                      color: e.paid ? "#94A3B8" : "#0F172A",
+                      textDecoration: e.paid ? "line-through" : "none",
+                    }}
+                  >
                     {e.name}
                   </span>
-                  <span className="bt-data text-right tabular-nums" style={{ color: "#0F172A" }}>
+                  <span
+                    className="bt-data text-right tabular-nums"
+                    style={{
+                      color: e.paid ? "#94A3B8" : "#0F172A",
+                      textDecoration: e.paid ? "line-through" : "none",
+                    }}
+                  >
                     ₱{fmt(e.amount)}
                   </span>
                 </button>
@@ -513,16 +526,30 @@ export default function PeriodDetail({ id }: Props) {
             </div>
 
             {editingExpense && (
-              <button
-                onClick={() => {
-                  if (editingExpense) deleteExpense(editingExpense.id);
-                  closeItemModal();
-                }}
-                className="w-full py-2 text-xs font-medium transition-colors hover:opacity-70"
-                style={{ color: "#FF5252" }}
-              >
-                Delete this item
-              </button>
+              <>
+                <button
+                  onClick={() => {
+                    togglePaid(editingExpense.id);
+                    closeItemModal();
+                  }}
+                  className="w-full py-2 text-xs font-medium transition-colors hover:opacity-70"
+                  style={{ color: "#0D9488" }}
+                >
+                  {expenses.find((e) => e.id === editingExpense.id)?.paid
+                    ? "Mark as unpaid"
+                    : "Mark as paid ✓"}
+                </button>
+                <button
+                  onClick={() => {
+                    if (editingExpense) deleteExpense(editingExpense.id);
+                    closeItemModal();
+                  }}
+                  className="w-full py-2 text-xs font-medium transition-colors hover:opacity-70"
+                  style={{ color: "#FF5252" }}
+                >
+                  Delete this item
+                </button>
+              </>
             )}
 
             <div className="flex gap-3 pt-1">

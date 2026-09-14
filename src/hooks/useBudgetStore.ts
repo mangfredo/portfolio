@@ -13,6 +13,7 @@ export interface Expense {
   id: string;
   name: string;
   amount: number;
+  paid?: boolean;
 }
 
 const PERIODS_KEY = "bt_periods";
@@ -129,7 +130,17 @@ export function useExpenses(periodId: string) {
     });
   };
 
+  const togglePaid = (id: string) => {
+    setExpenses((prev) => {
+      const next = prev.map((e) =>
+        e.id === id ? { ...e, paid: !e.paid } : e
+      );
+      save(itemsKey(periodId), next);
+      return next;
+    });
+  };
+
   const total = expenses.reduce((sum, e) => sum + e.amount, 0);
 
-  return { expenses, addExpense, updateExpense, deleteExpense, total };
+  return { expenses, addExpense, updateExpense, deleteExpense, togglePaid, total };
 }
