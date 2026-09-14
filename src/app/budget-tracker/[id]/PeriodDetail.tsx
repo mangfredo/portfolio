@@ -1,13 +1,36 @@
 "use client";
 
-import { use, useState } from "react";
+import "../budget.css";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend,
+} from "recharts";
 import { usePeriods, useExpenses } from "@/hooks/useBudgetStore";
 import { useSwipeToClose } from "@/hooks/useSwipeToClose";
 import Modal from "@/components/budget/Modal";
+import BudgetShell from "@/components/budget/BudgetShell";
 
-interface Props {
-  id: string;
+interface Props { id: string; }
+
+// Category color palette for donut
+const CAT_COLORS = ["#111D35", "#0D9488", "#3B82F6", "#F59E0B", "#94A3B8", "#8B5CF6"];
+
+const fmt = (n: number) =>
+  n.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+// Build a mini sparkline-like chart from expenses across the period
+// (uses expense index as x-axis — illustrates cashflow waterfall)
+function buildCashflowData(budget: number, expenses: { name: string; amount: number }[]) {
+  let running = budget;
+  return [
+    { label: "Start", balance: budget },
+    ...expenses.map((e) => {
+      running -= e.amount;
+      return { label: e.name, balance: Math.max(running, 0) };
+    }),
+  ];
 }
 
 export default function PeriodDetail({ id }: Props) {
@@ -15,7 +38,6 @@ export default function PeriodDetail({ id }: Props) {
   const { periods, updateBudget, deletePeriod } = usePeriods();
   const { expenses, addExpense, updateExpense, deleteExpense, total } = useExpenses(id);
 
-  // Swipe left/right → back to list
   useSwipeToClose("/budget-tracker");
 
   const period = periods.find((p) => p.id === id);
@@ -23,16 +45,28 @@ export default function PeriodDetail({ id }: Props) {
   // Modal state
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [showItemModal, setShowItemModal] = useState(false);
-  const [editingExpense, setEditingExpense] = useState<{ id: string; name: string; amount: string } | null>(null);
+  const [editingExpense, setEditingExpense] = useState<{ id: string } | null>(null);
 
-  // Budget form
+  // Form fields
   const [budgetInput, setBudgetInput] = useState("");
-
-  // Expense form
   const [itemName, setItemName] = useState("");
   const [itemAmount, setItemAmount] = useState("");
 
-  const remaining = (period?.budget ?? 0) - total;
+  const budget = period?.budget ?? 0;
+  const remaining = budget - total;
+  const spentPct = budget > 0 ? Math.min((total / budget) * 100, 100) : 0;
+
+  const cashflowData = buildCashflowData(budget, expenses);
+
+  // Donut data — top 5 + "Other"
+  const donutData = (() => {
+    if (expenses.length === 0) return [];
+    const sorted = [...expenses].sort((a, b) => b.amount - a.amount);
+    if (sorted.length <= 6) return sorted.map((e) => ({ name: e.name, value: e.amount }));
+    const top5 = sorted.slice(0, 5);
+    const other = sorted.slice(5).reduce((s, e) => s + e.amount, 0);
+    return [...top5.map((e) => ({ name: e.name, value: e.amount })), { name: "Other", value: other }];
+  })();
 
   const handleSetBudget = () => {
     const val = parseFloat(budgetInput.replace(/,/g, ""));
@@ -43,7 +77,7 @@ export default function PeriodDetail({ id }: Props) {
   };
 
   const openBudgetModal = () => {
-    setBudgetInput(period?.budget ? String(period.budget) : "");
+    setBudgetInput(budget ? String(budget) : "");
     setShowBudgetModal(true);
   };
 
@@ -51,169 +85,296 @@ export default function PeriodDetail({ id }: Props) {
     const name = itemName.trim();
     const amount = parseFloat(itemAmount.replace(/,/g, ""));
     if (!name || isNaN(amount) || amount < 0) return;
-
     if (editingExpense) {
       updateExpense(editingExpense.id, name, amount);
       setEditingExpense(null);
     } else {
       addExpense(name, amount);
     }
-
-    setItemName("");
-    setItemAmount("");
+    setItemName(""); setItemAmount("");
     setShowItemModal(false);
   };
 
   const openEditExpense = (e: { id: string; name: string; amount: number }) => {
     setItemName(e.name);
     setItemAmount(String(e.amount));
-    setEditingExpense({ id: e.id, name: e.name, amount: String(e.amount) });
+    setEditingExpense({ id: e.id });
     setShowItemModal(true);
   };
 
   const closeItemModal = () => {
     setShowItemModal(false);
-    setItemName("");
-    setItemAmount("");
+    setItemName(""); setItemAmount("");
     setEditingExpense(null);
   };
 
-  const fmt = (n: number) =>
-    n.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
   if (!period && periods.length > 0) {
-    // Period not found — back to list
     router.replace("/budget-tracker");
     return null;
   }
 
   return (
-    <div
-      className="min-h-screen flex flex-col pb-28"
-      style={{ background: "var(--bg)", color: "var(--fg)" }}
-    >
-      {/* Header */}
-      <header className="flex items-center justify-between px-5 pt-10 pb-4">
-        <button
-          onClick={() => router.push("/budget-tracker")}
-          className="font-mono text-xs transition-colors hover:text-[var(--accent-bright)]"
-          style={{ color: "var(--fg-muted)" }}
-          aria-label="Back"
-        >
-          ← Back
-        </button>
-        <button
-          onClick={() => {
-            if (confirm(`Delete "${period?.label}"? This cannot be undone.`)) {
-              deletePeriod(id);
-              router.replace("/budget-tracker");
-            }
-          }}
-          className="font-mono text-xs transition-colors hover:text-[var(--terracotta)]"
-          style={{ color: "var(--fg-muted)" }}
-        >
-          Delete
-        </button>
-      </header>
+    <BudgetShell>
+      <div className="px-6 pt-8 pb-4 max-w-5xl mx-auto">
 
-      <div className="px-5 space-y-8 mt-2">
-
-        {/* ── Section 1: Total Budget ──────────────────────────────── */}
-        <section>
-          <p
-            className="font-mono text-[0.65rem] uppercase tracking-widest mb-1"
-            style={{ color: "var(--accent-bright)" }}
+        {/* ── Page header ───────────────────────────────────────── */}
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <button
+              onClick={() => router.push("/budget-tracker")}
+              className="text-xs font-medium mb-2 flex items-center gap-1 transition-colors hover:opacity-70"
+              style={{ color: "#64748B" }}
+            >
+              ← All Periods
+            </button>
+            <h2
+              className="text-2xl font-semibold tracking-tight"
+              style={{ color: "#0F172A" }}
+            >
+              {period?.label ?? "Loading…"}
+            </h2>
+          </div>
+          <button
+            onClick={() => {
+              if (confirm(`Delete "${period?.label}"? This cannot be undone.`)) {
+                deletePeriod(id);
+                router.replace("/budget-tracker");
+              }
+            }}
+            className="text-xs font-medium transition-colors hover:opacity-70 mt-1"
+            style={{ color: "#94A3B8" }}
           >
-            Total Salary / Budget
-          </p>
-          <h2
-            className="text-2xl font-bold mb-1"
-            style={{ fontFamily: "var(--font-playfair), serif" }}
-          >
-            {period?.label ?? "—"}
-          </h2>
+            Delete period
+          </button>
+        </div>
 
-          <div className="flex items-end gap-4 mt-3">
-            {period?.budget ? (
-              <p className="text-3xl font-bold font-mono">
-                ₱{fmt(period.budget)}
-              </p>
-            ) : (
-              <p
-                className="text-base font-mono"
-                style={{ color: "var(--fg-muted)" }}
-              >
-                No budget set yet.
-              </p>
-            )}
+        {/* ── Section 1: Metric cards ───────────────────────────── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          {/* Budget card */}
+          <div className="bt-card p-5">
+            <p className="text-xs uppercase tracking-wider font-medium mb-3" style={{ color: "#64748B" }}>
+              Total Budget
+            </p>
+            <p className="bt-data text-3xl font-bold mb-1" style={{ color: "#0F172A", fontSize: "1.75rem" }}>
+              {budget > 0 ? `₱${fmt(budget)}` : "—"}
+            </p>
             <button
               onClick={openBudgetModal}
-              className="mb-0.5 px-4 py-2 rounded-lg font-mono text-xs font-bold transition-colors"
-              style={{ background: "var(--accent)", color: "var(--bg)" }}
+              className="text-xs font-medium transition-colors mt-1"
+              style={{ color: "#0D9488" }}
             >
-              {period?.budget ? "Edit" : "+ Set Budget"}
+              {budget > 0 ? "Edit →" : "Set budget →"}
             </button>
           </div>
-        </section>
 
-        {/* ── Section 2: Expense Table ─────────────────────────────── */}
-        <section>
-          <p
-            className="font-mono text-[0.65rem] uppercase tracking-widest mb-3"
-            style={{ color: "var(--accent-bright)" }}
+          {/* Spent card */}
+          <div className="bt-card p-5">
+            <p className="text-xs uppercase tracking-wider font-medium mb-3" style={{ color: "#64748B" }}>
+              Total Spent
+            </p>
+            <p className="bt-data text-3xl font-bold mb-1" style={{ color: "#0F172A", fontSize: "1.75rem" }}>
+              ₱{fmt(total)}
+            </p>
+            {budget > 0 && (
+              <div className="mt-2">
+                <div className="flex justify-between text-xs mb-1" style={{ color: "#64748B" }}>
+                  <span>{spentPct.toFixed(1)}% of budget</span>
+                </div>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#E2E8F0" }}>
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${spentPct}%`,
+                      background: spentPct > 90 ? "#FF5252" : "#0D9488",
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Remaining card */}
+          <div className="bt-card p-5">
+            <p className="text-xs uppercase tracking-wider font-medium mb-3" style={{ color: "#64748B" }}>
+              Remaining
+            </p>
+            <p
+              className="bt-data text-3xl font-bold mb-1"
+              style={{
+                color: budget === 0 ? "#94A3B8" : remaining >= 0 ? "#00C97A" : "#FF5252",
+                fontSize: "1.75rem",
+              }}
+            >
+              {budget > 0 ? `₱${fmt(remaining)}` : "—"}
+            </p>
+            {budget > 0 && remaining < 0 && (
+              <span className="bt-badge bt-badge-negative mt-1">Over budget</span>
+            )}
+            {budget > 0 && remaining >= 0 && remaining < budget * 0.1 && (
+              <span className="bt-badge bt-badge-warning mt-1">Almost depleted</span>
+            )}
+          </div>
+        </div>
+
+        {/* ── Charts row (only when data exists) ───────────────── */}
+        {expenses.length > 0 && budget > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+            {/* Area chart — cashflow waterfall */}
+            <div className="bt-card p-5">
+              <p className="text-xs uppercase tracking-wider font-medium mb-4" style={{ color: "#64748B" }}>
+                Balance Waterfall
+              </p>
+              <ResponsiveContainer width="100%" height={180}>
+                <AreaChart data={cashflowData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="tealGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"  stopColor="#0D9488" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#0D9488" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    horizontal vertical={false}
+                    stroke="#E2E8F0" strokeDasharray="4 4"
+                  />
+                  <XAxis
+                    dataKey="label"
+                    tick={{ fontSize: 10, fill: "#94A3B8" }}
+                    axisLine={false} tickLine={false}
+                    interval="preserveStartEnd"
+                  />
+                  <YAxis
+                    tick={{ fontSize: 10, fill: "#94A3B8" }}
+                    axisLine={false} tickLine={false}
+                    tickFormatter={(v) => `₱${(v / 1000).toFixed(0)}k`}
+                    width={48}
+                  />
+                  <Tooltip
+                    formatter={(v: number) => [`₱${fmt(v)}`, "Balance"]}
+                    contentStyle={{
+                      background: "#FFFFFF",
+                      border: "1px solid #E2E8F0",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      boxShadow: "0 4px 12px rgba(11,19,37,0.1)",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="balance"
+                    stroke="#0D9488"
+                    strokeWidth={2.5}
+                    fill="url(#tealGrad)"
+                    dot={false}
+                    activeDot={{ r: 4, fill: "#0D9488", strokeWidth: 0 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Donut — expense allocation */}
+            <div className="bt-card p-5">
+              <p className="text-xs uppercase tracking-wider font-medium mb-4" style={{ color: "#64748B" }}>
+                Expense Allocation
+              </p>
+              <ResponsiveContainer width="100%" height={180}>
+                <PieChart>
+                  <Pie
+                    data={donutData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={52}
+                    outerRadius={76}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {donutData.map((_, i) => (
+                      <Cell key={i} fill={CAT_COLORS[i % CAT_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(v: number) => [`₱${fmt(v)}`, ""]}
+                    contentStyle={{
+                      background: "#FFFFFF",
+                      border: "1px solid #E2E8F0",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                    }}
+                  />
+                  <Legend
+                    iconType="circle"
+                    iconSize={7}
+                    wrapperStyle={{ fontSize: "11px", color: "#64748B" }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
+
+        {/* ── Section 2: Expense table ──────────────────────────── */}
+        <div className="bt-card overflow-hidden mb-5">
+          <div
+            className="flex items-center justify-between px-5 py-3.5 border-b"
+            style={{ background: "#EAEFF5", borderColor: "#E2E8F0" }}
           >
-            Expenses
-          </p>
+            <p className="text-xs uppercase tracking-wider font-medium" style={{ color: "#64748B" }}>
+              Expenses
+            </p>
+            <button
+              onClick={() => setShowItemModal(true)}
+              className="bt-btn-primary px-3 py-1.5 text-xs"
+            >
+              + Add Item
+            </button>
+          </div>
 
           {expenses.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 gap-5">
-              <p
-                className="font-mono text-sm text-center"
-                style={{ color: "var(--fg-muted)" }}
+            <div className="flex flex-col items-center justify-center py-16 gap-4">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                style={{ background: "#EAEFF5", color: "#CBD5E1" }}
               >
-                No expenses yet.
+                ↕
+              </div>
+              <p className="text-sm" style={{ color: "#94A3B8" }}>
+                No expenses recorded yet.
               </p>
-              <button
-                onClick={() => setShowItemModal(true)}
-                className="px-8 py-3 rounded-xl font-mono text-sm font-bold transition-colors"
-                style={{ background: "var(--accent)", color: "var(--bg)" }}
-              >
-                + Add Item
-              </button>
             </div>
           ) : (
-            <div
-              className="rounded-xl border overflow-hidden"
-              style={{ borderColor: "var(--card-border)" }}
-            >
-              {/* Column headers */}
+            <div>
+              {/* Header row */}
               <div
-                className="grid grid-cols-2 px-4 py-2 font-mono text-[0.65rem] uppercase tracking-wider"
+                className="grid px-5 py-2.5"
                 style={{
-                  color: "var(--fg-muted)",
-                  background: "var(--card-bg)",
-                  borderBottom: "1px solid var(--card-border)",
+                  gridTemplateColumns: "1fr auto",
+                  background: "#F8FAFC",
+                  borderBottom: "1px solid #E2E8F0",
                 }}
               >
-                <span>Item</span>
-                <span className="text-right">Amount</span>
+                <span className="text-xs uppercase tracking-wider font-medium" style={{ color: "#94A3B8" }}>
+                  Item
+                </span>
+                <span className="text-xs uppercase tracking-wider font-medium text-right" style={{ color: "#94A3B8" }}>
+                  Amount
+                </span>
               </div>
 
-              {/* Expense rows */}
-              {expenses.map((e) => (
+              {/* Rows */}
+              {expenses.map((e, idx) => (
                 <button
                   key={e.id}
                   onClick={() => openEditExpense(e)}
-                  className="w-full grid grid-cols-2 px-4 py-3.5 text-sm transition-colors text-left group"
+                  className="bt-tr w-full grid px-5 py-3.5 text-sm"
                   style={{
-                    background: "var(--card-bg)",
-                    borderBottom: "1px solid var(--card-border)",
+                    gridTemplateColumns: "1fr auto",
+                    borderBottom: idx < expenses.length - 1 ? "1px solid #F1F5F9" : "none",
+                    textAlign: "left",
                   }}
                 >
-                  <span className="truncate pr-2 group-hover:text-[var(--accent-bright)] transition-colors">
+                  <span className="truncate pr-4 font-medium" style={{ color: "#0F172A" }}>
                     {e.name}
                   </span>
-                  <span className="text-right font-mono tabular-nums">
+                  <span className="bt-data text-right tabular-nums" style={{ color: "#0F172A" }}>
                     ₱{fmt(e.amount)}
                   </span>
                 </button>
@@ -221,112 +382,66 @@ export default function PeriodDetail({ id }: Props) {
 
               {/* Total row */}
               <div
-                className="grid grid-cols-2 px-4 py-3.5 text-sm font-bold"
+                className="grid px-5 py-3.5 text-sm font-semibold"
                 style={{
-                  background: "color-mix(in srgb, var(--accent) 6%, var(--card-bg))",
-                  borderBottom: "1px solid var(--card-border)",
+                  gridTemplateColumns: "1fr auto",
+                  background: "#F0FDF9",
+                  borderTop: "1px solid #E2E8F0",
                 }}
               >
-                <span className="font-mono text-xs uppercase tracking-wider" style={{ color: "var(--fg-muted)" }}>
-                  Total
+                <span className="text-xs uppercase tracking-wider font-semibold" style={{ color: "#0D9488" }}>
+                  Total Spent
                 </span>
-                <span className="text-right font-mono tabular-nums">
+                <span className="bt-data text-right tabular-nums" style={{ color: "#0D9488" }}>
                   ₱{fmt(total)}
                 </span>
               </div>
 
               {/* Remaining row */}
               <div
-                className="grid grid-cols-2 px-4 py-3.5 text-sm font-bold"
+                className="grid px-5 py-3.5 text-sm font-bold"
                 style={{
-                  background: "var(--card-bg)",
+                  gridTemplateColumns: "1fr auto",
+                  background: "#FFFFFF",
+                  borderTop: "1px solid #E2E8F0",
                 }}
               >
-                <span className="font-mono text-xs uppercase tracking-wider" style={{ color: "var(--fg-muted)" }}>
+                <span className="text-xs uppercase tracking-wider font-semibold" style={{ color: "#64748B" }}>
                   Remaining
                 </span>
                 <span
-                  className="text-right font-mono tabular-nums"
-                  style={{ color: remaining >= 0 ? "var(--accent-bright)" : "var(--terracotta)" }}
+                  className="bt-data text-right tabular-nums font-bold"
+                  style={{ color: budget === 0 ? "#94A3B8" : remaining >= 0 ? "#00C97A" : "#FF5252" }}
                 >
-                  ₱{fmt(remaining)}
+                  {budget > 0 ? `₱${fmt(remaining)}` : "—"}
                 </span>
               </div>
             </div>
           )}
-        </section>
-
-        {/* ── Section 3: Summary (shown only when table is populated) ─ */}
-        {expenses.length > 0 && (
-          <section
-            className="rounded-xl border p-5"
-            style={{
-              background: "var(--card-bg)",
-              borderColor: "var(--card-border)",
-            }}
-          >
-            <p
-              className="font-mono text-[0.65rem] uppercase tracking-widest mb-4"
-              style={{ color: "var(--accent-bright)" }}
-            >
-              Summary
-            </p>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span style={{ color: "var(--fg-muted)" }}>Budget</span>
-                <span className="font-mono tabular-nums">
-                  {period?.budget ? `₱${fmt(period.budget)}` : "—"}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span style={{ color: "var(--fg-muted)" }}>Spent</span>
-                <span className="font-mono tabular-nums text-[var(--terracotta)]">
-                  ₱{fmt(total)}
-                </span>
-              </div>
-              <div
-                className="flex justify-between text-sm font-bold pt-2 mt-2"
-                style={{ borderTop: "1px solid var(--card-border)" }}
-              >
-                <span>Remaining</span>
-                <span
-                  className="font-mono tabular-nums"
-                  style={{ color: remaining >= 0 ? "var(--accent-bright)" : "var(--terracotta)" }}
-                >
-                  ₱{fmt(remaining)}
-                </span>
-              </div>
-            </div>
-          </section>
-        )}
+        </div>
 
       </div>
 
-      {/* FAB — add expense (only when items exist) */}
+      {/* FAB — add expense when rows exist */}
       {expenses.length > 0 && (
         <button
           onClick={() => setShowItemModal(true)}
-          className="fixed bottom-8 right-6 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold transition-transform active:scale-95"
-          style={{ background: "var(--accent)", color: "var(--bg)" }}
+          className="bt-btn-primary fixed bottom-8 right-6 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-lg"
           aria-label="Add expense"
         >
           +
         </button>
       )}
 
-      {/* ── Budget Modal ───────────────────────────────────────────── */}
+      {/* ── Budget modal ──────────────────────────────────────── */}
       {showBudgetModal && (
         <Modal
-          title={period?.budget ? "Edit Budget" : "Set Budget"}
+          title={budget ? "Edit Budget" : "Set Budget"}
           onClose={() => { setShowBudgetModal(false); setBudgetInput(""); }}
         >
           <div className="space-y-4">
             <div>
-              <label
-                htmlFor="budget-input"
-                className="block font-mono text-xs uppercase tracking-wider mb-2"
-                style={{ color: "var(--fg-muted)" }}
-              >
+              <label htmlFor="budget-input" className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
                 Amount (₱)
               </label>
               <input
@@ -338,23 +453,20 @@ export default function PeriodDetail({ id }: Props) {
                 onKeyDown={(e) => { if (e.key === "Enter") handleSetBudget(); }}
                 placeholder="0.00"
                 autoFocus
-                className="w-full rounded-lg border px-4 py-3 text-sm bg-transparent outline-none focus:border-[var(--accent)] font-mono"
-                style={{ borderColor: "var(--card-border)", color: "var(--fg)" }}
+                className="bt-input bt-data"
               />
             </div>
             <div className="flex gap-3 pt-1">
               <button
                 onClick={() => { setShowBudgetModal(false); setBudgetInput(""); }}
-                className="flex-1 py-3 rounded-lg border font-mono text-sm transition-colors"
-                style={{ borderColor: "var(--card-border)", color: "var(--fg-muted)" }}
+                className="bt-btn-ghost flex-1 py-2.5"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSetBudget}
                 disabled={!budgetInput.trim()}
-                className="flex-1 py-3 rounded-lg font-mono text-sm font-bold transition-colors disabled:opacity-40"
-                style={{ background: "var(--accent)", color: "var(--bg)" }}
+                className="bt-btn-primary flex-1 py-2.5"
               >
                 Save
               </button>
@@ -363,7 +475,7 @@ export default function PeriodDetail({ id }: Props) {
         </Modal>
       )}
 
-      {/* ── Item Modal ─────────────────────────────────────────────── */}
+      {/* ── Item modal ────────────────────────────────────────── */}
       {showItemModal && (
         <Modal
           title={editingExpense ? "Edit Expense" : "Add Expense"}
@@ -371,11 +483,7 @@ export default function PeriodDetail({ id }: Props) {
         >
           <div className="space-y-4">
             <div>
-              <label
-                htmlFor="item-name"
-                className="block font-mono text-xs uppercase tracking-wider mb-2"
-                style={{ color: "var(--fg-muted)" }}
-              >
+              <label htmlFor="item-name" className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
                 Item
               </label>
               <input
@@ -385,16 +493,11 @@ export default function PeriodDetail({ id }: Props) {
                 onChange={(e) => setItemName(e.target.value)}
                 placeholder="e.g. Groceries"
                 autoFocus
-                className="w-full rounded-lg border px-4 py-3 text-sm bg-transparent outline-none focus:border-[var(--accent)]"
-                style={{ borderColor: "var(--card-border)", color: "var(--fg)" }}
+                className="bt-input"
               />
             </div>
             <div>
-              <label
-                htmlFor="item-amount"
-                className="block font-mono text-xs uppercase tracking-wider mb-2"
-                style={{ color: "var(--fg-muted)" }}
-              >
+              <label htmlFor="item-amount" className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
                 Amount (₱)
               </label>
               <input
@@ -405,38 +508,31 @@ export default function PeriodDetail({ id }: Props) {
                 onChange={(e) => setItemAmount(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleAddItem(); }}
                 placeholder="0.00"
-                className="w-full rounded-lg border px-4 py-3 text-sm bg-transparent outline-none focus:border-[var(--accent)] font-mono"
-                style={{ borderColor: "var(--card-border)", color: "var(--fg)" }}
+                className="bt-input bt-data"
               />
             </div>
 
-            {/* Delete option when editing */}
             {editingExpense && (
               <button
                 onClick={() => {
-                  deleteExpense(editingExpense.id);
+                  if (editingExpense) deleteExpense(editingExpense.id);
                   closeItemModal();
                 }}
-                className="w-full py-2 font-mono text-xs transition-colors hover:text-[var(--terracotta)]"
-                style={{ color: "var(--fg-muted)" }}
+                className="w-full py-2 text-xs font-medium transition-colors hover:opacity-70"
+                style={{ color: "#FF5252" }}
               >
                 Delete this item
               </button>
             )}
 
             <div className="flex gap-3 pt-1">
-              <button
-                onClick={closeItemModal}
-                className="flex-1 py-3 rounded-lg border font-mono text-sm transition-colors"
-                style={{ borderColor: "var(--card-border)", color: "var(--fg-muted)" }}
-              >
+              <button onClick={closeItemModal} className="bt-btn-ghost flex-1 py-2.5">
                 Cancel
               </button>
               <button
                 onClick={handleAddItem}
                 disabled={!itemName.trim() || !itemAmount.trim()}
-                className="flex-1 py-3 rounded-lg font-mono text-sm font-bold transition-colors disabled:opacity-40"
-                style={{ background: "var(--accent)", color: "var(--bg)" }}
+                className="bt-btn-primary flex-1 py-2.5"
               >
                 {editingExpense ? "Update" : "Add"}
               </button>
@@ -444,6 +540,6 @@ export default function PeriodDetail({ id }: Props) {
           </div>
         </Modal>
       )}
-    </div>
+    </BudgetShell>
   );
 }

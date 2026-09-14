@@ -1,18 +1,19 @@
 "use client";
 
+import "./budget.css";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePeriods } from "@/hooks/useBudgetStore";
 import { useSwipeToClose } from "@/hooks/useSwipeToClose";
 import Modal from "@/components/budget/Modal";
+import BudgetShell from "@/components/budget/BudgetShell";
 
 export default function BudgetHome() {
   const router = useRouter();
-  const { periods, addPeriod, deletePeriod } = usePeriods();
+  const { periods, addPeriod } = usePeriods();
   const [showAdd, setShowAdd] = useState(false);
   const [label, setLabel] = useState("");
 
-  // Swipe left or right → go home
   useSwipeToClose("/");
 
   const handleAdd = () => {
@@ -25,114 +26,115 @@ export default function BudgetHome() {
   };
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ background: "var(--bg)", color: "var(--fg)" }}
-    >
-      {/* Header */}
-      <header className="flex items-center justify-between px-5 pt-10 pb-4">
-        <div>
+    <BudgetShell>
+      <div className="px-6 pt-8 pb-4 max-w-4xl mx-auto">
+        {/* Page header */}
+        <div className="mb-8">
           <p
-            className="font-mono text-[0.65rem] uppercase tracking-widest mb-1"
-            style={{ color: "var(--accent-bright)" }}
+            className="text-xs uppercase tracking-[0.14em] font-medium mb-1"
+            style={{ color: "#64748B" }}
           >
-            Budget Tracker
+            Overview
           </p>
-          <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-playfair), serif" }}>
+          <h2
+            className="text-2xl font-semibold tracking-tight"
+            style={{ color: "#0F172A" }}
+          >
             Pay Periods
-          </h1>
+          </h2>
+          <p className="text-sm mt-1" style={{ color: "#64748B" }}>
+            Select a period to view its budget breakdown.
+          </p>
         </div>
-        {/* Back link — desktop only */}
-        <a
-          href="/"
-          className="hidden sm:inline font-mono text-xs transition-colors hover:text-[var(--accent-bright)]"
-          style={{ color: "var(--fg-muted)" }}
-        >
-          ← Portfolio
-        </a>
-      </header>
 
-      {/* List or empty state */}
-      <main className="flex-1 px-5 py-4">
         {periods.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[55vh] gap-6">
-            <p
-              className="font-mono text-sm text-center"
-              style={{ color: "var(--fg-muted)" }}
+          /* Empty state */
+          <div
+            className="bt-card flex flex-col items-center justify-center py-20 px-8 text-center"
+            style={{ borderStyle: "dashed" }}
+          >
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center mb-5 text-2xl"
+              style={{ background: "#EAEFF5", color: "#0D9488" }}
             >
-              No periods yet.
-              <br />
-              Add your first one to get started.
+              ₱
+            </div>
+            <p className="font-semibold text-base mb-1" style={{ color: "#0F172A" }}>
+              No periods yet
+            </p>
+            <p className="text-sm mb-6" style={{ color: "#64748B" }}>
+              Create your first pay period to start tracking your budget.
             </p>
             <button
               onClick={() => setShowAdd(true)}
-              className="px-8 py-3 rounded-xl font-mono text-sm font-bold transition-colors"
-              style={{
-                background: "var(--accent)",
-                color: "var(--bg)",
-              }}
+              className="bt-btn-primary px-6 py-2.5"
             >
-              + Add Period
+              + New Period
             </button>
           </div>
         ) : (
-          <ul className="space-y-3">
+          <div className="space-y-3">
             {periods.map((p) => (
-              <li key={p.id}>
-                <button
-                  onClick={() => router.push(`/budget-tracker/${p.id}`)}
-                  className="w-full text-left rounded-xl border px-5 py-4 flex items-center justify-between transition-colors group"
-                  style={{
-                    background: "var(--card-bg)",
-                    borderColor: "var(--card-border)",
-                  }}
-                >
+              <button
+                key={p.id}
+                onClick={() => router.push(`/budget-tracker/${p.id}`)}
+                className="bt-card w-full text-left px-5 py-4 flex items-center justify-between group"
+                style={{ borderRadius: "8px" }}
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-sm font-bold bt-data"
+                    style={{ background: "#EAEFF5", color: "#0D9488" }}
+                  >
+                    ₱
+                  </div>
                   <div>
-                    <p className="font-semibold text-base">{p.label}</p>
-                    <p
-                      className="font-mono text-xs mt-0.5"
-                      style={{ color: "var(--fg-muted)" }}
-                    >
+                    <p className="font-semibold text-sm" style={{ color: "#0F172A" }}>
+                      {p.label}
+                    </p>
+                    <p className="text-xs mt-0.5 bt-data" style={{ color: "#64748B" }}>
                       {p.budget > 0
-                        ? `Budget: ₱${p.budget.toLocaleString()}`
+                        ? `₱${p.budget.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`
                         : "Budget not set"}
                     </p>
                   </div>
-                  <span
-                    className="font-mono text-sm transition-colors group-hover:text-[var(--accent-bright)]"
-                    style={{ color: "var(--accent)" }}
-                  >
-                    →
-                  </span>
-                </button>
-                {/* Long-press / swipe hint: delete via dedicated button */}
-              </li>
+                </div>
+                <svg
+                  width="16" height="16" viewBox="0 0 16 16" fill="none"
+                  className="transition-transform group-hover:translate-x-0.5"
+                  style={{ color: "#CBD5E1" }}
+                >
+                  <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
             ))}
-          </ul>
+          </div>
         )}
-      </main>
+      </div>
 
-      {/* FAB — only when items exist */}
+      {/* FAB */}
       {periods.length > 0 && (
         <button
           onClick={() => setShowAdd(true)}
-          className="fixed bottom-8 right-6 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold transition-transform active:scale-95"
-          style={{ background: "var(--accent)", color: "var(--bg)" }}
+          className="bt-btn-primary fixed bottom-8 right-6 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-lg"
           aria-label="Add period"
         >
           +
         </button>
       )}
 
-      {/* Add Period modal */}
+      {/* Modal */}
       {showAdd && (
-        <Modal title="New Period" onClose={() => { setShowAdd(false); setLabel(""); }}>
+        <Modal
+          title="New Pay Period"
+          onClose={() => { setShowAdd(false); setLabel(""); }}
+        >
           <div className="space-y-4">
             <div>
               <label
                 htmlFor="period-label"
-                className="block font-mono text-xs uppercase tracking-wider mb-2"
-                style={{ color: "var(--fg-muted)" }}
+                className="block text-xs font-medium uppercase tracking-wider mb-2"
+                style={{ color: "#64748B" }}
               >
                 Label
               </label>
@@ -144,26 +146,20 @@ export default function BudgetHome() {
                 onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); }}
                 placeholder="e.g. September 15, 2026"
                 autoFocus
-                className="w-full rounded-lg border px-4 py-3 text-sm bg-transparent outline-none focus:border-[var(--accent)]"
-                style={{
-                  borderColor: "var(--card-border)",
-                  color: "var(--fg)",
-                }}
+                className="bt-input"
               />
             </div>
             <div className="flex gap-3 pt-1">
               <button
                 onClick={() => { setShowAdd(false); setLabel(""); }}
-                className="flex-1 py-3 rounded-lg border font-mono text-sm transition-colors"
-                style={{ borderColor: "var(--card-border)", color: "var(--fg-muted)" }}
+                className="bt-btn-ghost flex-1 py-2.5"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAdd}
                 disabled={!label.trim()}
-                className="flex-1 py-3 rounded-lg font-mono text-sm font-bold transition-colors disabled:opacity-40"
-                style={{ background: "var(--accent)", color: "var(--bg)" }}
+                className="bt-btn-primary flex-1 py-2.5"
               >
                 Create
               </button>
@@ -171,6 +167,6 @@ export default function BudgetHome() {
           </div>
         </Modal>
       )}
-    </div>
+    </BudgetShell>
   );
 }

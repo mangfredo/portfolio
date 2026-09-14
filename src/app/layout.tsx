@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Inter, Playfair_Display } from "next/font/google";
+import { Geist_Mono, Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -10,6 +10,12 @@ const inter = Inter({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
   display: "swap",
 });
@@ -81,7 +87,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${geistMono.variable} ${playfair.variable} h-full`}
+      className={`${inter.variable} ${geistMono.variable} ${jetbrainsMono.variable} ${playfair.variable} h-full`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
