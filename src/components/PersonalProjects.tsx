@@ -49,6 +49,14 @@ const projects = [
     link: "https://github.com/mangfredo/Fix-Me-Game",
   },
   {
+    title: "Budget Tracker",
+    platform: "Personal Tool",
+    story:
+      "A private budget tracker I built for personal use. Organizes expenses by pay period or month, tracks a running total against a set budget, and shows the remaining balance at a glance. Everything lives in localStorage — no backend, no account, no fuss. Accessible only by direct URL.",
+    tags: ["Next.js", "TypeScript", "localStorage", "Mobile-first"],
+    link: "/budget-tracker",
+  },
+  {
     title: "TaskManagementApp",
     platform: "Desktop — Windows",
     story:
@@ -146,12 +154,14 @@ export default function PersonalProjects() {
                   {p.link && (
                     <a
                       href={p.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      target={p.link.startsWith("/") ? "_self" : "_blank"}
+                      rel={p.link.startsWith("/") ? undefined : "noopener noreferrer"}
                       className="sel-accent ml-auto font-mono text-xs transition-colors hover:text-[var(--accent-bright)]"
                       style={{ color: "var(--accent)" }}
                     >
-                      {p.link.includes("github.com")
+                      {p.link.startsWith("/")
+                        ? "Open ↗"
+                        : p.link.includes("github.com")
                         ? "GitHub ↗"
                         : p.link.includes("apps.microsoft.com")
                         ? "Store ↗"
