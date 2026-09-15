@@ -35,6 +35,7 @@ export default function BudgetShell({ children }: BudgetShellProps) {
   };
 
   const handleBack = () => router.push("/");
+  const handleOverview = () => router.push("/budget-tracker");
   const isDark = settings.theme === "dark";
 
   return (
@@ -51,6 +52,7 @@ export default function BudgetShell({ children }: BudgetShellProps) {
         <div className="hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:w-60 z-20">
           <Sidebar
             onBack={handleBack}
+            onOverview={handleOverview}
             onReset={handleReset}
             onClear={handleClear}
             onToast={toast}
@@ -68,6 +70,7 @@ export default function BudgetShell({ children }: BudgetShellProps) {
             <div className="fixed inset-y-0 left-0 z-50 w-64 lg:hidden">
               <Sidebar
                 onBack={handleBack}
+                onOverview={handleOverview}
                 onReset={handleReset}
                 onClear={handleClear}
                 onToast={toast}

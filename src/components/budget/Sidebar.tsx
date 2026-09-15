@@ -7,12 +7,13 @@ import type { ToastType } from "@/hooks/useToast";
 
 interface SidebarProps {
   onBack: () => void;
+  onOverview: () => void;
   onReset: () => void;
   onClear: () => void;
   onToast: (msg: string, type?: ToastType) => void;
 }
 
-export default function Sidebar({ onBack, onReset, onClear, onToast }: SidebarProps) {
+export default function Sidebar({ onBack, onOverview, onReset, onClear, onToast }: SidebarProps) {
   const { theme, setTheme, demoMode, setDemoMode } = useBudgetSettingsCtx();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isLight = theme === "light";
@@ -61,7 +62,7 @@ export default function Sidebar({ onBack, onReset, onClear, onToast }: SidebarPr
 
       {/* Nav */}
       <nav className="flex flex-col gap-1 flex-1">
-        <button className="bt-nav-item active">
+        <button className="bt-nav-item active" onClick={onOverview}>
           <span className="text-sm w-4 text-center opacity-70">◈</span>
           <span>Overview</span>
         </button>
