@@ -12,6 +12,7 @@ import { useSwipeToClose } from "@/hooks/useSwipeToClose";
 import { useCountUp } from "@/hooks/useCountUp";
 import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
 import Modal from "@/components/budget/Modal";
+import { ConfirmModal } from "@/components/budget/BudgetModal";
 import BudgetShell from "@/components/budget/BudgetShell";
 
 interface Props { id: string; }
@@ -92,6 +93,7 @@ export default function PeriodDetail({ id }: Props) {
   const router = useRouter();
   const { theme } = useBudgetSettingsCtx();
   const isDark = theme === "dark";
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { periods, updateBudget, deletePeriod } = usePeriods();
   const { expenses, addExpense, updateExpense, deleteExpense, togglePaid, total } = useExpenses(id);
@@ -191,12 +193,7 @@ export default function PeriodDetail({ id }: Props) {
             </h2>
           </div>
           <button
-            onClick={() => {
-              if (confirm(`Delete "${period?.label}"? This cannot be undone.`)) {
-                deletePeriod(id);
-                router.replace("/budget-tracker");
-              }
-            }}
+            onClick={() => setShowDeleteConfirm(true)}
             className="bt-text-muted text-xs font-medium transition-opacity hover:opacity-70 mt-1"
           >
             Delete period
@@ -609,6 +606,21 @@ export default function PeriodDetail({ id }: Props) {
             </div>
           </div>
         </Modal>
+      )}
+
+      {showDeleteConfirm && (
+        <ConfirmModal
+          title={`Delete "${period?.label}"?`}
+          message="This will permanently remove this period and all its expenses. This cannot be undone."
+          confirmLabel="Delete"
+          danger
+          isDark={isDark}
+          onConfirm={() => {
+            deletePeriod(id);
+            router.replace("/budget-tracker");
+          }}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
       )}
     </BudgetShell>
   );

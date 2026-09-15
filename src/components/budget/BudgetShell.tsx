@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
 import ToastContainer from "./ToastContainer";
+import { LoadingOverlay, ConfirmModal } from "./BudgetModal";
 import { loadSampleData, clearAllData } from "@/lib/budgetSampleData";
 import { useBudgetSettings } from "@/hooks/useBudgetSettings";
 import { BudgetSettingsContext } from "@/context/BudgetSettingsContext";
@@ -13,30 +14,49 @@ interface BudgetShellProps {
   children: React.ReactNode;
 }
 
+type ModalState =
+  | { type: "none" }
+  | { type: "loading"; message: string }
+  | { type: "confirm-clear" }
+  | { type: "confirm-reset" };
+
 export default function BudgetShell({ children }: BudgetShellProps) {
   const router = useRouter();
   const settings = useBudgetSettings();
   const { toasts, toast, dismiss } = useToast();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [modal, setModal] = useState<ModalState>({ type: "none" });
 
-  const handleReset = () => {
-    loadSampleData();
-    toast("Sample data loaded", "success");
-    // Short delay so toast is visible before reload
-    setTimeout(() => { window.location.href = "/budget-tracker"; }, 600);
-  };
-
-  const handleClear = () => {
-    if (confirm("Clear all budget data? This cannot be undone.")) {
-      clearAllData();
-      toast("All data cleared", "info");
-      setTimeout(() => { window.location.href = "/budget-tracker"; }, 600);
-    }
-  };
-
-  const handleBack = () => router.push("/");
-  const handleOverview = () => router.push("/budget-tracker");
   const isDark = settings.theme === "dark";
+
+  // ── Reset (load sample data) ─────────────────────────────────────────────
+  const handleReset = () => setModal({ type: "confirm-reset" });
+
+  const doReset = async () => {
+    setModal({ type: "loading", message: "Loading sample data…" });
+    await new Promise((r) => setTimeout(r, 800));
+    loadSampleData();
+    setModal({ type: "none" });
+    toast("Sample data loaded", "success");
+    router.push("/budget-tracker");
+    router.refresh();
+  };
+
+  // ── Clear all data ───────────────────────────────────────────────────────
+  const handleClear = () => setModal({ type: "confirm-clear" });
+
+  const doClear = async () => {
+    setModal({ type: "loading", message: "Clearing all data…" });
+    await new Promise((r) => setTimeout(r, 600));
+    clearAllData();
+    setModal({ type: "none" });
+    toast("All data cleared", "info");
+    router.push("/budget-tracker");
+    router.refresh();
+  };
+
+  const handleBack     = () => router.push("/");
+  const handleOverview = () => router.push("/budget-tracker");
 
   return (
     <BudgetSettingsContext.Provider value={settings}>
@@ -84,10 +104,7 @@ export default function BudgetShell({ children }: BudgetShellProps) {
           {/* Mobile top bar */}
           <div
             className="lg:hidden flex items-center justify-between px-4 py-3 border-b"
-            style={{
-              background: "#0F172A",
-              borderColor: "rgba(255,255,255,0.07)",
-            }}
+            style={{ background: "#0F172A", borderColor: "rgba(255,255,255,0.07)" }}
           >
             <button
               onClick={() => setDrawerOpen(true)}
@@ -112,6 +129,34 @@ export default function BudgetShell({ children }: BudgetShellProps) {
 
         {/* Toasts */}
         <ToastContainer toasts={toasts} dismiss={dismiss} isDark={isDark} />
+
+        {/* Modals */}
+        {modal.type === "loading" && (
+          <LoadingOverlay message={modal.message} isDark={isDark} />
+        )}
+
+        {modal.type === "confirm-reset" && (
+          <ConfirmModal
+            title="Load Sample Data"
+            message="This will add demo periods to your existing data. Your current periods will not be affected."
+            confirmLabel="Load"
+            isDark={isDark}
+            onConfirm={doReset}
+            onCancel={() => setModal({ type: "none" })}
+          />
+        )}
+
+        {modal.type === "confirm-clear" && (
+          <ConfirmModal
+            title="Clear All Data"
+            message="This will permanently delete all your budget periods and expenses. This cannot be undone."
+            confirmLabel="Clear Everything"
+            danger
+            isDark={isDark}
+            onConfirm={doClear}
+            onCancel={() => setModal({ type: "none" })}
+          />
+        )}
       </div>
     </BudgetSettingsContext.Provider>
   );
