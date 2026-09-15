@@ -121,6 +121,7 @@ export default function RootLayout({
           }}
         />
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               (function() {

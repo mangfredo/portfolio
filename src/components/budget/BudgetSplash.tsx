@@ -3,20 +3,18 @@
 import { useEffect, useState } from "react";
 
 export default function BudgetSplash() {
-  // Skip if already shown this session (e.g. coming back from a period page)
-  const [skip] = useState(() => {
-    if (typeof window === "undefined") return false;
-    if (sessionStorage.getItem("bt_splash_shown")) return true;
-    sessionStorage.setItem("bt_splash_shown", "1");
-    return false;
-  });
-
-  // Phase: "visible" → "fading" → "done"
-  const [phase, setPhase] = useState<"visible" | "fading" | "done">(skip ? "done" : "visible");
+  // Always start as "visible" on SSR, then check sessionStorage on mount
+  const [phase, setPhase] = useState<"visible" | "fading" | "done">("visible");
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (skip) return; // already shown this session
+    // If already shown this session (e.g. returning from a period), skip immediately
+    if (sessionStorage.getItem("bt_splash_shown")) {
+      setPhase("done");
+      return;
+    }
+    sessionStorage.setItem("bt_splash_shown", "1");
+
     // Animate progress bar 0 → 100 over 900ms
     const start = performance.now();
     const duration = 900;
