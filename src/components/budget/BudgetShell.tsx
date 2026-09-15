@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
 import ToastContainer from "./ToastContainer";
 import { LoadingOverlay, ConfirmModal } from "./BudgetModal";
-import BudgetSplash from "./BudgetSplash";
 import { loadSampleData, clearAllData } from "@/lib/budgetSampleData";
 import { useBudgetSettings } from "@/hooks/useBudgetSettings";
 import { BudgetSettingsContext } from "@/context/BudgetSettingsContext";
@@ -134,9 +133,6 @@ export default function BudgetShell({ children }: BudgetShellProps) {
 
         {/* Toasts */}
         <ToastContainer toasts={toasts} dismiss={dismiss} isDark={isDark} />
-
-        {/* Entry splash — first load only, fades out automatically */}
-        <BudgetSplash />
 
         {/* Goodbye overlay — fades in when navigating back to portfolio */}
         {leaving && (

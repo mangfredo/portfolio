@@ -8,6 +8,7 @@ import { useSwipeToClose } from "@/hooks/useSwipeToClose";
 import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
 import Modal from "@/components/budget/Modal";
 import BudgetShell from "@/components/budget/BudgetShell";
+import BudgetSplash from "@/components/budget/BudgetSplash";
 
 export default function BudgetHome() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function BudgetHome() {
 
   return (
     <BudgetShell>
+      <BudgetSplash />
       <div className="px-6 pt-8 pb-4 max-w-4xl mx-auto">
         {/* Page header */}
         <div className="mb-8">
