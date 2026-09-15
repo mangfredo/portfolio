@@ -928,7 +928,7 @@
   left: 0 !important;
   right: 0 !important;
   height: 3px !important;
-  background: linear-gradient(90deg, #00B4D8 0%, #0D9488 50%, #415A77 100%) !important;
+  background: linear-gradient(90deg, #415A77 0%, #0D9488 50%, #1D4ED8 100%) !important;
   border-radius: 12px 12px 0 0 !important;
   z-index: 1 !important;
   pointer-events: none !important;
