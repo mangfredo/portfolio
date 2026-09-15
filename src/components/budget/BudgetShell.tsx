@@ -58,8 +58,8 @@ export default function BudgetShell({ children }: BudgetShellProps) {
 
   const handleBack = () => {
     setLeaving(true);
-    // Let the fade-in complete (400ms), hold briefly, then navigate
-    setTimeout(() => router.push("/"), 900);
+    // Let the fade-in complete (400ms), hold so GIF plays, then navigate
+    setTimeout(() => router.push("/"), 1800);
   };
   const handleOverview = () => router.push("/budget-tracker");
 
@@ -149,16 +149,11 @@ export default function BudgetShell({ children }: BudgetShellProps) {
               animation: "bt-farewell-in 400ms cubic-bezier(0.4,0,0.2,1) forwards",
             }}
           >
-            <svg width="48" height="48" viewBox="0 0 64 64" fill="none">
-              <circle cx="32" cy="32" r="26" stroke="#1E293B" strokeWidth="5"/>
-              <path d="M32 6 A26 26 0 1 1 6 32" stroke="url(#byeGrad)" strokeWidth="5" strokeLinecap="round"/>
-              <defs>
-                <linearGradient id="byeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#0D9488"/>
-                  <stop offset="100%" stopColor="#2DD4BF"/>
-                </linearGradient>
-              </defs>
-            </svg>
+            <img
+              src="/wave-cute.gif"
+              alt="Waving goodbye"
+              style={{ width: 120, height: 120, objectFit: "contain" }}
+            />
             <div style={{ textAlign: "center" }}>
               <p style={{ color: "#2DD4BF", fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 6px" }}>
                 See you next time
