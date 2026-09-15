@@ -5,11 +5,19 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePeriods } from "@/hooks/useBudgetStore";
 import { useSwipeToClose } from "@/hooks/useSwipeToClose";
+import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
 import Modal from "@/components/budget/Modal";
 import BudgetShell from "@/components/budget/BudgetShell";
 
 export default function BudgetHome() {
   const router = useRouter();
+  const { theme } = useBudgetSettingsCtx();
+  const isDark = theme === "dark";
+  const textMain  = isDark ? "#F8FAFC" : "#0F172A";
+  const textMuted = isDark ? "#94A3B8" : "#415A77";
+  const cardBg    = isDark ? "#111D35" : "#FFFFFF";
+  const borderCol = isDark ? "rgba(255,255,255,0.08)" : "#CBD5E1";
+
   const { periods, addPeriod } = usePeriods();
   const [showAdd, setShowAdd] = useState(false);
   const [label, setLabel] = useState("");
@@ -30,45 +38,33 @@ export default function BudgetHome() {
       <div className="px-6 pt-8 pb-4 max-w-4xl mx-auto">
         {/* Page header */}
         <div className="mb-8">
-          <p
-            className="text-xs uppercase tracking-[0.14em] font-medium mb-1"
-            style={{ color: "#64748B" }}
-          >
+          <p className="bt-text-muted text-xs uppercase tracking-[0.14em] font-medium mb-1">
             Overview
           </p>
-          <h2
-            className="text-2xl font-semibold tracking-tight"
-            style={{ color: "#0F172A" }}
-          >
+          <h2 className="bt-text-main text-2xl font-semibold tracking-tight">
             Pay Periods
           </h2>
-          <p className="text-sm mt-1" style={{ color: "#64748B" }}>
+          <p className="bt-text-muted text-sm mt-1">
             Select a period to view its budget breakdown.
           </p>
         </div>
 
         {periods.length === 0 ? (
-          /* Empty state */
           <div
             className="bt-card flex flex-col items-center justify-center py-20 px-8 text-center"
             style={{ borderStyle: "dashed" }}
           >
             <div
               className="w-14 h-14 rounded-full flex items-center justify-center mb-5 text-2xl"
-              style={{ background: "#EAEFF5", color: "#0D9488" }}
+              style={{ background: isDark ? "#1E293B" : "#EAEFF5", color: isDark ? "#2DD4BF" : "#0D9488" }}
             >
               ₱
             </div>
-            <p className="font-semibold text-base mb-1" style={{ color: "#0F172A" }}>
-              No periods yet
-            </p>
-            <p className="text-sm mb-6" style={{ color: "#64748B" }}>
+            <p className="bt-text-main font-semibold text-base mb-1">No periods yet</p>
+            <p className="bt-text-muted text-sm mb-6">
               Create your first pay period to start tracking your budget.
             </p>
-            <button
-              onClick={() => setShowAdd(true)}
-              className="bt-btn-primary px-6 py-2.5"
-            >
+            <button onClick={() => setShowAdd(true)} className="bt-btn-primary px-6 py-2.5">
               + New Period
             </button>
           </div>
@@ -79,20 +75,18 @@ export default function BudgetHome() {
                 key={p.id}
                 onClick={() => router.push(`/budget-tracker/${p.id}`)}
                 className="bt-card w-full text-left px-5 py-4 flex items-center justify-between group"
-                style={{ borderRadius: "8px" }}
+                style={{ borderRadius: "8px", background: cardBg, border: `1px solid ${borderCol}`, color: textMain, boxShadow: isDark ? "0 4px 20px -2px rgba(0,0,0,0.5)" : "0 1px 3px 0 rgba(11,19,37,0.05)" }}
               >
                 <div className="flex items-center gap-4">
                   <div
                     className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-sm font-bold bt-data"
-                    style={{ background: "#EAEFF5", color: "#0D9488" }}
+                    style={{ background: isDark ? "#1E293B" : "#EAEFF5", color: isDark ? "#2DD4BF" : "#0D9488" }}
                   >
                     ₱
                   </div>
                   <div>
-                    <p className="font-semibold text-sm" style={{ color: "#0F172A" }}>
-                      {p.label}
-                    </p>
-                    <p className="text-xs mt-0.5 bt-data" style={{ color: "#64748B" }}>
+                    <p className="bt-text-main font-semibold text-sm">{p.label}</p>
+                    <p className="bt-text-muted text-xs mt-0.5 bt-data">
                       {p.budget > 0
                         ? `₱${p.budget.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`
                         : "Budget not set"}
@@ -116,10 +110,14 @@ export default function BudgetHome() {
       {periods.length > 0 && (
         <button
           onClick={() => setShowAdd(true)}
-          className="bt-btn-primary fixed bottom-8 right-6 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold shadow-lg"
+          className="bt-btn-primary fixed bottom-8 right-6 w-14 h-14 rounded-full flex items-center justify-center"
+          style={{ boxShadow: "0 8px 24px rgba(13,148,136,0.35), 0 2px 8px rgba(0,0,0,0.3)" }}
           aria-label="Add period"
         >
-          +
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="11" y1="4" x2="11" y2="18" />
+            <line x1="4" y1="11" x2="18" y2="11" />
+          </svg>
         </button>
       )}
 

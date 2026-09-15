@@ -1,25 +1,39 @@
-/* Budget Tracker — scoped design tokens & utilities */
-/* These are ONLY active inside /budget-tracker pages */
+/* ─────────────────────────────────────────────────────────────────────────
+   Budget Tracker — scoped design system
+   Tokens are set on .bt-root, overridden by .bt-root[data-bt-theme="dark"]
+   Nothing here bleeds into the portfolio's global styles.
+   ───────────────────────────────────────────────────────────────────────── */
 
+/* ── Light mode tokens ─────────────────────────────────────────────────── */
 .bt-root {
-  --bt-bg:           #F4F6F9;
-  --bt-surface:      #FFFFFF;
-  --bt-surface-alt:  #EAEFF5;
-  --bt-navy:         #111D35;
-  --bt-navy-dark:    #0B1325;
-  --bt-navy-muted:   #1E2D4A;
-  --bt-text:         #0F172A;
-  --bt-muted:        #64748B;
-  --bt-teal:         #0D9488;
-  --bt-teal-soft:    #CCFBF1;
-  --bt-positive:     #00C97A;
-  --bt-negative:     #FF5252;
-  --bt-warning:      #FFB703;
-  --bt-border:       #E2E8F0;
-  --bt-shadow-card:  0 1px 3px 0 rgba(11,19,37,0.05), 0 1px 2px -1px rgba(11,19,37,0.05);
-  --bt-shadow-hover: 0 10px 15px -3px rgba(11,19,37,0.08), 0 4px 6px -4px rgba(11,19,37,0.03);
-  --bt-font-data:    var(--font-jetbrains), "JetBrains Mono", "Fira Code", ui-monospace, monospace;
-  --bt-font-ui:      var(--font-geist-sans), Inter, -apple-system, sans-serif;
+  /* Backgrounds */
+  --bt-bg:            #F4F6F9;
+  --bt-surface:       #FFFFFF;
+  --bt-surface-alt:   #EAEFF5;
+  --bt-sidebar-bg:    #111D35;
+
+  /* Text */
+  --bt-text:          #0F172A;
+  --bt-muted:         #64748B;
+
+  /* Brand */
+  --bt-teal:          #0D9488;
+  --bt-teal-soft:     #CCFBF1;
+  --bt-teal-glow:     rgba(13,148,136,0.0); /* no glow in light */
+
+  /* Status */
+  --bt-positive:      #00C97A;
+  --bt-negative:      #FF5252;
+  --bt-warning:       #FFB703;
+
+  /* Borders & shadows */
+  --bt-border:        #E2E8F0;
+  --bt-shadow-card:   0 1px 3px 0 rgba(11,19,37,0.05), 0 1px 2px -1px rgba(11,19,37,0.05);
+  --bt-shadow-hover:  0 10px 15px -3px rgba(11,19,37,0.08), 0 4px 6px -4px rgba(11,19,37,0.03);
+
+  /* Fonts */
+  --bt-font-data:     var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+  --bt-font-ui:       var(--font-geist-sans), Inter, -apple-system, sans-serif;
 
   background: var(--bt-bg);
   color: var(--bt-text);
@@ -27,28 +41,76 @@
   min-height: 100vh;
 }
 
-/* Sidebar */
+/* ── Dark mode tokens ──────────────────────────────────────────────────── */
+.bt-root[data-bt-theme="dark"] {
+  --bt-bg:            #090D16;   /* void base */
+  --bt-surface:       #1E293B;   /* cards */
+  --bt-surface-alt:   #334155;   /* inputs / hover */
+  --bt-sidebar-bg:    #0F172A;   /* elevated shell */
+
+  --bt-text:          #E2E8F0;
+  --bt-muted:         #94A3B8;
+
+  --bt-teal:          #2DD4BF;
+  --bt-teal-soft:     rgba(13,148,136,0.18);
+  --bt-teal-glow:     rgba(13,148,136,0.12);
+
+  --bt-positive:      #00E699;
+  --bt-negative:      #FF5252;
+  --bt-warning:       #FFB703;
+
+  --bt-border:        rgba(255,255,255,0.05);
+  --bt-shadow-card:   0 4px 20px -2px rgba(0,0,0,0.5);
+  --bt-shadow-hover:  0 8px 30px -4px rgba(0,0,0,0.65);
+}
+
+/* ── Sidebar ───────────────────────────────────────────────────────────── */
 .bt-sidebar {
-  background: var(--bt-navy);
+  background: var(--bt-sidebar-bg);
   color: #E2E8F0;
   width: 240px;
   min-height: 100vh;
   flex-shrink: 0;
 }
 
-/* Card */
+/* ── Card ──────────────────────────────────────────────────────────────── */
 .bt-card {
-  background: var(--bt-surface);
-  border: 1px solid var(--bt-border);
   border-radius: 8px;
-  box-shadow: var(--bt-shadow-card);
-  transition: box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: box-shadow 200ms cubic-bezier(0.4,0,0.2,1);
+  /* background is always set via inline style — not here */
 }
 .bt-card:hover {
   box-shadow: var(--bt-shadow-hover);
 }
 
-/* Primary button */
+/* Dark mode: refractive top-edge highlight — inline style handles bg, just override border */
+.bt-root[data-bt-theme="dark"] .bt-card {
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+
+/* Ambient glow behind metric cards in dark mode */
+.bt-root[data-bt-theme="dark"] .bt-metric-glow {
+  position: relative;
+  overflow: hidden;
+}
+.bt-root[data-bt-theme="dark"] .bt-metric-glow::before {
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(ellipse at 50% 0%, var(--bt-teal-glow) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.bt-root[data-bt-theme="dark"] .bt-metric-glow > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Primary button ────────────────────────────────────────────────────── */
 .bt-btn-primary {
   background: var(--bt-teal);
   color: #FFFFFF;
@@ -56,22 +118,17 @@
   font-family: var(--bt-font-ui);
   font-size: 0.875rem;
   font-weight: 600;
-  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 150ms cubic-bezier(0.4,0,0.2,1),
+              box-shadow 150ms cubic-bezier(0.4,0,0.2,1);
 }
 .bt-btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35);
+  box-shadow: 0 4px 12px rgba(13,148,136,0.35);
 }
-.bt-btn-primary:active {
-  transform: translateY(0);
-}
-.bt-btn-primary:disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
+.bt-btn-primary:active  { transform: translateY(0); }
+.bt-btn-primary:disabled { opacity: 0.4; pointer-events: none; }
 
-/* Ghost button */
+/* ── Ghost button ──────────────────────────────────────────────────────── */
 .bt-btn-ghost {
   background: transparent;
   border: 1px solid var(--bt-border);
@@ -86,7 +143,7 @@
   color: var(--bt-teal);
 }
 
-/* Badge / pill */
+/* ── Badges / pills ────────────────────────────────────────────────────── */
 .bt-badge {
   border-radius: 9999px;
   font-size: 0.7rem;
@@ -96,19 +153,37 @@
   display: inline-flex;
   align-items: center;
 }
-.bt-badge-positive { background: var(--bt-teal-soft); color: #0F766E; }
-.bt-badge-negative { background: #FFE5E5; color: #CC2B2B; }
-.bt-badge-warning  { background: #FFF3CC; color: #A07600; }
-.bt-badge-soon     { background: #F1F5F9; color: var(--bt-muted); }
-
-/* Data / currency font helper */
-.bt-data {
-  font-family: var(--bt-font-data);
-  font-feature-settings: "tnum" 1;
-  font-variant-numeric: tabular-nums;
+/* Alpha-tint badges */
+.bt-badge-positive {
+  background: rgba(0,230,153,0.12);
+  color: #00875A;
+}
+.bt-root[data-bt-theme="dark"] .bt-badge-positive {
+  background: rgba(0,230,153,0.15);
+  color: #00E699;
+}
+.bt-badge-negative {
+  background: rgba(255,82,82,0.12);
+  color: #CC2B2B;
+}
+.bt-root[data-bt-theme="dark"] .bt-badge-negative {
+  background: rgba(255,82,82,0.15);
+  color: #FF5252;
+}
+.bt-badge-warning {
+  background: rgba(255,183,3,0.12);
+  color: #A07600;
+}
+.bt-root[data-bt-theme="dark"] .bt-badge-warning {
+  background: rgba(255,183,3,0.15);
+  color: #FFB703;
+}
+.bt-badge-soon {
+  background: var(--bt-surface-alt);
+  color: var(--bt-muted);
 }
 
-/* Input */
+/* ── Input ─────────────────────────────────────────────────────────────── */
 .bt-input {
   background: var(--bt-surface-alt);
   border: 1px solid var(--bt-border);
@@ -118,25 +193,30 @@
   padding: 10px 14px;
   width: 100%;
   outline: none;
-  transition: border-color 150ms ease;
+  transition: border-color 150ms ease, background 150ms ease;
 }
 .bt-input:focus {
   border-color: var(--bt-teal);
+  background: var(--bt-surface);
 }
-.bt-input::placeholder {
-  color: var(--bt-muted);
-}
+.bt-input::placeholder { color: var(--bt-muted); }
 
-/* Table row hover */
+/* ── Table row hover ───────────────────────────────────────────────────── */
 .bt-tr {
+  background: transparent;
   transition: background-color 150ms ease;
   cursor: pointer;
 }
-.bt-tr:hover {
-  background: var(--bt-surface-alt);
+.bt-tr:hover { background: var(--bt-surface-alt); }
+
+/* ── Data / currency font helper ───────────────────────────────────────── */
+.bt-data {
+  font-family: var(--bt-font-data);
+  font-feature-settings: "tnum" 1;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Sidebar nav item */
+/* ── Sidebar nav item ──────────────────────────────────────────────────── */
 .bt-nav-item {
   display: flex;
   align-items: center;
@@ -151,11 +231,677 @@
   width: 100%;
   text-align: left;
 }
-.bt-nav-item:hover {
-  background: rgba(255,255,255,0.06);
-  color: #E2E8F0;
-}
+.bt-nav-item:hover { background: rgba(255,255,255,0.06); color: #E2E8F0; }
 .bt-nav-item.active {
-  background: rgba(13, 148, 136, 0.18);
+  background: rgba(13,148,136,0.18);
   color: #5EEAD4;
+}
+
+/* ── Animations ────────────────────────────────────────────────────────── */
+@keyframes bt-slide-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+@keyframes bt-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ==========================================================================
+   DARK MODE NUCLEAR OVERRIDE BLOCK
+   These !important rules defeat any inline styles, Tailwind utilities,
+   or portfolio globals that leak light values into dark mode.
+   ========================================================================== */
+
+/* Canvas */
+.bt-root[data-bt-theme="dark"] {
+  background-color: #0B1325 !important;
+  color: #F8FAFC !important;
+}
+
+/* All card surfaces */
+.bt-root[data-bt-theme="dark"] .bt-card {
+  background-color: #111D35 !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-top: 1px solid rgba(255,255,255,0.15) !important;
+  box-shadow: 0 4px 20px -2px rgba(0,0,0,0.4) !important;
+  color: #F8FAFC !important;
+}
+
+.bt-root[data-bt-theme="dark"] .bt-card:hover {
+  background-color: #111D35 !important; /* no lift — stays same as resting */
+  border-color: rgba(255,255,255,0.08) !important;
+  box-shadow: 0 4px 20px -2px rgba(0,0,0,0.4) !important;
+}
+
+/* All headings and financial figures */
+.bt-root[data-bt-theme="dark"] h1,
+.bt-root[data-bt-theme="dark"] h2,
+.bt-root[data-bt-theme="dark"] h3,
+.bt-root[data-bt-theme="dark"] h4 {
+  color: #F8FAFC !important;
+}
+
+/* Expense table — only target the content wrapper, not rows with custom bg */
+.bt-root[data-bt-theme="dark"] .bt-card > div:not([style*="background"]) {
+  color: #F8FAFC !important;
+}
+
+/* Table rows */
+.bt-root[data-bt-theme="dark"] .bt-tr {
+  background-color: transparent !important;
+  color: #F8FAFC !important;
+}
+.bt-root[data-bt-theme="dark"] .bt-tr:hover {
+  background-color: rgba(255,255,255,0.03) !important;
+}
+
+/* Recharts axis text and grid */
+.bt-root[data-bt-theme="dark"] .recharts-cartesian-grid-horizontal line,
+.bt-root[data-bt-theme="dark"] .recharts-cartesian-grid-vertical line {
+  stroke: rgba(255,255,255,0.08) !important;
+}
+.bt-root[data-bt-theme="dark"] .recharts-text {
+  fill: #94A3B8 !important;
+}
+.bt-root[data-bt-theme="dark"] .recharts-legend-item-text {
+  color: #94A3B8 !important;
+}
+.bt-root[data-bt-theme="dark"] .recharts-legend-wrapper {
+  color: #94A3B8 !important;
+}
+
+/* Input fields */
+.bt-root[data-bt-theme="dark"] .bt-input {
+  background-color: #1E2D4A !important;
+  color: #F8FAFC !important;
+  border-color: rgba(255,255,255,0.12) !important;
+}
+.bt-root[data-bt-theme="dark"] .bt-input::placeholder {
+  color: #64748B !important;
+}
+
+/* Ghost button in dark mode */
+.bt-root[data-bt-theme="dark"] .bt-btn-ghost {
+  border-color: rgba(255,255,255,0.12) !important;
+  color: #94A3B8 !important;
+}
+.bt-root[data-bt-theme="dark"] .bt-btn-ghost:hover {
+  background-color: #1E2D4A !important;
+  border-color: #2DD4BF !important;
+  color: #2DD4BF !important;
+}
+
+/* FAB */
+.bt-root[data-bt-theme="dark"] .bt-btn-primary {
+  background-color: #0D9488 !important;
+  color: #FFFFFF !important;
+}
+
+/* Chart legend — ensure minimum contrast in light mode */
+.bt-root:not([data-bt-theme="dark"]) .recharts-legend-item-text {
+  color: #374151 !important; /* slate-700 — 12:1 on white */
+}
+
+/* Sidebar section labels — always legible on dark sidebar */
+.bt-sidebar p[class*="uppercase"] {
+  color: #7CA4D4 !important;
+}
+
+/* ── Theme-aware text helpers (bypasses hydration mismatch) ─────────────── */
+/* In light mode: dark text. In dark mode: white text via !important */
+.bt-text-main  { color: #0F172A; }
+.bt-text-muted { color: #64748B; }
+.bt-text-teal  { color: #0D9488; }
+
+.bt-root[data-bt-theme="dark"] .bt-text-main  { color: #F8FAFC !important; }
+.bt-root[data-bt-theme="dark"] .bt-text-muted { color: #94A3B8 !important; }
+.bt-root[data-bt-theme="dark"] .bt-text-teal  { color: #2DD4BF !important; }
+
+/* ── Paid item dimming — must beat !important text helpers ──────────────── */
+.bt-root[data-bt-theme="dark"] .bt-tr span[style*="line-through"] {
+  color: #475569 !important;
+  opacity: 0.6;
+}
+
+/* ── Expense row buttons — explicit transparent bg beats browser default ── */
+.bt-root[data-bt-theme="dark"] .bt-tr,
+.bt-root[data-bt-theme="dark"] button.bt-tr {
+  background-color: transparent !important;
+  color: #F8FAFC !important;
+}
+
+/* ── Table header and Total Spent rows — fix hydration bg mismatch ──────── */
+/* Header row (ITEM / AMOUNT) */
+.bt-root[data-bt-theme="dark"] .bt-card .grid.px-5.py-2\.5 {
+  background-color: #1E2D4A !important;
+}
+
+/* Total Spent summary row (has font-semibold) */
+.bt-root[data-bt-theme="dark"] .bt-card .grid.px-5.py-3\.5.font-semibold {
+  background-color: #1E2D4A !important;
+}
+
+/* ── Expenses section header bar (EXPENSES / + Add Item) ────────────────── */
+.bt-root[data-bt-theme="dark"] .bt-card .flex.items-center.justify-between.px-5.py-3\.5 {
+  background-color: #1E2D4A !important;
+}
+
+/* ==========================================================================
+   DUAL-THEME GRADIENTS & AMBIENT DEPTH SYSTEM
+   ========================================================================== */
+
+/* ── Light mode canvas (subtle depth, doesn't touch cards) ────────────── */
+.bt-root[data-bt-theme="light"] {
+  background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%) !important;
+}
+
+/* Light mode ambient glows on metric cards */
+.bt-root[data-bt-theme="light"] .metric-card-glow-teal {
+  background: radial-gradient(350px circle at 85% 15%, rgba(13,148,136,0.07), transparent 70%),
+              linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+}
+
+.bt-root[data-bt-theme="light"] .metric-card-glow-positive {
+  background: radial-gradient(350px circle at 85% 15%, rgba(16,185,129,0.08), transparent 70%),
+              linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+}
+
+/* Light mode progress bar */
+.bt-root[data-bt-theme="light"] .progress-bar-fill {
+  background: linear-gradient(90deg, #0D9488 0%, #10B981 100%) !important;
+  box-shadow: 0 1px 3px rgba(13,148,136,0.2) !important;
+}
+
+/* ── Dark mode card gradient + ambient glows ───────────────────────────── */
+.bt-root[data-bt-theme="dark"] .bt-card,
+.bt-root[data-bt-theme="dark"] .metric-card {
+  background: linear-gradient(180deg, #111D35 0%, #0F172A 100%) !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  border-top: 1px solid rgba(255,255,255,0.14) !important;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5) !important;
+}
+
+.bt-root[data-bt-theme="dark"] .metric-card-glow-teal {
+  background: radial-gradient(300px circle at 85% 15%, rgba(13,148,136,0.15), transparent 70%),
+              linear-gradient(180deg, #111D35 0%, #0F172A 100%) !important;
+}
+
+.bt-root[data-bt-theme="dark"] .metric-card-glow-positive {
+  background: radial-gradient(300px circle at 85% 15%, rgba(0,230,153,0.10), transparent 70%),
+              linear-gradient(180deg, #111D35 0%, #0F172A 100%) !important;
+}
+
+/* Dark mode progress bar */
+.bt-root[data-bt-theme="dark"] .progress-bar-fill {
+  background: linear-gradient(90deg, #0D9488 0%, #00E699 100%) !important;
+  box-shadow: 0 0 12px rgba(0,230,153,0.3) !important;
+}
+
+/* ── Button gradient (both themes) ────────────────────────────────────── */
+.bt-root .bt-btn-primary {
+  background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%) !important;
+  box-shadow: 0 2px 8px rgba(13,148,136,0.25) !important;
+  transition: all 150ms ease !important;
+}
+
+.bt-root .bt-btn-primary:hover {
+  background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%) !important;
+  box-shadow: 0 4px 14px rgba(13,148,136,0.4) !important;
+}
+
+/* ==========================================================================
+   DEEP NAVY & ROYAL SLATE COLOR SYSTEM
+   ========================================================================== */
+
+/* Dark mode canvas */
+.bt-root[data-bt-theme="dark"] {
+  background-color: #0D1B2A !important;
+  color: #F8FAFC !important;
+}
+
+/* Dark card surface gradient */
+.bt-root[data-bt-theme="dark"] .bt-card,
+.bt-root[data-bt-theme="dark"] .metric-card {
+  background: linear-gradient(145deg, #1B263B 0%, #0D1B2A 100%) !important;
+  border: 1px solid rgba(65,90,119,0.35) !important;
+  border-top: 1px solid rgba(255,255,255,0.20) !important;
+  box-shadow: 0 12px 32px -8px rgba(13,27,42,0.7) !important;
+}
+
+/* Dark card hover — no lift */
+.bt-root[data-bt-theme="dark"] .bt-card:hover {
+  background: linear-gradient(145deg, #1B263B 0%, #0D1B2A 100%) !important;
+  border-color: rgba(65,90,119,0.35) !important;
+  box-shadow: 0 12px 32px -8px rgba(13,27,42,0.7) !important;
+}
+
+/* Dark metric glow — teal/cyan radial */
+.bt-root[data-bt-theme="dark"] .metric-card-glow-teal {
+  background: radial-gradient(400px circle at 90% 10%, rgba(0,180,216,0.22), transparent 70%),
+              linear-gradient(145deg, #1B263B 0%, #0D1B2A 100%) !important;
+}
+
+/* Dark progress bar */
+.bt-root[data-bt-theme="dark"] .progress-bar-fill {
+  background: linear-gradient(90deg, #00B4D8 0%, #00E699 100%) !important;
+  box-shadow: 0 0 12px rgba(0,230,153,0.4) !important;
+}
+
+/* Light mode canvas gradient (subtle) */
+.bt-root[data-bt-theme="light"] {
+  background: linear-gradient(180deg, #F8FAFC 0%, #E2E8F0 100%) !important;
+}
+
+/* Light metric glow */
+.bt-root[data-bt-theme="light"] .metric-card-glow-teal {
+  background: radial-gradient(400px circle at 90% 10%, rgba(13,148,136,0.12), transparent 70%),
+              linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%) !important;
+}
+
+/* Light progress bar — royal slate to teal */
+.bt-root[data-bt-theme="light"] .progress-bar-fill {
+  background: linear-gradient(90deg, #415A77 0%, #0D9488 100%) !important;
+  box-shadow: 0 2px 6px rgba(65,90,119,0.25) !important;
+}
+
+/* Button gradient — royal slate system */
+.bt-root .bt-btn-primary {
+  background: linear-gradient(135deg, #415A77 0%, #1B263B 100%) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(27,38,59,0.4) !important;
+}
+
+.bt-root .bt-btn-primary:hover {
+  background: linear-gradient(135deg, #778DA9 0%, #415A77 100%) !important;
+  box-shadow: 0 6px 18px rgba(65,90,119,0.5) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ── Light mode cards — Royal Slate accent system ──────────────────────── */
+.bt-root[data-bt-theme="light"] .bt-card,
+.bt-root[data-bt-theme="light"] .metric-card {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%) !important;
+  border: 1px solid #CBD5E1 !important;
+  border-top: 2px solid #415A77 !important;
+  box-shadow: 0 6px 16px -4px rgba(13,27,42,0.08) !important;
+}
+
+/* ==========================================================================
+   LIGHT MODE — COMPLETE NAVY & SLATE SYSTEM
+   ========================================================================== */
+
+/* Canvas */
+.bt-root[data-bt-theme="light"] {
+  background: linear-gradient(180deg, #F8FAFC 0%, #E2E8F0 100%) !important;
+  color: #0F172A !important;
+}
+
+/* All cards */
+.bt-root[data-bt-theme="light"] .bt-card,
+.bt-root[data-bt-theme="light"] .metric-card {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%) !important;
+  border: 1px solid #CBD5E1 !important;
+  border-top: 2px solid #415A77 !important;
+  box-shadow: 0 6px 16px -4px rgba(13,27,42,0.08) !important;
+  color: #0F172A !important;
+}
+
+/* Card hover — crisp slate tint */
+.bt-root[data-bt-theme="light"] .bt-card:hover {
+  border-top-color: #0D9488 !important;
+  box-shadow: 0 8px 20px -4px rgba(13,27,42,0.12) !important;
+}
+
+/* Metric glow — teal radial */
+.bt-root[data-bt-theme="light"] .metric-card-glow-teal {
+  background: radial-gradient(400px circle at 90% 10%, rgba(13,148,136,0.10), transparent 70%),
+              linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%) !important;
+}
+
+/* Metric glow — positive / remaining */
+.bt-root[data-bt-theme="light"] .metric-card-glow-positive {
+  background: radial-gradient(400px circle at 90% 10%, rgba(16,185,129,0.10), transparent 70%),
+              linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%) !important;
+}
+
+/* Progress bar */
+.bt-root[data-bt-theme="light"] .progress-bar-fill {
+  background: linear-gradient(90deg, #415A77 0%, #0D9488 100%) !important;
+  box-shadow: 0 2px 6px rgba(65,90,119,0.25) !important;
+}
+
+/* Table header (ITEM / AMOUNT) */
+.bt-root[data-bt-theme="light"] .bt-card .grid.px-5.py-2\.5 {
+  background: linear-gradient(180deg, #F1F5F9 0%, #E2E8F0 100%) !important;
+  border-bottom: 1px solid #CBD5E1 !important;
+}
+
+/* Table header text */
+.bt-root[data-bt-theme="light"] .bt-card .grid.px-5.py-2\.5 span {
+  color: #415A77 !important;
+  font-weight: 600 !important;
+}
+
+/* Total Spent row */
+.bt-root[data-bt-theme="light"] .bt-card .grid.px-5.py-3\.5.font-semibold {
+  background: linear-gradient(90deg, rgba(65,90,119,0.05) 0%, rgba(13,148,136,0.04) 100%) !important;
+  border-top: 1px solid #CBD5E1 !important;
+}
+
+/* Expense section header (EXPENSES / +Add Item bar) */
+.bt-root[data-bt-theme="light"] .bt-card .flex.items-center.justify-between.px-5.py-3\.5 {
+  background: linear-gradient(180deg, #F1F5F9 0%, #EAEFF5 100%) !important;
+  border-bottom: 1px solid #CBD5E1 !important;
+}
+
+/* Expense row hover */
+.bt-root[data-bt-theme="light"] .bt-tr:hover {
+  background: rgba(65,90,119,0.04) !important;
+}
+
+/* Input fields */
+.bt-root[data-bt-theme="light"] .bt-input {
+  background: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
+  color: #0F172A !important;
+}
+.bt-root[data-bt-theme="light"] .bt-input:focus {
+  border-color: #415A77 !important;
+}
+
+/* Muted text in light */
+.bt-root[data-bt-theme="light"] .bt-text-muted {
+  color: #415A77 !important;
+}
+
+/* Teal accent text in light */
+.bt-root[data-bt-theme="light"] .bt-text-teal {
+  color: #0D9488 !important;
+}
+
+/* ==========================================================================
+   LIGHT MODE COMPLETE REVAMP — FINAL PASS
+   All selectors scoped to [data-bt-theme="light"], no dark mode affected.
+   ========================================================================== */
+
+/* ── Canvas ────────────────────────────────────────────────────────────── */
+.bt-root[data-bt-theme="light"] {
+  background: radial-gradient(120% 120% at 50% 0%, #F8FAFC 0%, #E2E8F0 100%) !important;
+  color: #0D1B2A !important;
+}
+
+/* ── All cards — elevated glass-layer surface ──────────────────────────── */
+.bt-root[data-bt-theme="light"] .bt-card,
+.bt-root[data-bt-theme="light"] .metric-card {
+  background: linear-gradient(165deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+  border: 1px solid #E2E8F0 !important;
+  border-top: 3px solid #415A77 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px -5px rgba(13,27,42,0.05),
+              0 4px 10px -2px rgba(13,27,42,0.02) !important;
+  transition: transform 150ms ease, box-shadow 150ms ease !important;
+}
+
+/* Card hover — subtle lift */
+.bt-root[data-bt-theme="light"] .bt-card:hover,
+.bt-root[data-bt-theme="light"] .metric-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 14px 30px -5px rgba(13,27,42,0.08) !important;
+}
+
+/* Remaining card — teal-accented top border + spotlight */
+.bt-root[data-bt-theme="light"] .bt-card.bt-metric-glow.metric-card-glow-positive {
+  background: radial-gradient(350px circle at 90% 10%, rgba(13,148,136,0.12), transparent 70%),
+              linear-gradient(165deg, #FFFFFF 0%, #F1F5F9 100%) !important;
+  border-top: 3px solid #0D9488 !important;
+}
+
+/* ── Section labels / muted text ───────────────────────────────────────── */
+.bt-root[data-bt-theme="light"] .bt-text-muted {
+  color: #415A77 !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* ── Primary metric values ─────────────────────────────────────────────── */
+.bt-root[data-bt-theme="light"] .bt-text-main {
+  color: #0D1B2A !important;
+}
+
+/* ── Progress bar track + fill ─────────────────────────────────────────── */
+.bt-root[data-bt-theme="light"] .h-1\.5.rounded-full.overflow-hidden {
+  background: #E2E8F0 !important;
+  height: 8px !important;
+}
+
+.bt-root[data-bt-theme="light"] .progress-bar-fill {
+  background: linear-gradient(90deg, #415A77 0%, #0D9488 100%) !important;
+  box-shadow: 0 2px 6px rgba(65,90,119,0.3) !important;
+}
+
+/* ── Expense section header (EXPENSES / + Add Item) ─────────────────────  */
+.bt-root[data-bt-theme="light"] .bt-card .flex.items-center.justify-between.px-5.py-3\.5 {
+  background: linear-gradient(90deg, #1B263B 0%, #0D1B2A 100%) !important;
+  border-bottom: none !important;
+}
+
+/* EXPENSES label in dark header bar */
+.bt-root[data-bt-theme="light"] .bt-card .flex.items-center.justify-between.px-5.py-3\.5 p {
+  color: #CBD5E1 !important;
+}
+
+/* ── Table column header row (ITEM / AMOUNT) ───────────────────────────── */
+.bt-root[data-bt-theme="light"] .bt-card .grid.px-5.py-2\.5 {
+  background: linear-gradient(90deg, #1B263B 0%, #0D1B2A 100%) !important;
+  border-bottom: none !important;
+}
+
+.bt-root[data-bt-theme="light"] .bt-card .grid.px-5.py-2\.5 span {
+  color: #F8FAFC !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+}
+
+/* ── Expense rows ──────────────────────────────────────────────────────── */
+.bt-root[data-bt-theme="light"] .bt-tr {
+  background: #FFFFFF !important;
+}
+
+/* Alternating stripe — even rows */
+.bt-root[data-bt-theme="light"] .bt-tr:nth-child(even) {
+  background: #FAFAFA !important;
+}
+
+.bt-root[data-bt-theme="light"] .bt-tr:hover {
+  background: #F1F5F9 !important;
+}
+
+/* Expense row text */
+.bt-root[data-bt-theme="light"] .bt-tr .bt-text-main,
+.bt-root[data-bt-theme="light"] .bt-tr span.truncate,
+.bt-root[data-bt-theme="light"] .bt-tr span.bt-data {
+  color: #0D1B2A !important;
+}
+
+/* ── Total Spent row ───────────────────────────────────────────────────── */
+.bt-root[data-bt-theme="light"] .bt-card .grid.px-5.py-3\.5.font-semibold {
+  background: linear-gradient(90deg, rgba(65,90,119,0.06) 0%, rgba(13,148,136,0.04) 100%) !important;
+  border-top: 2px solid #CBD5E1 !important;
+}
+
+/* ── Remaining row ─────────────────────────────────────────────────────── */
+.bt-root[data-bt-theme="light"] .bt-card .grid.px-5.py-3\.5.font-bold {
+  background: #FAFAFA !important;
+  border-top: 1px solid #E2E8F0 !important;
+}
+
+/* ── Input fields ──────────────────────────────────────────────────────── */
+.bt-root[data-bt-theme="light"] .bt-input {
+  background: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
+  color: #0D1B2A !important;
+}
+.bt-root[data-bt-theme="light"] .bt-input:focus {
+  border-color: #415A77 !important;
+  background: #FFFFFF !important;
+}
+
+/* ── Ghost button ──────────────────────────────────────────────────────── */
+.bt-root[data-bt-theme="light"] .bt-btn-ghost {
+  border-color: #CBD5E1 !important;
+  color: #415A77 !important;
+}
+.bt-root[data-bt-theme="light"] .bt-btn-ghost:hover {
+  background: #F1F5F9 !important;
+  border-color: #415A77 !important;
+}
+
+/* ── FAB floating button ───────────────────────────────────────────────── */
+.bt-root[data-bt-theme="light"] button.bt-btn-primary.rounded-full {
+  background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%) !important;
+  box-shadow: 0 8px 20px rgba(13,148,136,0.4) !important;
+}
+
+/* ==========================================================================
+   HIGH-INTENSITY VIBRANT LIGHT MODE — FINAL GRADIENT OVERHAUL
+   All selectors scoped to [data-bt-theme="light"]. Dark mode untouched.
+   ========================================================================== */
+
+/* Canvas */
+.bt-root[data-bt-theme="light"] {
+  background: linear-gradient(135deg, #E2E8F0 0%, #DBEFEF 40%, #DCE6F1 100%) !important;
+  color: #0D1B2A !important;
+}
+
+/* Cards — 3-stop diagonal surface */
+.bt-root[data-bt-theme="light"] .bt-card,
+.bt-root[data-bt-theme="light"] .metric-card {
+  background: linear-gradient(145deg, #FFFFFF 0%, #F1F5F9 50%, #E2E8F0 100%) !important;
+  border: 1px solid rgba(65,90,119,0.25) !important;
+  border-top: 4px solid #415A77 !important; /* solid fallback; gradient border via pseudo below */
+  border-radius: 14px !important;
+  box-shadow: 0 12px 28px -6px rgba(13,27,42,0.12),
+              0 4px 10px -2px rgba(65,90,119,0.08) !important;
+  position: relative !important;
+}
+
+/* Gradient top-border via inset pseudo — preserves border-radius */
+.bt-root[data-bt-theme="light"] .bt-card::before,
+.bt-root[data-bt-theme="light"] .metric-card::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 4px !important;
+  background: linear-gradient(90deg, #415A77 0%, #0D9488 50%, #1D4ED8 100%) !important;
+  border-radius: 14px 14px 0 0 !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+/* Remaining card — teal-dominant spotlight */
+.bt-root[data-bt-theme="light"] .bt-card.bt-metric-glow.metric-card-glow-positive {
+  background: radial-gradient(450px circle at 90% 10%, rgba(13,148,136,0.18), transparent 70%),
+              linear-gradient(145deg, #FFFFFF 0%, #EEF2FF 100%) !important;
+}
+.bt-root[data-bt-theme="light"] .bt-card.bt-metric-glow.metric-card-glow-positive::before {
+  background: linear-gradient(90deg, #0D9488 0%, #10B981 100%) !important;
+}
+
+/* Card hover lift */
+.bt-root[data-bt-theme="light"] .bt-card:hover,
+.bt-root[data-bt-theme="light"] .metric-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 14px 30px -5px rgba(13,27,42,0.15) !important;
+}
+
+/* Expense section header & table column header — navy gradient banner */
+.bt-root[data-bt-theme="light"] .bt-card .flex.items-center.justify-between.px-5.py-3\.5,
+.bt-root[data-bt-theme="light"] .bt-card .grid.px-5.py-2\.5 {
+  background: linear-gradient(90deg, #0D1B2A 0%, #1B263B 40%, #415A77 100%) !important;
+  border-bottom: none !important;
+}
+
+.bt-root[data-bt-theme="light"] .bt-card .flex.items-center.justify-between.px-5.py-3\.5 p,
+.bt-root[data-bt-theme="light"] .bt-card .grid.px-5.py-2\.5 span {
+  color: #F8FAFC !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+}
+
+/* Expense rows */
+.bt-root[data-bt-theme="light"] .bt-tr {
+  background: #FFFFFF !important;
+}
+.bt-root[data-bt-theme="light"] .bt-tr:nth-child(even) {
+  background: linear-gradient(90deg, rgba(241,245,249,0.8) 0%, rgba(226,232,240,0.4) 100%) !important;
+}
+.bt-root[data-bt-theme="light"] .bt-tr:hover {
+  background: linear-gradient(90deg, rgba(65,90,119,0.10) 0%, rgba(13,148,136,0.06) 100%) !important;
+}
+
+/* Total Spent row */
+.bt-root[data-bt-theme="light"] .bt-card .grid.px-5.py-3\.5.font-semibold {
+  background: linear-gradient(90deg, rgba(65,90,119,0.08) 0%, rgba(13,148,136,0.06) 50%, rgba(29,78,216,0.04) 100%) !important;
+  border-top: 2px solid #CBD5E1 !important;
+}
+
+/* Progress bar fill — cobalt→teal→emerald */
+.bt-root[data-bt-theme="light"] .progress-bar-fill {
+  background: linear-gradient(90deg, #1D4ED8 0%, #0D9488 50%, #10B981 100%) !important;
+  box-shadow: 0 2px 8px rgba(13,148,136,0.3) !important;
+}
+
+/* Buttons */
+.bt-root[data-bt-theme="light"] .bt-btn-primary {
+  background: linear-gradient(135deg, #415A77 0%, #1B263B 50%, #0D1B2A 100%) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  box-shadow: 0 6px 20px rgba(13,27,42,0.3) !important;
+}
+.bt-root[data-bt-theme="light"] .bt-btn-primary:hover {
+  background: linear-gradient(135deg, #1D4ED8 0%, #415A77 50%, #0D1B2A 100%) !important;
+  box-shadow: 0 8px 24px rgba(29,78,216,0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* FAB — teal→cobalt in light */
+.bt-root[data-bt-theme="light"] button.bt-btn-primary.rounded-full {
+  background: linear-gradient(135deg, #0D9488 0%, #1D4ED8 100%) !important;
+  box-shadow: 0 10px 25px rgba(13,148,136,0.45) !important;
+}
+
+/* ==========================================================================
+   LIGHT MODE SIDEBAR — flat #E2E8F0 background with dark text
+   ========================================================================== */
+
+.bt-root[data-bt-theme="light"] .bt-sidebar {
+  background: #94A3B8 !important;
+  border-right: 1px solid #7B8FA6 !important;
+  box-shadow: none !important;
+}
+
+/* Nav items — dark text on mid-slate sidebar */
+.bt-root[data-bt-theme="light"] .bt-nav-item {
+  color: #0F172A !important;
+}
+.bt-root[data-bt-theme="light"] .bt-nav-item:hover {
+  background: rgba(0, 0, 0, 0.1) !important;
+  color: #000000 !important;
+}
+.bt-root[data-bt-theme="light"] .bt-nav-item.active {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  font-weight: 600 !important;
+  border-left: 3px solid #0D9488 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Light mode sidebar — force all small label paragraphs to white */
+.bt-root[data-bt-theme="light"] .bt-sidebar p {
+  color: #FFFFFF !important;
 }
