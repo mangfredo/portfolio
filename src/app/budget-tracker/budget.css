@@ -372,6 +372,11 @@
   color: #F8FAFC !important;
 }
 
+/* Dark mode alternating row stripes */
+.bt-root[data-bt-theme="dark"] .bt-tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
 /* ── Table header and Total Spent rows — fix hydration bg mismatch ──────── */
 /* Header row (ITEM / AMOUNT) */
 .bt-root[data-bt-theme="dark"] .bt-card .grid.px-5.py-2\.5 {

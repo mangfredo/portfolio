@@ -110,7 +110,7 @@ export default function PeriodDetail({ id }: Props) {
 
   const budget    = period?.budget ?? 0;
   const remaining = budget - total;
-  const spentPct  = budget > 0 ? Math.min((total / budget) * 100, 100) : 0;
+  const spentPct  = budget > 0 ? (total / budget) * 100 : 0;
 
   const cashflowData = buildCashflowData(budget, expenses);
 
@@ -243,7 +243,7 @@ export default function PeriodDetail({ id }: Props) {
                 <div className="h-1.5 rounded-full overflow-hidden" style={{ background: isDark ? "#334155" : "#E2E8F0" }}>
                   <div
                     className="progress-bar-fill h-full rounded-full transition-all duration-700"
-                    style={{ width: `${spentPct}%`, background: spentPct > 90 ? "#FF5252" : undefined }}
+                    style={{ width: `${Math.min(spentPct, 100)}%`, background: spentPct > 90 ? "#FF5252" : undefined }}
                   />
                 </div>
               </div>
@@ -439,6 +439,9 @@ export default function PeriodDetail({ id }: Props) {
                     gridTemplateColumns: "1fr auto",
                     borderBottom: idx < expenses.length - 1 ? `1px solid ${isDark ? "rgba(255,255,255,0.04)" : "#F1F5F9"}` : "none",
                     textAlign: "left",
+                    background: isDark
+                      ? idx % 2 === 0 ? "transparent" : "rgba(255,255,255,0.05)"
+                      : undefined,
                   }}
                 >
                   <span
