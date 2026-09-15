@@ -4,6 +4,17 @@
    Nothing here bleeds into the portfolio's global styles.
    ───────────────────────────────────────────────────────────────────────── */
 
+/* ── Pre-hydration dark background ─────────────────────────────────────── */
+/* The inline script in layout.tsx sets data-bt-theme on <html> synchronously
+   before React hydrates, eliminating the light→dark flash on first load.    */
+html[data-bt-theme="dark"] body {
+  background-color: #090D16;
+}
+html[data-bt-theme="dark"] .bt-root {
+  background-color: #090D16 !important;
+  color: #E2E8F0 !important;
+}
+
 /* ── Light mode tokens ─────────────────────────────────────────────────── */
 .bt-root {
   /* Backgrounds */

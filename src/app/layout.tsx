@@ -127,6 +127,10 @@ export default function RootLayout({
               (function() {
                 var t = localStorage.getItem('theme');
                 if (t) document.documentElement.setAttribute('data-theme', t);
+                var bt = localStorage.getItem('bt_theme');
+                if (bt === 'dark' || bt === 'light') {
+                  document.documentElement.setAttribute('data-bt-theme', bt);
+                }
               })();
             `,
           }}

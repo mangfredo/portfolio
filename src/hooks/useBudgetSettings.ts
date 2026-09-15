@@ -56,16 +56,8 @@ const CURRENCY_KEY = "bt_currency";
 const DEFAULT_CURRENCY = CURRENCIES[0]; // PHP
 
 export function useBudgetSettings(): BudgetSettings {
-  const [theme, setThemeState] = useState<BtTheme>(() => {
-    if (typeof window === "undefined") return "light";
-    const saved = localStorage.getItem(THEME_KEY);
-    return (saved === "dark" || saved === "light") ? saved : "light";
-  });
-  const [demoMode, setDemoState] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    const saved = localStorage.getItem(DEMO_KEY);
-    return saved !== null ? saved !== "false" : true;
-  });
+  const [theme, setThemeState] = useState<BtTheme>("light");
+  const [demoMode, setDemoState] = useState<boolean>(true);
   // Start with SSR-safe defaults so server HTML matches initial client render.
   // After mount, read localStorage and update if different.
   const [currency, setCurrencyState] = useState<string>(SSR_CURRENCY);
@@ -80,6 +72,12 @@ export function useBudgetSettings(): BudgetSettings {
 
   // On mount: read localStorage for all settings, then mark mounted.
   useEffect(() => {
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === "dark" || savedTheme === "light") setThemeState(savedTheme);
+
+    const savedDemo = localStorage.getItem(DEMO_KEY);
+    if (savedDemo !== null) setDemoState(savedDemo !== "false");
+
     const savedCurrency = localStorage.getItem(CURRENCY_KEY);
     if (savedCurrency && CURRENCIES.find((c) => c.code === savedCurrency)) {
       setCurrencyState(savedCurrency);

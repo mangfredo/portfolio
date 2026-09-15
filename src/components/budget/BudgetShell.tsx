@@ -94,6 +94,7 @@ export default function BudgetShell({ children }: BudgetShellProps) {
       <div
         className="bt-root flex min-h-screen"
         data-bt-theme={settings.theme}
+        suppressHydrationWarning
         style={{
           background: isDark ? "#090D16" : "#F4F6F9",
           color: isDark ? "#E2E8F0" : "#0F172A",
