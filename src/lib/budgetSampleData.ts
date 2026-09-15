@@ -72,6 +72,9 @@ export function loadSampleData() {
     const exp = expenses[p.id];
     if (exp) localStorage.setItem(`bt_items_${p.id}`, JSON.stringify(exp));
   }
+
+  // Signal all usePeriods hooks to re-read
+  window.dispatchEvent(new Event("bt_reload"));
 }
 
 export function clearAllData() {
@@ -79,4 +82,7 @@ export function clearAllData() {
     (k) => k === "bt_periods" || k.startsWith("bt_items_")
   );
   keys.forEach((k) => localStorage.removeItem(k));
+
+  // Signal all usePeriods hooks to re-read
+  window.dispatchEvent(new Event("bt_reload"));
 }

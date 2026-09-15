@@ -35,8 +35,7 @@ export default function BudgetShell({ children }: BudgetShellProps) {
   const doReset = async () => {
     setModal({ type: "loading", message: "Loading sample data…" });
     await new Promise((r) => setTimeout(r, 800));
-    loadSampleData();
-    settings.bumpReload();
+    loadSampleData(); // dispatches bt_reload → usePeriods re-reads
     setModal({ type: "none" });
     toast("Sample data loaded", "success");
     router.push("/budget-tracker");
@@ -48,8 +47,7 @@ export default function BudgetShell({ children }: BudgetShellProps) {
   const doClear = async () => {
     setModal({ type: "loading", message: "Clearing all data…" });
     await new Promise((r) => setTimeout(r, 600));
-    clearAllData();
-    settings.bumpReload();
+    clearAllData(); // dispatches bt_reload → usePeriods re-reads
     setModal({ type: "none" });
     toast("All data cleared", "info");
     router.push("/budget-tracker");

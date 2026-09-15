@@ -44,14 +44,21 @@ export function usePeriods() {
   const [periods, setPeriods] = useState<Period[]>([]);
   const { reloadKey } = useBudgetSettingsCtx();
 
+  const reload = () => setPeriods(load<Period[]>(PERIODS_KEY, []));
+
   useEffect(() => {
-    setPeriods(load<Period[]>(PERIODS_KEY, []));
-  }, [reloadKey]);
+    reload();
+  }, [reloadKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Also re-read when a "bt_reload" custom storage event fires
+  useEffect(() => {
+    const handler = () => reload();
+    window.addEventListener("bt_reload", handler);
+    return () => window.removeEventListener("bt_reload", handler);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   /** Re-read periods from localStorage — call after external writes (sample data, clear). */
-  const reloadPeriods = () => {
-    setPeriods(load<Period[]>(PERIODS_KEY, []));
-  };
+  const reloadPeriods = () => reload();
 
   const addPeriod = (label: string): Period => {
     const period: Period = {
