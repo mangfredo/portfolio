@@ -14,7 +14,6 @@ import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
 import Modal from "@/components/budget/Modal";
 import { ConfirmModal } from "@/components/budget/BudgetModal";
 import BudgetShell from "@/components/budget/BudgetShell";
-
 interface Props { id: string; }
 
 // 12-color vivid palette — no dark navy or flat grey
@@ -25,7 +24,7 @@ const CAT_COLORS = [
 ];
 
 const fmt = (n: number) =>
-  n.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 function buildCashflowData(budget: number, expenses: { name: string; amount: number }[]) {
   let running = budget;
@@ -39,10 +38,11 @@ function buildCashflowData(budget: number, expenses: { name: string; amount: num
 }
 
 // ── Custom glassmorphism tooltip ───────────────────────────────────────────
-function GlassTooltip({ active, payload, label }: {
+function GlassTooltip({ active, payload, label, currencySymbol = "" }: {
   active?: boolean;
   payload?: Array<{ value: number; color: string; name: string }>;
   label?: string;
+  currencySymbol?: string;
 }) {
   if (!active || !payload?.length) return null;
   return (
@@ -70,7 +70,7 @@ function GlassTooltip({ active, payload, label }: {
             className="bt-data text-xs"
             style={{ fontFamily: "var(--bt-font-data)" }}
           >
-            ₱{fmt(item.value)}
+            {currencySymbol}{fmt(item.value)}
           </span>
         </div>
       ))}
@@ -79,7 +79,7 @@ function GlassTooltip({ active, payload, label }: {
 }
 
 // ── Animated metric value ──────────────────────────────────────────────────
-function MetricValue({ value, prefix = "₱", fallback = "—" }: {
+function MetricValue({ value, prefix = "", fallback = "—" }: {
   value: number;
   prefix?: string;
   fallback?: string;
@@ -90,8 +90,16 @@ function MetricValue({ value, prefix = "₱", fallback = "—" }: {
 }
 
 export default function PeriodDetail({ id }: Props) {
+  return (
+    <BudgetShell>
+      <PeriodDetailInner id={id} />
+    </BudgetShell>
+  );
+}
+
+function PeriodDetailInner({ id }: Props) {
   const router = useRouter();
-  const { theme } = useBudgetSettingsCtx();
+  const { theme, currencySymbol } = useBudgetSettingsCtx();
   const isDark = theme === "dark";
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -174,7 +182,7 @@ export default function PeriodDetail({ id }: Props) {
   }
 
   return (
-    <BudgetShell>
+    <>
       <div className="px-6 pt-8 pb-4 max-w-5xl mx-auto">
 
         {/* ── Page header ──────────────────────────────────────────── */}
@@ -211,7 +219,7 @@ export default function PeriodDetail({ id }: Props) {
               Total Budget
             </p>
             <p className="bt-text-main bt-data font-bold mb-1" style={{ fontSize: "1.75rem" }}>
-              {budget > 0 ? <MetricValue value={budget} /> : "—"}
+              {budget > 0 ? <MetricValue value={budget} prefix={currencySymbol} /> : "—"}
             </p>
             <button
               onClick={openBudgetModal}
@@ -230,7 +238,7 @@ export default function PeriodDetail({ id }: Props) {
               Total Spent
             </p>
             <p className="bt-text-main bt-data font-bold mb-1" style={{ fontSize: "1.75rem" }}>
-              <MetricValue value={total} />
+              <MetricValue value={total} prefix={currencySymbol} />
             </p>
             {budget > 0 && (
               <div className="mt-2">
@@ -264,7 +272,7 @@ export default function PeriodDetail({ id }: Props) {
                 fontSize: "1.75rem",
               }}
             >
-              {budget > 0 ? <MetricValue value={Math.abs(remaining)} prefix={remaining < 0 ? "-₱" : "₱"} /> : "—"}
+              {budget > 0 ? <MetricValue value={Math.abs(remaining)} prefix={remaining < 0 ? `-${currencySymbol}` : currencySymbol} /> : "—"}
             </p>
             {budget > 0 && remaining < 0 && (
               <span className="bt-badge bt-badge-negative mt-1">Over budget</span>
@@ -332,10 +340,10 @@ export default function PeriodDetail({ id }: Props) {
                   <YAxis
                     tick={{ fontSize: 10, fill: textMuted }}
                     axisLine={false} tickLine={false}
-                    tickFormatter={(v) => `₱${(v / 1000).toFixed(0)}k`}
+                    tickFormatter={(v) => `${currencySymbol}${(v / 1000).toFixed(0)}k`}
                     width={48}
                   />
-                  <Tooltip content={<GlassTooltip />} />
+                  <Tooltip content={<GlassTooltip currencySymbol={currencySymbol} />} />
                   <Area
                     type="monotone"
                     dataKey="balance"
@@ -378,7 +386,7 @@ export default function PeriodDetail({ id }: Props) {
                       <Cell key={i} fill={CAT_COLORS[i % CAT_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip content={<GlassTooltip />} />
+                  <Tooltip content={<GlassTooltip currencySymbol={currencySymbol} />} />
                   <Legend
                     iconType="circle"
                     iconSize={7}
@@ -459,7 +467,7 @@ export default function PeriodDetail({ id }: Props) {
                       textDecoration: e.paid ? "line-through" : "none",
                     }}
                   >
-                    ₱{fmt(e.amount)}
+                    {currencySymbol}{fmt(e.amount)}
                   </span>
                 </button>
               ))}
@@ -474,7 +482,7 @@ export default function PeriodDetail({ id }: Props) {
                 }}
               >
                 <span className="bt-text-teal text-xs uppercase tracking-wider font-semibold">Total Spent</span>
-                <span className="bt-text-teal bt-data text-right tabular-nums">₱{fmt(total)}</span>
+                <span className="bt-text-teal bt-data text-right tabular-nums">{currencySymbol}{fmt(total)}</span>
               </div>
 
               {/* Remaining row */}
@@ -487,7 +495,7 @@ export default function PeriodDetail({ id }: Props) {
                   className="bt-data text-right tabular-nums font-bold"
                   style={{ color: budget === 0 ? undefined : remaining >= 0 ? (isDark ? "#00E699" : "#00C97A") : "#FF5252" }}
                 >
-                  {budget > 0 ? `₱${fmt(remaining)}` : "—"}
+                  {budget > 0 ? `${currencySymbol}${fmt(remaining)}` : "—"}
                 </span>
               </div>
             </div>
@@ -520,7 +528,7 @@ export default function PeriodDetail({ id }: Props) {
           <div className="space-y-4">
             <div>
               <label htmlFor="budget-input" className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
-                Amount (₱)
+                Amount ({currencySymbol})
               </label>
               <input
                 id="budget-input"
@@ -562,7 +570,7 @@ export default function PeriodDetail({ id }: Props) {
               />
             </div>
             <div>
-              <label htmlFor="item-amount" className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>Amount (₱)</label>
+              <label htmlFor="item-amount" className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>Amount ({currencySymbol})</label>
               <input
                 id="item-amount"
                 type="number"
@@ -622,6 +630,6 @@ export default function PeriodDetail({ id }: Props) {
           onCancel={() => setShowDeleteConfirm(false)}
         />
       )}
-    </BudgetShell>
+    </>
   );
 }

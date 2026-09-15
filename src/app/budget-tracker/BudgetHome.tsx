@@ -10,20 +10,26 @@ import Modal from "@/components/budget/Modal";
 import BudgetShell from "@/components/budget/BudgetShell";
 import BudgetSplash from "@/components/budget/BudgetSplash";
 
-export default function BudgetHome() {
+// Inner component — rendered inside <BudgetShell> so it is always below the
+// BudgetSettingsContext.Provider.  Moving useBudgetSettingsCtx() here fixes
+// the "consumer above provider" bug that caused currencySymbol to always
+// return the default ₱ even after the user changed the currency.
+function BudgetHomeInner() {
   const router = useRouter();
-  const { theme } = useBudgetSettingsCtx();
-  const isDark = theme === "dark";
+  const { theme, currencySymbol } = useBudgetSettingsCtx();
+  const isDark    = theme === "dark";
   const textMain  = isDark ? "#F8FAFC" : "#0F172A";
-  const textMuted = isDark ? "#94A3B8" : "#415A77";
   const cardBg    = isDark ? "#111D35" : "#FFFFFF";
   const borderCol = isDark ? "rgba(255,255,255,0.08)" : "#CBD5E1";
 
   const { periods, addPeriod } = usePeriods();
   const [showAdd, setShowAdd] = useState(false);
-  const [label, setLabel] = useState("");
+  const [label,   setLabel]   = useState("");
 
   useSwipeToClose("/");
+
+  const fmtBudget = (n: number) =>
+    n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const handleAdd = () => {
     const trimmed = label.trim();
@@ -35,7 +41,7 @@ export default function BudgetHome() {
   };
 
   return (
-    <BudgetShell>
+    <>
       <BudgetSplash />
       <div className="px-6 pt-8 pb-4 max-w-4xl mx-auto">
         {/* Page header */}
@@ -60,7 +66,7 @@ export default function BudgetHome() {
               className="w-14 h-14 rounded-full flex items-center justify-center mb-5 text-2xl"
               style={{ background: isDark ? "#1E293B" : "#EAEFF5", color: isDark ? "#2DD4BF" : "#0D9488" }}
             >
-              ₱
+              {currencySymbol}
             </div>
             <p className="bt-text-main font-semibold text-base mb-1">No periods yet</p>
             <p className="bt-text-muted text-sm mb-6">
@@ -84,13 +90,13 @@ export default function BudgetHome() {
                     className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-sm font-bold bt-data"
                     style={{ background: isDark ? "#1E293B" : "#EAEFF5", color: isDark ? "#2DD4BF" : "#0D9488" }}
                   >
-                    ₱
+                    {currencySymbol}
                   </div>
                   <div>
                     <p className="bt-text-main font-semibold text-sm">{p.label}</p>
                     <p className="bt-text-muted text-xs mt-0.5 bt-data">
                       {p.budget > 0
-                        ? `₱${p.budget.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`
+                        ? `${currencySymbol}${fmtBudget(p.budget)}`
                         : "Budget not set"}
                     </p>
                   </div>
@@ -150,23 +156,24 @@ export default function BudgetHome() {
               />
             </div>
             <div className="flex gap-3 pt-1">
-              <button
-                onClick={() => { setShowAdd(false); setLabel(""); }}
-                className="bt-btn-ghost flex-1 py-2.5"
-              >
+              <button onClick={() => { setShowAdd(false); setLabel(""); }} className="bt-btn-ghost flex-1 py-2.5">
                 Cancel
               </button>
-              <button
-                onClick={handleAdd}
-                disabled={!label.trim()}
-                className="bt-btn-primary flex-1 py-2.5"
-              >
+              <button onClick={handleAdd} disabled={!label.trim()} className="bt-btn-primary flex-1 py-2.5">
                 Create
               </button>
             </div>
           </div>
         </Modal>
       )}
+    </>
+  );
+}
+
+export default function BudgetHome() {
+  return (
+    <BudgetShell>
+      <BudgetHomeInner />
     </BudgetShell>
   );
 }
