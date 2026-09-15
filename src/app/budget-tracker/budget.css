@@ -917,19 +917,5 @@
 
 .bt-root[data-bt-theme="dark"] .bt-card,
 .bt-root[data-bt-theme="dark"] .metric-card {
-  position: relative !important;
-}
-
-.bt-root[data-bt-theme="dark"] .bt-card::before,
-.bt-root[data-bt-theme="dark"] .metric-card::before {
-  content: "" !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  height: 3px !important;
-  background: linear-gradient(90deg, #415A77 0%, #0D9488 50%, #1D4ED8 100%) !important;
-  border-radius: 12px 12px 0 0 !important;
-  z-index: 1 !important;
-  pointer-events: none !important;
+  border-top: 3px solid #0D9488 !important;
 }
