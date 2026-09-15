@@ -2,18 +2,20 @@
 
 import { useEffect, useState } from "react";
 
+// Module-level flag — survives SPA navigation but resets on hard reload
+let splashShown = false;
+
 export default function BudgetSplash() {
-  // Always start as "visible" on SSR — consistent server/client initial render
   const [phase, setPhase] = useState<"visible" | "fading" | "done">("visible");
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Check sessionStorage after mount (client-only)
-    if (sessionStorage.getItem("bt_splash_shown")) {
+    // Skip if already shown this session (e.g. navigating back from a period)
+    if (splashShown) {
       setPhase("done");
       return;
     }
-    sessionStorage.setItem("bt_splash_shown", "1");
+    splashShown = true;
 
     // Animate progress bar 0 → 100 over 2000ms
     const start = performance.now();
