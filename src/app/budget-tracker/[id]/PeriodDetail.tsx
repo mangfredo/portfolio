@@ -238,12 +238,14 @@ export default function PeriodDetail({ id }: Props) {
             {budget > 0 && (
               <div className="mt-2">
                 <div className="bt-text-muted flex justify-between text-xs mb-1">
-                  <span>{spentPct.toFixed(1)}% of budget</span>
+                  <span style={{ color: spentPct >= 100 ? "#FF5252" : undefined }}>
+                    {spentPct.toFixed(1)}% of budget
+                  </span>
                 </div>
                 <div className="h-1.5 rounded-full overflow-hidden" style={{ background: isDark ? "#334155" : "#E2E8F0" }}>
                   <div
                     className="progress-bar-fill h-full rounded-full transition-all duration-700"
-                    style={{ width: `${Math.min(spentPct, 100)}%`, background: spentPct > 90 ? "#FF5252" : undefined }}
+                    style={{ width: `${Math.min(spentPct, 100)}%`, background: spentPct >= 100 ? "#FF5252" : undefined }}
                   />
                 </div>
               </div>
