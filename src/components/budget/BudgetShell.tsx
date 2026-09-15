@@ -36,8 +36,10 @@ export default function BudgetShell({ children }: BudgetShellProps) {
     setModal({ type: "loading", message: "Loading sample data…" });
     await new Promise((r) => setTimeout(r, 800));
     loadSampleData();
-    // Hard navigate after modal so React re-reads localStorage from scratch
-    window.location.href = "/budget-tracker";
+    settings.bumpReload();
+    setModal({ type: "none" });
+    toast("Sample data loaded", "success");
+    router.push("/budget-tracker");
   };
 
   // ── Clear all data ───────────────────────────────────────────────────────
@@ -47,7 +49,10 @@ export default function BudgetShell({ children }: BudgetShellProps) {
     setModal({ type: "loading", message: "Clearing all data…" });
     await new Promise((r) => setTimeout(r, 600));
     clearAllData();
-    window.location.href = "/budget-tracker";
+    settings.bumpReload();
+    setModal({ type: "none" });
+    toast("All data cleared", "info");
+    router.push("/budget-tracker");
   };
 
   const handleBack     = () => router.push("/");

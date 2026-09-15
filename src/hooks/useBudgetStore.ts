@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
 
 export interface Period {
   id: string;
@@ -41,10 +42,16 @@ function save<T>(key: string, value: T): void {
 
 export function usePeriods() {
   const [periods, setPeriods] = useState<Period[]>([]);
+  const { reloadKey } = useBudgetSettingsCtx();
 
   useEffect(() => {
     setPeriods(load<Period[]>(PERIODS_KEY, []));
-  }, []);
+  }, [reloadKey]);
+
+  /** Re-read periods from localStorage — call after external writes (sample data, clear). */
+  const reloadPeriods = () => {
+    setPeriods(load<Period[]>(PERIODS_KEY, []));
+  };
 
   const addPeriod = (label: string): Period => {
     const period: Period = {
@@ -87,7 +94,7 @@ export function usePeriods() {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  return { periods: sorted, addPeriod, updateBudget, deletePeriod };
+  return { periods: sorted, addPeriod, updateBudget, deletePeriod, reloadPeriods };
 }
 
 // ── Expenses ───────────────────────────────────────────────────────────────

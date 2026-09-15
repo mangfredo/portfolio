@@ -8,6 +8,8 @@ interface BudgetSettingsCtx {
   demoMode: boolean;
   setTheme: (t: BtTheme) => void;
   setDemoMode: (v: boolean) => void;
+  /** Increment to signal all store hooks to re-read from localStorage. */
+  reloadKey: number;
 }
 
 export const BudgetSettingsContext = createContext<BudgetSettingsCtx>({
@@ -15,6 +17,7 @@ export const BudgetSettingsContext = createContext<BudgetSettingsCtx>({
   demoMode: true,
   setTheme: () => {},
   setDemoMode: () => {},
+  reloadKey: 0,
 });
 
 export function useBudgetSettingsCtx() {

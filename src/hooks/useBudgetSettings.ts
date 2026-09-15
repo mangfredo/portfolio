@@ -9,6 +9,8 @@ interface BudgetSettings {
   demoMode: boolean;
   setTheme: (t: BtTheme) => void;
   setDemoMode: (v: boolean) => void;
+  reloadKey: number;
+  bumpReload: () => void;
 }
 
 const THEME_KEY = "bt_theme";
@@ -17,6 +19,7 @@ const DEMO_KEY  = "bt_demo";
 export function useBudgetSettings(): BudgetSettings {
   const [theme, setThemeState]   = useState<BtTheme>("light");
   const [demoMode, setDemoState] = useState<boolean>(true);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const saved = localStorage.getItem(THEME_KEY) as BtTheme | null;
@@ -36,5 +39,7 @@ export function useBudgetSettings(): BudgetSettings {
     localStorage.setItem(DEMO_KEY, String(v));
   };
 
-  return { theme, demoMode, setTheme, setDemoMode };
+  const bumpReload = () => setReloadKey((k) => k + 1);
+
+  return { theme, demoMode, setTheme, setDemoMode, reloadKey, bumpReload };
 }
