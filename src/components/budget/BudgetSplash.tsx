@@ -3,21 +3,21 @@
 import { useEffect, useState } from "react";
 
 export default function BudgetSplash() {
-  // Always start as "visible" on SSR, then check sessionStorage on mount
+  // Always start as "visible" on SSR — consistent server/client initial render
   const [phase, setPhase] = useState<"visible" | "fading" | "done">("visible");
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // If already shown this session (e.g. returning from a period), skip immediately
+    // Check sessionStorage after mount (client-only)
     if (sessionStorage.getItem("bt_splash_shown")) {
       setPhase("done");
       return;
     }
     sessionStorage.setItem("bt_splash_shown", "1");
 
-    // Animate progress bar 0 → 100 over 900ms
+    // Animate progress bar 0 → 100 over 2000ms
     const start = performance.now();
-    const duration = 900;
+    const duration = 2000;
 
     const tick = (now: number) => {
       const elapsed = now - start;
@@ -27,8 +27,8 @@ export default function BudgetSplash() {
         requestAnimationFrame(tick);
       } else {
         // Hold at 100% briefly, then fade out
-        setTimeout(() => setPhase("fading"), 200);
-        setTimeout(() => setPhase("done"), 750); // after 550ms fade
+        setTimeout(() => setPhase("fading"), 400);
+        setTimeout(() => setPhase("done"), 1000); // after 600ms fade
       }
     };
 
@@ -50,7 +50,7 @@ export default function BudgetSplash() {
         justifyContent: "center",
         gap: 32,
         opacity: phase === "fading" ? 0 : 1,
-        transition: phase === "fading" ? "opacity 550ms cubic-bezier(0.4,0,0.2,1)" : "none",
+        transition: phase === "fading" ? "opacity 600ms cubic-bezier(0.4,0,0.2,1)" : "none",
         pointerEvents: phase === "fading" ? "none" : "all",
       }}
     >
