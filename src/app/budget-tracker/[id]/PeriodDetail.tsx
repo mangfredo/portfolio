@@ -58,15 +58,10 @@ export default function PeriodDetail({ id }: Props) {
 
   const cashflowData = buildCashflowData(budget, expenses);
 
-  // Donut data — top 5 + "Other"
-  const donutData = (() => {
-    if (expenses.length === 0) return [];
-    const sorted = [...expenses].sort((a, b) => b.amount - a.amount);
-    if (sorted.length <= 6) return sorted.map((e) => ({ name: e.name, value: e.amount }));
-    const top5 = sorted.slice(0, 5);
-    const other = sorted.slice(5).reduce((s, e) => s + e.amount, 0);
-    return [...top5.map((e) => ({ name: e.name, value: e.amount })), { name: "Other", value: other }];
-  })();
+  // Donut data — all expenses, no consolidation
+  const donutData = expenses.length === 0
+    ? []
+    : expenses.map((e) => ({ name: e.name, value: e.amount }));
 
   const handleSetBudget = () => {
     const val = parseFloat(budgetInput.replace(/,/g, ""));
@@ -276,12 +271,12 @@ export default function PeriodDetail({ id }: Props) {
               <p className="text-xs uppercase tracking-wider font-medium mb-4" style={{ color: "#64748B" }}>
                 Expense Allocation
               </p>
-              <ResponsiveContainer width="100%" height={180}>
+              <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
                   <Pie
                     data={donutData}
                     cx="50%"
-                    cy="50%"
+                    cy="45%"
                     innerRadius={52}
                     outerRadius={76}
                     paddingAngle={2}
@@ -303,7 +298,7 @@ export default function PeriodDetail({ id }: Props) {
                   <Legend
                     iconType="circle"
                     iconSize={7}
-                    wrapperStyle={{ fontSize: "11px", color: "#64748B" }}
+                    wrapperStyle={{ fontSize: "11px", color: "#64748B", lineHeight: "1.6" }}
                   />
                 </PieChart>
               </ResponsiveContainer>
