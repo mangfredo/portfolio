@@ -14,6 +14,7 @@ import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
 import Modal from "@/components/budget/Modal";
 import { ConfirmModal } from "@/components/budget/BudgetModal";
 import BudgetShell from "@/components/budget/BudgetShell";
+import NumericInput, { parseNumeric } from "@/components/budget/NumericInput";
 interface Props { id: string; }
 
 // 12-color vivid palette — no dark navy or flat grey
@@ -137,7 +138,7 @@ function PeriodDetailInner({ id }: Props) {
   const teal      = isDark ? "#2DD4BF" : "#0D9488";
 
   const handleSetBudget = () => {
-    const val = parseFloat(budgetInput.replace(/,/g, ""));
+    const val = parseNumeric(budgetInput);
     if (isNaN(val) || val < 0) return;
     updateBudget(id, val);
     setBudgetInput("");
@@ -151,7 +152,7 @@ function PeriodDetailInner({ id }: Props) {
 
   const handleAddItem = () => {
     const name   = itemName.trim();
-    const amount = parseFloat(itemAmount.replace(/,/g, ""));
+    const amount = parseNumeric(itemAmount);
     if (!name || isNaN(amount) || amount < 0) return;
     if (editingExpense) {
       updateExpense(editingExpense.id, name, amount);
@@ -530,10 +531,8 @@ function PeriodDetailInner({ id }: Props) {
               <label htmlFor="budget-input" className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
                 Amount ({currencySymbol})
               </label>
-              <input
+              <NumericInput
                 id="budget-input"
-                type="number"
-                inputMode="decimal"
                 value={budgetInput}
                 onChange={(e) => setBudgetInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleSetBudget(); }}
@@ -571,10 +570,8 @@ function PeriodDetailInner({ id }: Props) {
             </div>
             <div>
               <label htmlFor="item-amount" className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>Amount ({currencySymbol})</label>
-              <input
+              <NumericInput
                 id="item-amount"
-                type="number"
-                inputMode="decimal"
                 value={itemAmount}
                 onChange={(e) => setItemAmount(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleAddItem(); }}

@@ -10,6 +10,7 @@ import {
 } from "@/hooks/useLoanStore";
 import BudgetShell from "@/components/budget/BudgetShell";
 import Modal from "@/components/budget/Modal";
+import NumericInput, { parseNumeric } from "@/components/budget/NumericInput";
 
 const fmt = (n: number) =>
   n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -45,9 +46,9 @@ function LoansHomeInner() {
   });
 
   const handleAdd = () => {
-    const p = parseFloat(form.principal);
-    const r = parseFloat(form.interestRate);
-    const m = parseFloat(form.monthlyPayment);
+    const p = parseNumeric(form.principal);
+    const r = parseNumeric(form.interestRate);
+    const m = parseNumeric(form.monthlyPayment);
     if (!form.name.trim() || isNaN(p) || isNaN(r) || isNaN(m)) return;
     const loan = addLoan({
       name: form.name.trim(), principal: p, interestRate: r,
@@ -111,14 +112,14 @@ function LoansHomeInner() {
                 onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); }} />
             </Field>
             <Field label={`Principal Amount (${currencySymbol})`}>
-              <input type="number" inputMode="decimal" {...fp("principal")} placeholder="0.00" className="bt-input bt-data" />
+              <NumericInput {...fp("principal")} placeholder="0.00" className="bt-input bt-data" />
             </Field>
             <Field label="Annual Interest Rate (%)">
-              <input type="number" inputMode="decimal" {...fp("interestRate")} placeholder="e.g. 12" className="bt-input bt-data" />
+              <NumericInput {...fp("interestRate")} placeholder="e.g. 12" className="bt-input bt-data" />
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label={`Payment Amount (${currencySymbol})`}>
-                <input type="number" inputMode="decimal" {...fp("monthlyPayment")} placeholder="0.00" className="bt-input bt-data" />
+                <NumericInput {...fp("monthlyPayment")} placeholder="0.00" className="bt-input bt-data" />
               </Field>
               <Field label="Frequency">
                 <select {...fp("paymentFrequency")} className="bt-input">

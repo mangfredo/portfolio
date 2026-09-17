@@ -15,6 +15,7 @@ import {
 import BudgetShell from "@/components/budget/BudgetShell";
 import Modal from "@/components/budget/Modal";
 import { ConfirmModal } from "@/components/budget/BudgetModal";
+import NumericInput, { parseNumeric } from "@/components/budget/NumericInput";
 
 interface Props { id: string; }
 const fmt = (n: number) =>
@@ -74,7 +75,7 @@ function LoanDetailInner({ id }: Props) {
     : `${currencySymbol}${fmt(loan.monthlyPayment)}/mo`;
 
   const handleAddPayment = () => {
-    const amt = parseFloat(payAmount);
+    const amt = parseNumeric(payAmount);
     if (isNaN(amt) || amt <= 0) return;
     addPayment(payDate, amt, payNote.trim() || undefined);
     setPayAmount(""); setPayNote("");
@@ -83,7 +84,7 @@ function LoanDetailInner({ id }: Props) {
   };
 
   const handleEditLoan = () => {
-    const m = parseFloat(editForm.monthlyPayment);
+    const m = parseNumeric(editForm.monthlyPayment);
     if (isNaN(m) || m <= 0) return;
     updateLoan(id, { monthlyPayment: m, paymentFrequency: editForm.paymentFrequency });
     setShowEditLoan(false);
@@ -261,7 +262,7 @@ function LoanDetailInner({ id }: Props) {
               <label className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
                 Amount ({currencySymbol})
               </label>
-              <input type="number" inputMode="decimal" value={payAmount} onChange={(e) => setPayAmount(e.target.value)}
+              <NumericInput value={payAmount} onChange={(e) => setPayAmount(e.target.value)}
                 placeholder="0.00" autoFocus className="bt-input bt-data"
                 onKeyDown={(e) => { if (e.key === "Enter") handleAddPayment(); }} />
             </div>
@@ -275,7 +276,7 @@ function LoanDetailInner({ id }: Props) {
             </div>
             <div className="flex gap-3 pt-1">
               <button onClick={() => setShowAddPayment(false)} className="bt-btn-ghost flex-1 py-2.5">Cancel</button>
-              <button onClick={handleAddPayment} disabled={!payAmount || parseFloat(payAmount) <= 0}
+              <button onClick={handleAddPayment} disabled={!payAmount || parseNumeric(payAmount) <= 0}
                 className="bt-btn-primary flex-1 py-2.5">Log Payment</button>
             </div>
           </div>
@@ -294,7 +295,7 @@ function LoanDetailInner({ id }: Props) {
                 <label className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
                   Payment Amount ({currencySymbol})
                 </label>
-                <input type="number" inputMode="decimal" value={editForm.monthlyPayment}
+                <NumericInput value={editForm.monthlyPayment}
                   onChange={(e) => setEditForm((f) => ({ ...f, monthlyPayment: e.target.value }))}
                   autoFocus className="bt-input bt-data" />
               </div>
@@ -311,7 +312,7 @@ function LoanDetailInner({ id }: Props) {
             <div className="flex gap-3 pt-1">
               <button onClick={() => setShowEditLoan(false)} className="bt-btn-ghost flex-1 py-2.5">Cancel</button>
               <button onClick={handleEditLoan}
-                disabled={!editForm.monthlyPayment || parseFloat(editForm.monthlyPayment) <= 0}
+                disabled={!editForm.monthlyPayment || parseNumeric(editForm.monthlyPayment) <= 0}
                 className="bt-btn-primary flex-1 py-2.5">Save Plan</button>
             </div>
           </div>

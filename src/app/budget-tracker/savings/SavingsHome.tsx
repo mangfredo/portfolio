@@ -10,6 +10,7 @@ import {
 } from "@/hooks/useSavingsStore";
 import BudgetShell from "@/components/budget/BudgetShell";
 import Modal from "@/components/budget/Modal";
+import NumericInput, { parseNumeric } from "@/components/budget/NumericInput";
 
 const fmt = (n: number) =>
   n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -51,8 +52,8 @@ function SavingsHomeInner() {
   });
 
   const handleAdd = () => {
-    const target  = parseFloat(form.targetAmount);
-    const current = parseFloat(form.currentAmount) || 0;
+    const target  = parseNumeric(form.targetAmount);
+    const current = parseNumeric(form.currentAmount) || 0;
     if (!form.name.trim() || isNaN(target) || target <= 0) return;
     const goal = addGoal({
       name: form.name.trim(),
@@ -60,7 +61,7 @@ function SavingsHomeInner() {
       currentAmount: current,
       targetDate: form.targetDate || undefined,
       monthlyContribution: form.monthlyContribution
-        ? parseFloat(form.monthlyContribution)
+        ? parseNumeric(form.monthlyContribution)
         : undefined,
     });
     resetForm();
@@ -153,16 +154,16 @@ function SavingsHomeInner() {
               />
             </Field>
             <Field label={`Target Amount (${currencySymbol})`}>
-              <input type="number" inputMode="decimal" {...fieldProps("targetAmount")} placeholder="0.00" className="bt-input bt-data" />
+              <NumericInput {...fieldProps("targetAmount")} placeholder="0.00" className="bt-input bt-data" />
             </Field>
             <Field label={`Amount Already Saved (${currencySymbol})`}>
-              <input type="number" inputMode="decimal" {...fieldProps("currentAmount")} placeholder="0.00" className="bt-input bt-data" />
+              <NumericInput {...fieldProps("currentAmount")} placeholder="0.00" className="bt-input bt-data" />
             </Field>
             <Field label="Target Date (optional)">
               <input type="date" {...fieldProps("targetDate")} className="bt-input" />
             </Field>
             <Field label={`Monthly Contribution (${currencySymbol}, optional)`}>
-              <input type="number" inputMode="decimal" {...fieldProps("monthlyContribution")} placeholder="0.00" className="bt-input bt-data" />
+              <NumericInput {...fieldProps("monthlyContribution")} placeholder="0.00" className="bt-input bt-data" />
             </Field>
             <div className="flex gap-3 pt-1">
               <button onClick={() => { setShowAdd(false); resetForm(); }} className="bt-btn-ghost flex-1 py-2.5">Cancel</button>

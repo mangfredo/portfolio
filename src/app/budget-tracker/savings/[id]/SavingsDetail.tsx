@@ -14,6 +14,7 @@ import {
 import BudgetShell from "@/components/budget/BudgetShell";
 import Modal from "@/components/budget/Modal";
 import { ConfirmModal } from "@/components/budget/BudgetModal";
+import NumericInput, { parseNumeric } from "@/components/budget/NumericInput";
 
 interface Props { id: string; }
 
@@ -94,7 +95,7 @@ function SavingsDetailInner({ id }: Props) {
     : teal;
 
   const handleAddDeposit = () => {
-    const amt = parseFloat(depAmount);
+    const amt = parseNumeric(depAmount);
     if (isNaN(amt) || amt <= 0) return;
     addDeposit(depDate, amt, depNote.trim() || undefined);
     setDepAmount(""); setDepNote("");
@@ -315,8 +316,7 @@ function SavingsDetailInner({ id }: Props) {
               <label className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
                 Amount ({currencySymbol})
               </label>
-              <input
-                type="number" inputMode="decimal"
+              <NumericInput
                 value={depAmount} onChange={(e) => setDepAmount(e.target.value)}
                 placeholder="0.00" autoFocus className="bt-input bt-data"
                 onKeyDown={(e) => { if (e.key === "Enter") handleAddDeposit(); }}
@@ -337,7 +337,7 @@ function SavingsDetailInner({ id }: Props) {
               <button onClick={() => setShowAddDeposit(false)} className="bt-btn-ghost flex-1 py-2.5">Cancel</button>
               <button
                 onClick={handleAddDeposit}
-                disabled={!depAmount || parseFloat(depAmount) <= 0}
+                disabled={!depAmount || parseNumeric(depAmount) <= 0}
                 className="bt-btn-primary flex-1 py-2.5"
               >
                 Log Deposit

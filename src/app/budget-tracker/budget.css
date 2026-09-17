@@ -212,6 +212,14 @@ html[data-bt-theme="dark"] .bt-root {
 }
 .bt-input::placeholder { color: var(--bt-muted); }
 
+/* ── Hide number input spinners (we use NumericInput with type="text") ── */
+.bt-input[type="number"]::-webkit-inner-spin-button,
+.bt-input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+.bt-input[type="number"] { -moz-appearance: textfield; }
+
 /* ── Table row hover ───────────────────────────────────────────────────── */
 .bt-tr {
   background: transparent;
