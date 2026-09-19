@@ -39,6 +39,9 @@ export default function TopNav({
   const isDark = theme === "dark";
   const fileRef = useRef<HTMLInputElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+
+  const selectedCurrency = CURRENCIES.find(c => c.code === currency) ?? CURRENCIES[0];
 
   const tabLabel = activeTab === "pay-periods" ? "Pay Period"
     : activeTab === "loans" ? "Loan" : "Savings";
@@ -118,19 +121,63 @@ export default function TopNav({
             <ArrowLeft size={13} /> Portfolio
           </button>
 
-          <span style={{ fontSize:"0.7rem", fontWeight:600, textTransform:"uppercase",
-            letterSpacing:"0.14em", color:"#475569" }}>
-            {tabLabel}
-          </span>
+          <div style={{ flex:1 }} />
 
           <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
-            <select value={currency} onChange={e=>setCurrency(e.target.value)} className="wf-select">
-              {CURRENCIES.map(c => (
-                <option key={c.code} value={c.code} style={{ background:"#1E293B", color:"var(--wf-text)" }}>
-                  {c.symbol} {c.code}
-                </option>
-              ))}
-            </select>
+            {/* Custom currency picker */}
+            <div style={{ position:"relative" }}>
+              <button
+                onClick={() => setCurrencyOpen(!currencyOpen)}
+                style={{
+                  display:"flex", alignItems:"center", gap:4,
+                  background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)",
+                  border: isDark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(0,0,0,0.12)",
+                  borderRadius:8, padding:"4px 8px", cursor:"pointer",
+                  color: isDark ? "#F1F5F9" : "#0F172A",
+                  fontSize:"0.75rem", fontWeight:600, fontFamily:"var(--font-outfit,system-ui)",
+                }}
+              >
+                <span>{selectedCurrency.symbol}</span>
+                <span>{selectedCurrency.code}</span>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ opacity:0.5 }}>
+                  <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+              {currencyOpen && (
+                <>
+                  <div onClick={() => setCurrencyOpen(false)} style={{ position:"fixed", inset:0, zIndex:200 }}/>
+                  <div style={{
+                    position:"absolute", top:"calc(100% + 6px)", right:0, zIndex:201,
+                    background: isDark ? "#1E293B" : "#E4E8E9",
+                    border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.12)",
+                    borderRadius:10, overflow:"hidden",
+                    boxShadow: isDark ? "0 12px 32px rgba(0,0,0,0.5)" : "0 8px 24px rgba(0,0,0,0.15)",
+                    minWidth:160, maxHeight:280, overflowY:"auto",
+                  }}>
+                    {CURRENCIES.map(c => (
+                      <button key={c.code} onClick={() => { setCurrency(c.code); setCurrencyOpen(false); }}
+                        style={{
+                          display:"flex", alignItems:"center", gap:8,
+                          width:"100%", padding:"8px 12px", textAlign:"left",
+                          background: c.code === currency
+                            ? "rgba(34,211,238,0.15)"
+                            : "transparent",
+                          color: c.code === currency
+                            ? "#22D3EE"
+                            : isDark ? "#F1F5F9" : "#121A2C",
+                          fontSize:"0.8rem", fontWeight: c.code === currency ? 700 : 400,
+                          fontFamily:"var(--font-outfit,system-ui)", cursor:"pointer",
+                          borderBottom: isDark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.06)",
+                        }}>
+                        <span style={{ width:20, flexShrink:0 }}>{c.symbol}</span>
+                        <span>{c.code}</span>
+                        <span style={{ color: isDark ? "#64748B" : "#64748B", fontSize:"0.7rem", marginLeft:"auto" }}>{c.name.split(" ")[0]}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
             <button onClick={() => setTheme(isDark ? "light" : "dark")} className="wf-icon-btn" title="Toggle theme">
               {isDark ? <Sun size={14}/> : <Moon size={14}/>}
             </button>
@@ -271,14 +318,22 @@ export default function TopNav({
             {/* Currency */}
             <div style={{ marginBottom:16 }}>
               <p style={{ fontSize:"0.7rem", fontWeight:600, textTransform:"uppercase", letterSpacing:"0.1em", color: isDark ? "#94A3B8" : "#64748B", marginBottom:8 }}>Currency</p>
-              <select value={currency} onChange={e => setCurrency(e.target.value)}
-                style={{ width:"100%", background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", border: isDark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(0,0,0,0.10)", borderRadius:10, color: isDark ? "#F1F5F9" : "#0F172A", fontSize:"0.875rem", padding:"10px 14px", outline:"none", fontFamily:"var(--font-outfit, system-ui)" }}>
+              <div style={{ width:"100%", display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:6 }}>
                 {CURRENCIES.map(c => (
-                  <option key={c.code} value={c.code} style={{ background: isDark ? "#1E293B" : "#FFFFFF", color: isDark ? "#F1F5F9" : "#0F172A" }}>
-                    {c.symbol} {c.code} — {c.name}
-                  </option>
+                  <button key={c.code} onClick={() => setCurrency(c.code)}
+                    style={{
+                      padding:"8px 4px", borderRadius:8, cursor:"pointer", textAlign:"center",
+                      background: c.code === currency ? "rgba(34,211,238,0.15)" : (isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)"),
+                      border: c.code === currency ? "1.5px solid rgba(34,211,238,0.40)" : isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.08)",
+                      color: c.code === currency ? "#22D3EE" : (isDark ? "#F1F5F9" : "#0F172A"),
+                      fontSize:"0.7rem", fontWeight: c.code === currency ? 700 : 500,
+                      fontFamily:"var(--font-outfit,system-ui)",
+                    }}>
+                    <div style={{ fontSize:"0.9rem" }}>{c.symbol}</div>
+                    <div>{c.code}</div>
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
 
             {/* Theme */}
