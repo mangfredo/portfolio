@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { X } from "@phosphor-icons/react";
 
 interface ModalProps {
   title: string;
@@ -25,32 +26,18 @@ export default function Modal({ title, onClose, children }: ModalProps) {
   return (
     <div
       ref={backdropRef}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 sm:p-6"
-      style={{ background: "rgba(11,19,37,0.6)", backdropFilter: "blur(4px)" }}
+      className="wf-modal-overlay"
       onClick={(e) => { if (e.target === backdropRef.current) onClose(); }}
     >
-      <div
-        className="w-full max-w-sm rounded-xl border p-6"
-        style={{
-          background: "#FFFFFF",
-          borderColor: "#E2E8F0",
-          boxShadow: "0 20px 40px rgba(11,19,37,0.18)",
-        }}
-      >
-        <div className="flex items-center justify-between mb-5">
-          <h3
-            className="font-semibold text-base"
-            style={{ color: "#0F172A", fontFamily: "var(--bt-font-ui, Inter, sans-serif)" }}
-          >
-            {title}
-          </h3>
+      <div className="wf-modal">
+        <div className="wf-modal-title">
+          <span>{title}</span>
           <button
             onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center rounded-full text-xs transition-colors hover:bg-gray-100"
-            style={{ color: "#64748B" }}
+            className="wf-icon-btn"
             aria-label="Close"
           >
-            ✕
+            <X size={14} />
           </button>
         </div>
         {children}

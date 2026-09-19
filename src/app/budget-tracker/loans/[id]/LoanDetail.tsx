@@ -126,22 +126,30 @@ function LoanDetailInner({ id }: Props) {
         <div className="flex items-start justify-between mb-8">
           <div>
             <button onClick={() => router.push("/budget-tracker/loans")}
-              className="bt-text-muted text-xs font-medium mb-2 flex items-center gap-1 hover:opacity-70 transition-opacity">
-              ← All Loans
+              className="flex items-center gap-1.5 text-xs font-medium mb-3 transition-opacity hover:opacity-70"
+              style={{ color:"var(--wf-muted)" }}>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M8 2L4 6l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              All Loans
             </button>
-            <h2 className="bt-text-main text-2xl font-semibold tracking-tight">{loan.name}</h2>
+            <h2 className="font-bold text-2xl tracking-tight" style={{ color:"var(--wf-text)" }}>{loan.name}</h2>
             <div className="flex items-center gap-3 mt-1">
-              <p className="bt-text-muted text-sm">{loan.interestRate}% annual · {freqLabel}</p>
+              <p className="text-sm" style={{ color:"var(--wf-muted)" }}>{loan.interestRate}% annual · {freqLabel}</p>
               <button onClick={() => { setEditForm({ monthlyPayment: String(loan.monthlyPayment), paymentFrequency: loan.paymentFrequency }); setShowEditLoan(true); }}
-                className="text-xs font-medium px-2 py-0.5 rounded"
-                style={{ background: isDark ? "#1E293B" : "#F1F5F9", color: teal }}>
+                className="text-xs font-semibold px-2 py-0.5 rounded-lg transition-colors"
+                style={{ background:"var(--wf-cyan-dim)", color:"var(--wf-cyan)" }}>
                 Edit
               </button>
             </div>
           </div>
           <button onClick={() => setShowDeleteLoan(true)}
-            className="bt-text-muted text-xs font-medium transition-opacity hover:opacity-70 mt-1">
-            Delete loan
+            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+            style={{ color:"var(--wf-pink)", background:"var(--wf-pink-dim)", border:"1px solid rgba(236,72,153,0.20)" }}>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 3h8M5 3V2h2v1M4 3l.5 7h3L8 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Delete
           </button>
         </div>
 

@@ -146,33 +146,38 @@ function SavingsDetailInner({ id }: Props) {
           <div>
             <button
               onClick={() => router.push("/budget-tracker/savings")}
-              className="bt-text-muted text-xs font-medium mb-2 flex items-center gap-1 hover:opacity-70 transition-opacity"
+              className="flex items-center gap-1.5 text-xs font-medium mb-3 transition-opacity hover:opacity-70"
+              style={{ color:"var(--wf-muted)" }}
             >
-              ← All Goals
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M8 2L4 6l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              All Goals
             </button>
             <div className="flex items-center gap-3">
-              <h2 className="bt-text-main text-2xl font-semibold tracking-tight">{goal.name}</h2>
+              <h2 className="font-bold text-2xl tracking-tight" style={{ color:"var(--wf-text)" }}>{goal.name}</h2>
               <span
                 className="text-[0.65rem] font-semibold px-2 py-0.5 rounded-full"
-                style={{
-                  background: `${status.color}22`,
-                  color: status.color,
-                }}
+                style={{ background: `${status.color}22`, color: status.color }}
               >
                 {status.label}
               </span>
             </div>
             {goal.targetDate && (
-              <p className="bt-text-muted text-sm mt-0.5">
+              <p className="text-sm mt-0.5" style={{ color:"var(--wf-muted)" }}>
                 Target: {new Date(goal.targetDate).toLocaleDateString(undefined, { dateStyle: "medium" })}
               </p>
             )}
           </div>
           <button
             onClick={() => setShowDeleteGoal(true)}
-            className="bt-text-muted text-xs font-medium transition-opacity hover:opacity-70 mt-1"
+            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+            style={{ color:"var(--wf-pink)", background:"var(--wf-pink-dim)", border:"1px solid rgba(236,72,153,0.20)" }}
           >
-            Delete goal
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 3h8M5 3V2h2v1M4 3l.5 7h3L8 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Delete
           </button>
         </div>
 
