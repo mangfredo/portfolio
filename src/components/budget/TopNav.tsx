@@ -82,7 +82,7 @@ export default function TopNav({
                 </svg>
               </div>
               <span style={{ fontWeight:700, fontSize:"0.875rem", color:"var(--wf-text)", letterSpacing:"-0.01em" }}>
-                WealthFlow
+                LaanFlow
               </span>
             </div>
 
@@ -178,7 +178,7 @@ export default function TopNav({
               <path d="M1 9L4 6l2 2 5-5" stroke="#0F172A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <span style={{ fontWeight:700, fontSize:"0.8125rem", color:"var(--wf-text)" }}>WealthFlow</span>
+          <span style={{ fontWeight:700, fontSize:"0.8125rem", color:"var(--wf-text)" }}>LaanFlow</span>
         </div>
 
         {/* Current tab label */}

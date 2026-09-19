@@ -155,7 +155,7 @@ export default function BudgetShell({ children }: BudgetShellProps) {
         {modal.type === "confirm-back" && (
           <ConfirmModal
             title="Back to Portfolio?"
-            message="Your data is saved locally and will be here when you return. Ready to leave WealthFlow?"
+            message="Your data is saved locally and will be here when you return. Ready to leave LaanFlow?"
             confirmLabel="Leave"
             isDark={settings.theme === "dark"}
             onConfirm={doBack}
