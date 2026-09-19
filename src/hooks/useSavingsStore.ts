@@ -8,6 +8,7 @@ import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
 export interface SavingsGoal {
   id: string;
   name: string;
+  icon?: string;               // icon key from GOAL_ICONS
   targetAmount: number;
   currentAmount: number;       // starting / manual balance
   targetDate?: string;         // ISO date string (optional)

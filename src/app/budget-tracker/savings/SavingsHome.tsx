@@ -11,6 +11,7 @@ import {
   useSavings, useSavingsDeposits, calcSavingsMetrics,
   type SavingsGoal, type GoalStatus,
 } from "@/hooks/useSavingsStore";
+import GoalIconPicker, { GOAL_ICONS } from "@/components/budget/GoalIconPicker";
 import BudgetShell from "@/components/budget/BudgetShell";
 import Modal from "@/components/budget/Modal";
 import NumericInput, { parseNumeric } from "@/components/budget/NumericInput";
@@ -27,8 +28,17 @@ const STATUS: Record<GoalStatus, { label: string; cls: string }> = {
   "no-date":  { label:"In Progress", cls:"wf-badge-muted" },
 };
 
-function GoalIcon({ name, color }: { name: string; color: string }) {
-  const n = name.toLowerCase();
+function GoalIcon({ goal, color }: { goal: SavingsGoal; color: string }) {
+  // Use stored icon if available
+  if (goal.icon && GOAL_ICONS[goal.icon]) {
+    return (
+      <span style={{ width: 18, height: 18, display: "block", color }}>
+        {GOAL_ICONS[goal.icon].svg}
+      </span>
+    );
+  }
+  // Fallback heuristic
+  const n = goal.name.toLowerCase();
   const sz = 18;
   if (n.includes("trip")||n.includes("travel")||n.includes("vacation"))
     return <AirplaneTilt size={sz} color={color} weight="fill"/>;
@@ -67,10 +77,10 @@ function SavingsHomeInner() {
   const { goals, addGoal } = useSavings();
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({
-    name:"", targetAmount:"", currentAmount:"0", targetDate:"", monthlyContribution:"",
+    name:"", targetAmount:"", currentAmount:"0", targetDate:"", monthlyContribution:"", icon:"piggybank",
   });
 
-  const resetForm = () => setForm({ name:"", targetAmount:"", currentAmount:"0", targetDate:"", monthlyContribution:"" });
+  const resetForm = () => setForm({ name:"", targetAmount:"", currentAmount:"0", targetDate:"", monthlyContribution:"", icon:"piggybank" });
 
   const handleAdd = () => {
     const target  = parseNumeric(form.targetAmount);
@@ -78,6 +88,7 @@ function SavingsHomeInner() {
     if (!form.name.trim() || isNaN(target) || target <= 0) return;
     const goal = addGoal({
       name: form.name.trim(), targetAmount: target, currentAmount: current,
+      icon: form.icon || "piggybank",
       targetDate: form.targetDate || undefined,
       monthlyContribution: form.monthlyContribution ? parseNumeric(form.monthlyContribution) : undefined,
     });
@@ -239,7 +250,17 @@ function SavingsHomeInner() {
         <Modal title="Create New Goal" onClose={() => { setShowAdd(false); resetForm(); }}>
           <div className="space-y-4">
             {[
-              { label:"Goal Name", el:<input type="text" {...fp("name")} placeholder="e.g. Emergency Fund" autoFocus className="wf-input" onKeyDown={e=>{if(e.key==="Enter")handleAdd();}}/> },
+              { label:"Goal Name", el:
+                <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                  <GoalIconPicker
+                    selected={form.icon}
+                    onChange={(key) => setForm(f => ({ ...f, icon: key }))}
+                    color="#22D3EE"
+                  />
+                  <input type="text" {...fp("name")} placeholder="e.g. Emergency Fund" autoFocus className="wf-input" style={{ flex:1 }}
+                    onKeyDown={e=>{if(e.key==="Enter")handleAdd();}}/>
+                </div>
+              },
               { label:`Target Amount (${currencySymbol})`, el:<NumericInput {...fp("targetAmount")} placeholder="0.00" className="wf-input wf-input-data"/> },
               { label:`Already Saved (${currencySymbol})`, el:<NumericInput {...fp("currentAmount")} placeholder="0.00" className="wf-input wf-input-data"/> },
               { label:"Target Date (optional)", el:<input type="date" {...fp("targetDate")} className="wf-input"/> },
@@ -292,7 +313,7 @@ function GoalCard({ goal, color, sym, onClick, index }: {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
               style={{ background:`${color}20`, border:`1px solid ${color}30` }}>
-              <GoalIcon name={goal.name} color={color}/>
+              <GoalIcon goal={goal} color={color}/>
             </div>
             <div>
               <p className="font-semibold text-sm leading-tight" style={{ color:"var(--wf-text)" }}>{goal.name}</p>
