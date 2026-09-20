@@ -40,6 +40,7 @@ export default function TopNav({
   const fileRef = useRef<HTMLInputElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [mobileCurrencyOpen, setMobileCurrencyOpen] = useState(false);
 
   const selectedCurrency = CURRENCIES.find(c => c.code === currency) ?? CURRENCIES[0];
 
@@ -75,15 +76,13 @@ export default function TopNav({
           <nav className="wf-dock flex items-center gap-1 px-2 py-1.5">
             {/* Logo */}
             <div style={{ display:"flex", alignItems:"center", gap:8, padding:"0 12px", marginRight:8 }}>
-              <div style={{
-                width:24, height:24, borderRadius:8, flexShrink:0,
-                background:"linear-gradient(135deg,#22D3EE,#0EA5E9)",
-                display:"flex", alignItems:"center", justifyContent:"center",
-              }}>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M1 9L4 6l2 2 5-5" stroke="#0F172A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
+              <img
+                src="/budget-tracker-logo-arrow.svg"
+                alt="LaanFlow"
+                width={24}
+                height={24}
+                style={{ borderRadius: 6, display:"block", flexShrink:0 }}
+              />
               <span style={{ fontWeight:700, fontSize:"0.875rem", color:"var(--wf-text)", letterSpacing:"-0.01em" }}>
                 LaanFlow
               </span>
@@ -216,20 +215,16 @@ export default function TopNav({
       }}>
         {/* Logo */}
         <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
-          <div style={{
-            width:22, height:22, borderRadius:7, flexShrink:0,
-            background:"linear-gradient(135deg,#22D3EE,#0EA5E9)",
-            display:"flex", alignItems:"center", justifyContent:"center",
-          }}>
-            <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-              <path d="M1 9L4 6l2 2 5-5" stroke="#0F172A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
+          <img
+            src="/budget-tracker-logo-arrow.svg"
+            alt="LaanFlow"
+            width={22}
+            height={22}
+            style={{ borderRadius: 6, display:"block", flexShrink:0 }}
+          />
           <span style={{ fontWeight:700, fontSize:"0.8125rem", color:"var(--wf-text)" }}>LaanFlow</span>
         </div>
 
-        {/* Current tab label */}
-        <span style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--wf-muted)" }}>{tabLabel}</span>
       </header>
 
       {/* ── Mobile: bottom tab dock (fixed, iOS-style) ───────────────────── */}
@@ -289,7 +284,7 @@ export default function TopNav({
       {menuOpen && (
         <>
           {/* Backdrop */}
-          <div onClick={() => setMenuOpen(false)} style={{
+          <div onClick={() => { setMenuOpen(false); setMobileCurrencyOpen(false); }} style={{
             position:"fixed", inset:0, zIndex:60,
             background:"rgba(0,0,0,0.5)",
             backdropFilter:"blur(4px)",
@@ -310,30 +305,68 @@ export default function TopNav({
 
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
               <span style={{ fontWeight:700, fontSize:"1rem", color: isDark ? "#F1F5F9" : "#0F172A" }}>Settings</span>
-              <button onClick={() => setMenuOpen(false)} className="wf-icon-btn">
+              <button onClick={() => { setMenuOpen(false); setMobileCurrencyOpen(false); }} className="wf-icon-btn">
                 <X size={14}/>
               </button>
             </div>
 
             {/* Currency */}
-            <div style={{ marginBottom:16 }}>
+            <div style={{ marginBottom:16, position:"relative" }}>
               <p style={{ fontSize:"0.7rem", fontWeight:600, textTransform:"uppercase", letterSpacing:"0.1em", color: isDark ? "#94A3B8" : "#64748B", marginBottom:8 }}>Currency</p>
-              <div style={{ width:"100%", display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:6 }}>
-                {CURRENCIES.map(c => (
-                  <button key={c.code} onClick={() => setCurrency(c.code)}
-                    style={{
-                      padding:"8px 4px", borderRadius:8, cursor:"pointer", textAlign:"center",
-                      background: c.code === currency ? "rgba(34,211,238,0.15)" : (isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)"),
-                      border: c.code === currency ? "1.5px solid rgba(34,211,238,0.40)" : isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.08)",
-                      color: c.code === currency ? "#22D3EE" : (isDark ? "#F1F5F9" : "#0F172A"),
-                      fontSize:"0.7rem", fontWeight: c.code === currency ? 700 : 500,
-                      fontFamily:"var(--font-outfit,system-ui)",
-                    }}>
-                    <div style={{ fontSize:"0.9rem" }}>{c.symbol}</div>
-                    <div>{c.code}</div>
-                  </button>
-                ))}
-              </div>
+              {/* Trigger button */}
+              <button
+                onClick={() => setMobileCurrencyOpen(!mobileCurrencyOpen)}
+                style={{
+                  width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between",
+                  padding:"10px 14px", borderRadius:10, cursor:"pointer",
+                  background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
+                  border: isDark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(0,0,0,0.10)",
+                  color: isDark ? "#F1F5F9" : "#0F172A",
+                  fontFamily:"var(--font-outfit,system-ui)", fontSize:"0.875rem",
+                }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                  <span style={{ fontSize:"1.1rem" }}>{selectedCurrency.symbol}</span>
+                  <span style={{ fontWeight:600 }}>{selectedCurrency.code}</span>
+                  <span style={{ color: isDark ? "#64748B" : "#94A3B8", fontSize:"0.8rem" }}>{selectedCurrency.name}</span>
+                </div>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                  style={{ transform: mobileCurrencyOpen ? "rotate(180deg)" : "rotate(0)", transition:"transform 200ms ease", flexShrink:0 }}>
+                  <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+
+              {/* Dropdown list */}
+              {mobileCurrencyOpen && (
+                <div style={{
+                  position:"absolute", top:"calc(100% + 4px)", left:0, right:0, zIndex:10,
+                  background: isDark ? "#1E293B" : "#FFFFFF",
+                  border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.10)",
+                  borderRadius:10, overflow:"hidden", maxHeight:220, overflowY:"auto",
+                  boxShadow: isDark ? "0 12px 32px rgba(0,0,0,0.5)" : "0 8px 24px rgba(0,0,0,0.15)",
+                }}>
+                  {CURRENCIES.map((c, i) => (
+                    <button key={c.code}
+                      onClick={() => { setCurrency(c.code); setMobileCurrencyOpen(false); }}
+                      style={{
+                        display:"flex", alignItems:"center", gap:12,
+                        width:"100%", padding:"10px 14px", textAlign:"left",
+                        background: c.code === currency
+                          ? "rgba(34,211,238,0.12)"
+                          : (isDark ? "transparent" : i % 2 === 0 ? "#FFFFFF" : "rgba(0,0,0,0.02)"),
+                        borderBottom: i < CURRENCIES.length - 1
+                          ? (isDark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)")
+                          : "none",
+                        color: c.code === currency ? "#22D3EE" : (isDark ? "#F1F5F9" : "#0F172A"),
+                        fontFamily:"var(--font-outfit,system-ui)", cursor:"pointer",
+                      }}>
+                      <span style={{ fontSize:"1rem", width:24, textAlign:"center", flexShrink:0 }}>{c.symbol}</span>
+                      <span style={{ fontWeight: c.code === currency ? 700 : 500, fontSize:"0.875rem" }}>{c.code}</span>
+                      <span style={{ fontSize:"0.75rem", color: isDark ? "#64748B" : "#94A3B8", marginLeft:"auto" }}>{c.name}</span>
+                      {c.code === currency && <span style={{ color:"#22D3EE", flexShrink:0 }}>✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Theme */}
