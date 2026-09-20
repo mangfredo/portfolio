@@ -148,7 +148,7 @@ interface GoalIconPickerProps {
   color?: string;
 }
 
-export default function GoalIconPicker({ selected, onChange, color = "#22D3EE" }: GoalIconPickerProps) {
+export default function GoalIconPicker({ selected, onChange, color = "var(--wf-cyan)" }: GoalIconPickerProps) {
   const [open, setOpen] = useState(false);
 
   const selectedIcon = GOAL_ICONS[selected];

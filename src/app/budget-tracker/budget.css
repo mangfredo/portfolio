@@ -1,78 +1,169 @@
 /* =========================================================================
-   LaanFlow Design System — scoped to .wf-root
-   Spec: #0F172A bg, rgba(30,41,59,0.55) glass, #22D3EE cyan, #EC4899 pink,
-         #10B981 emerald, Outfit font.
+   LaanFlow Design System — budget.css
+   Clean token-driven CSS. No !important nuclear overrides.
+   All values consumed via CSS custom properties.
    ========================================================================= */
 
-/* ── Outfit font injection ───────────────────────────────────────────────── */
+/* ── Font ──────────────────────────────────────────────────────────────── */
 .wf-root,
 .wf-root * {
   font-family: var(--font-outfit), "Outfit", system-ui, sans-serif;
 }
 
-/* ── Canvas ──────────────────────────────────────────────────────────────── */
+/* ── Dark mode tokens (default) ────────────────────────────────────────── */
 .wf-root {
-  background: #0F172A;
-  color: #E2E8F0;
+  /* Canvas */
+  --wf-bg:               #090D16;
+
+  /* Card surfaces — solid, not glass */
+  --wf-surface:          #1E293B;
+  --wf-surface-alt:      #162032;
+
+  /* Floating surfaces — docks, modals only */
+  --wf-surface-glass:    rgba(15, 23, 42, 0.75);
+
+  /* Borders */
+  --wf-border:           rgba(255, 255, 255, 0.08);
+  --wf-border-hi:        rgba(255, 255, 255, 0.16);
+
+  /* Primary CTA — high-contrast slate, not cyan */
+  --wf-primary-cta:      #F8FAFC;
+  --wf-primary-cta-text: #0F172A;
+
+  /* Accent — cyan reserved for active states & metrics only */
+  --wf-cyan:             #38BDF8;
+  --wf-cyan-dim:         rgba(56, 189, 248, 0.12);
+
+  /* Semantic */
+  --wf-emerald:          #10B981;
+  --wf-emerald-dim:      rgba(16, 185, 129, 0.12);
+  --wf-pink:             #F43F5E;
+  --wf-pink-dim:         rgba(244, 63, 94, 0.12);
+  --wf-amber:            #F59E0B;
+
+  /* Text */
+  --wf-text:             #F8FAFC;
+  --wf-muted:            #94A3B8;
+
+  /* Data font */
+  --wf-data-font:        var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+
+  /* Base canvas */
+  background: var(--wf-bg);
+  color: var(--wf-text);
   min-height: 100vh;
 }
 
-/* ── CSS custom properties ───────────────────────────────────────────────── */
-.wf-root {
-  --wf-bg:        #0F172A;
-  --wf-surface:   rgba(30, 41, 59, 0.55);
-  --wf-surface-solid: #1E293B;
-  --wf-border:    rgba(255, 255, 255, 0.08);
-  --wf-border-hi: rgba(255, 255, 255, 0.14);
-  --wf-cyan:      #22D3EE;
-  --wf-cyan-dim:  rgba(34, 211, 238, 0.15);
-  --wf-pink:      #EC4899;
-  --wf-pink-dim:  rgba(236, 72, 153, 0.15);
-  --wf-emerald:   #10B981;
-  --wf-emerald-dim: rgba(16, 185, 129, 0.15);
-  --wf-text:      #F1F5F9;
-  --wf-muted:     #94A3B8;
-  --wf-data:      var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+/* ── Light mode token overrides ────────────────────────────────────────── */
+.wf-root[data-theme="light"] {
+  --wf-bg:               #F8FAFC;
+  --wf-surface:          #FFFFFF;
+  --wf-surface-alt:      #F1F5F9;
+  --wf-surface-glass:    rgba(255, 255, 255, 0.85);
+  --wf-border:           #E2E8F0;
+  --wf-border-hi:        #CBD5E1;
+
+  --wf-primary-cta:      #0F172A;
+  --wf-primary-cta-text: #FFFFFF;
+
+  --wf-cyan:             #0284C7;
+  --wf-cyan-dim:         rgba(2, 132, 199, 0.10);
+  --wf-emerald:          #059669;
+  --wf-emerald-dim:      rgba(5, 150, 105, 0.10);
+  --wf-pink:             #E11D48;
+  --wf-pink-dim:         rgba(225, 29, 72, 0.10);
+
+  --wf-text:             #0F172A;
+  --wf-muted:            #64748B;
+
+  background: var(--wf-bg);
+  color: var(--wf-text);
 }
 
-/* ── Glassmorphism card ──────────────────────────────────────────────────── */
+/* =========================================================================
+   CARD SURFACE — solid, legible, grounded
+   Glass blur is for floating UI only (docks, modals).
+   ========================================================================= */
+
 .wf-glass {
   background: var(--wf-surface);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--wf-border);
   border-radius: 16px;
-  transition: border-color 200ms ease, transform 150ms ease, box-shadow 150ms ease;
-}
-.wf-glass:hover {
-  border-color: rgba(34, 211, 238, 0.30);
+  transition: border-color 150ms ease, transform 150ms ease;
 }
 
-/* Clickable card lift */
+.wf-glass:hover {
+  border-color: var(--wf-border-hi);
+}
+
 button.wf-glass:hover,
 a.wf-glass:hover {
-  transform: scale(1.02);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transform: scale(1.015);
 }
 
-/* ── Floating dock (top nav pill) ────────────────────────────────────────── */
+/* =========================================================================
+   FLOATING SURFACES — dock, modals, overlays
+   Only these elements get backdrop-filter blur.
+   ========================================================================= */
+
 .wf-dock {
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--wf-surface-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--wf-border-hi);
   border-radius: 9999px;
 }
 
-/* ── Utility bar ─────────────────────────────────────────────────────────── */
 .wf-utility-bar {
-  background: rgba(15, 23, 42, 0.6);
+  background: var(--wf-surface-glass);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--wf-border);
 }
 
-/* ── Tab button ──────────────────────────────────────────────────────────── */
+/* Desktop/mobile top nav backgrounds */
+.wf-desktop-header {
+  display: none;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 0;
+  height: auto;
+}
+@media (min-width: 640px) {
+  .wf-desktop-header { display: flex; }
+}
+
+.wf-mobile-topbar {
+  display: flex;
+  min-height: 0;
+  height: auto;
+  background: var(--wf-surface-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--wf-border);
+}
+@media (min-width: 640px) {
+  .wf-mobile-topbar { display: none; }
+}
+
+.wf-bottom-dock {
+  display: flex;
+  flex-direction: row;
+  min-height: 0;
+  height: auto;
+  background: var(--wf-surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--wf-border-hi);
+}
+@media (min-width: 640px) {
+  .wf-bottom-dock { display: none; }
+}
+
+/* =========================================================================
+   NAVIGATION TABS
+   ========================================================================= */
+
 .wf-tab {
   display: flex;
   align-items: center;
@@ -84,14 +175,68 @@ a.wf-glass:hover {
   color: var(--wf-muted);
   transition: background 150ms ease, color 150ms ease;
   white-space: nowrap;
+  cursor: pointer;
 }
-.wf-tab:hover { color: var(--wf-text); }
+
+.wf-tab:hover {
+  color: var(--wf-text);
+}
+
 .wf-tab.active {
-  background: rgba(34, 211, 238, 0.15);
+  background: var(--wf-cyan-dim);
   color: var(--wf-cyan);
 }
 
-/* ── Utility icon button ─────────────────────────────────────────────────── */
+/* =========================================================================
+   PRIMARY BUTTON — solid high-contrast CTA
+   Dark: off-white slate. Light: deep navy. No cyan gradients.
+   ========================================================================= */
+
+.wf-btn-primary {
+  background: var(--wf-primary-cta);
+  color: var(--wf-primary-cta-text);
+  font-weight: 600;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: opacity 150ms ease, transform 150ms ease;
+  cursor: pointer;
+}
+
+.wf-btn-primary:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.wf-btn-primary:active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.wf-btn-primary:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ── Ghost button ──────────────────────────────────────────────────────── */
+.wf-btn-ghost {
+  background: transparent;
+  border: 1px solid var(--wf-border);
+  color: var(--wf-muted);
+  border-radius: 10px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.wf-btn-ghost:hover {
+  background: var(--wf-surface-alt);
+  border-color: var(--wf-border-hi);
+  color: var(--wf-text);
+}
+
+/* ── Icon button ───────────────────────────────────────────────────────── */
 .wf-icon-btn {
   width: 32px;
   height: 32px;
@@ -99,60 +244,42 @@ a.wf-glass:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--wf-border);
   color: var(--wf-muted);
-  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
   flex-shrink: 0;
 }
+
 .wf-icon-btn:hover {
-  background: rgba(34, 211, 238, 0.10);
-  border-color: rgba(34, 211, 238, 0.30);
-  color: var(--wf-cyan);
+  background: var(--wf-surface-alt);
+  border-color: var(--wf-border-hi);
+  color: var(--wf-text);
 }
+
 .wf-icon-btn.danger:hover {
-  background: rgba(236, 72, 153, 0.10);
-  border-color: rgba(236, 72, 153, 0.30);
+  background: var(--wf-pink-dim);
+  border-color: var(--wf-pink);
   color: var(--wf-pink);
 }
 
-/* ── Primary button ──────────────────────────────────────────────────────── */
-.wf-btn-primary {
-  background: linear-gradient(135deg, #22D3EE 0%, #0EA5E9 100%);
-  color: #0F172A;
-  font-weight: 700;
-  border-radius: 10px;
-  font-size: 0.875rem;
-  transition: opacity 150ms ease, transform 150ms ease, box-shadow 150ms ease;
-  box-shadow: 0 4px 14px rgba(34, 211, 238, 0.30);
-}
-.wf-btn-primary:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(34, 211, 238, 0.40);
-}
-.wf-btn-primary:active { transform: translateY(0); }
-.wf-btn-primary:disabled { opacity: 0.35; pointer-events: none; }
-
-/* ── Ghost button ────────────────────────────────────────────────────────── */
-.wf-btn-ghost {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--wf-border);
-  color: var(--wf-muted);
-  border-radius: 10px;
-  font-size: 0.875rem;
-  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
-}
-.wf-btn-ghost:hover {
-  background: rgba(34, 211, 238, 0.08);
-  border-color: rgba(34, 211, 238, 0.25);
-  color: var(--wf-cyan);
+/* Light mode icon btn */
+.wf-root[data-theme="light"] .wf-icon-btn {
+  background: rgba(0, 0, 0, 0.04);
 }
 
-/* ── Glass input ─────────────────────────────────────────────────────────── */
+.wf-root[data-theme="light"] .wf-icon-btn:hover {
+  background: var(--wf-surface-alt);
+}
+
+/* =========================================================================
+   INPUTS
+   ========================================================================= */
+
 .wf-input {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: var(--wf-surface-alt);
+  border: 1px solid var(--wf-border);
   border-radius: 10px;
   color: var(--wf-text);
   font-size: 0.875rem;
@@ -162,32 +289,85 @@ a.wf-glass:hover {
   transition: border-color 150ms ease, background 150ms ease;
   font-family: var(--font-outfit), system-ui, sans-serif;
 }
+
 .wf-input:focus {
   border-color: var(--wf-cyan);
-  background: rgba(34, 211, 238, 0.05);
+  background: var(--wf-surface);
 }
-.wf-input::placeholder { color: var(--wf-muted); }
+
+.wf-input::placeholder {
+  color: var(--wf-muted);
+}
+
 .wf-input-data {
-  font-family: var(--wf-data) !important;
+  font-family: var(--wf-data-font);
   font-feature-settings: "tnum" 1;
 }
 
-/* ── Data / monospace text ───────────────────────────────────────────────── */
+/* =========================================================================
+   SELECT
+   ========================================================================= */
+
+.wf-select {
+  background: var(--wf-surface-alt);
+  border: 1px solid var(--wf-border);
+  border-radius: 8px;
+  color: var(--wf-text);
+  font-size: 0.75rem;
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  padding: 5px 8px;
+  outline: none;
+  cursor: pointer;
+}
+
+.wf-select:focus {
+  border-color: var(--wf-cyan);
+}
+
+/* =========================================================================
+   DATA / MONOSPACE
+   ========================================================================= */
+
 .wf-data {
-  font-family: var(--wf-data);
+  font-family: var(--wf-data-font);
   font-feature-settings: "tnum" 1;
   font-variant-numeric: tabular-nums;
 }
 
-/* ── Stat value (large hero numbers) ────────────────────────────────────── */
-.wf-stat {
-  font-family: var(--font-outfit), system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--wf-text);
+/* =========================================================================
+   PROGRESS BARS
+   ========================================================================= */
+
+.wf-progress-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--wf-border);
+  overflow: hidden;
 }
 
-/* ── Badge / pill ────────────────────────────────────────────────────────── */
+.wf-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--wf-cyan);
+  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wf-progress-fill-emerald {
+  background: var(--wf-emerald);
+}
+
+.wf-progress-fill-pink {
+  background: var(--wf-pink);
+}
+
+.wf-progress-fill-warn {
+  background: var(--wf-amber);
+}
+
+/* =========================================================================
+   BADGES
+   ========================================================================= */
+
 .wf-badge {
   display: inline-flex;
   align-items: center;
@@ -198,141 +378,53 @@ a.wf-glass:hover {
   letter-spacing: 0.04em;
   padding: 2px 10px;
 }
-.wf-badge-cyan   { background: var(--wf-cyan-dim);    color: var(--wf-cyan); }
-.wf-badge-pink   { background: var(--wf-pink-dim);    color: var(--wf-pink); }
-.wf-badge-emerald{ background: var(--wf-emerald-dim); color: var(--wf-emerald); }
-.wf-badge-muted  { background: rgba(148,163,184,0.12); color: var(--wf-muted); }
 
-/* ── Progress bar ────────────────────────────────────────────────────────── */
-.wf-progress-track {
-  height: 6px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-}
-.wf-progress-fill {
-  height: 100%;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, var(--wf-cyan) 0%, #0EA5E9 100%);
-  box-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
-  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-.wf-progress-fill-emerald {
-  background: linear-gradient(90deg, var(--wf-emerald) 0%, #34D399 100%);
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-}
-.wf-progress-fill-pink {
-  background: linear-gradient(90deg, var(--wf-pink) 0%, #F472B6 100%);
-  box-shadow: 0 0 8px rgba(236, 72, 153, 0.4);
-}
-.wf-progress-fill-warn {
-  background: linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%);
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
-}
+.wf-badge-cyan    { background: var(--wf-cyan-dim);    color: var(--wf-cyan); }
+.wf-badge-pink    { background: var(--wf-pink-dim);    color: var(--wf-pink); }
+.wf-badge-emerald { background: var(--wf-emerald-dim); color: var(--wf-emerald); }
+.wf-badge-muted   { background: rgba(148, 163, 184, 0.12); color: var(--wf-muted); }
 
-/* ── Table row ───────────────────────────────────────────────────────────── */
+/* =========================================================================
+   TABLE ROWS
+   ========================================================================= */
+
 .wf-row {
   background: transparent;
   transition: background 120ms ease;
-}
-.wf-row:hover { background: rgba(34, 211, 238, 0.04); }
-
-/* ── Divider ─────────────────────────────────────────────────────────────── */
-.wf-divider { border-color: var(--wf-border); }
-
-/* ── Recharts overrides ──────────────────────────────────────────────────── */
-.wf-root .recharts-cartesian-grid-horizontal line,
-.wf-root .recharts-cartesian-grid-vertical line {
-  stroke: rgba(255, 255, 255, 0.06) !important;
-}
-.wf-root .recharts-text { fill: #94A3B8 !important; }
-.wf-root .recharts-legend-item-text { color: #94A3B8 !important; }
-
-/* ── FAB ─────────────────────────────────────────────────────────────────── */
-.wf-fab {
-  background: linear-gradient(135deg, #22D3EE 0%, #0EA5E9 100%);
-  color: #0F172A;
-  border-radius: 9999px;
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 24px rgba(34, 211, 238, 0.35);
-  transition: transform 150ms ease, box-shadow 150ms ease;
-}
-.wf-fab:hover {
-  transform: scale(1.08);
-  box-shadow: 0 12px 32px rgba(34, 211, 238, 0.50);
-}
-
-/* ── Scrollbar ───────────────────────────────────────────────────────────── */
-.wf-root ::-webkit-scrollbar { width: 6px; height: 6px; }
-.wf-root ::-webkit-scrollbar-track { background: transparent; }
-.wf-root ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 9999px;
-}
-
-/* ── Animations ──────────────────────────────────────────────────────────── */
-@keyframes wf-fade-up {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes wf-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* ── Range input ─────────────────────────────────────────────────────────── */
-.wf-root input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.10);
-  outline: none;
-}
-.wf-root input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 9999px;
-  background: var(--wf-cyan);
   cursor: pointer;
-  border: 2px solid #0F172A;
-  box-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
-}
-.wf-root input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 9999px;
-  background: var(--wf-cyan);
-  cursor: pointer;
-  border: 2px solid #0F172A;
 }
 
-/* ── Modal overlay ───────────────────────────────────────────────────────── */
+.wf-row:hover {
+  background: var(--wf-surface-alt);
+}
+
+/* =========================================================================
+   MODAL
+   ========================================================================= */
+
 .wf-modal-overlay {
   position: fixed;
   inset: 0;
   z-index: 9000;
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
 }
+
 .wf-modal {
-  background: #1E293B;
+  background: var(--wf-surface);
   border: 1px solid var(--wf-border-hi);
   border-radius: 20px;
   width: 100%;
   max-width: 440px;
   padding: 28px;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
 }
+
 .wf-modal-title {
   font-size: 1.125rem;
   font-weight: 700;
@@ -343,263 +435,96 @@ a.wf-glass:hover {
   justify-content: space-between;
 }
 
-/* ── Select ──────────────────────────────────────────────────────────────── */
-.wf-select {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: 8px;
-  color: var(--wf-text);
-  font-size: 0.75rem;
-  font-family: var(--font-outfit), system-ui, sans-serif;
-  padding: 5px 8px;
-  outline: none;
+/* =========================================================================
+   FAB
+   ========================================================================= */
+
+.wf-fab {
+  background: var(--wf-primary-cta);
+  color: var(--wf-primary-cta-text);
+  border-radius: 9999px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transition: transform 150ms ease, box-shadow 150ms ease;
   cursor: pointer;
-  color-scheme: dark; /* forces native dropdown to render dark */
-}
-.wf-select:focus { border-color: var(--wf-cyan); }
-
-/* Light mode select — keep color-scheme dark so option list stays readable */
-.wf-root[data-theme="light"] .wf-select {
-  background: rgba(0, 0, 0, 0.07) !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
-  color: #0F172A !important;
-  color-scheme: dark; /* native option list stays dark even in light mode */
 }
 
-/* ── Cyan glow ambient ───────────────────────────────────────────────────── */
-.wf-glow-cyan::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(400px circle at 80% 20%, rgba(34, 211, 238, 0.12), transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-.wf-glow-pink::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(300px circle at 80% 20%, rgba(236, 72, 153, 0.10), transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-.wf-glow-emerald::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(300px circle at 80% 20%, rgba(16, 185, 129, 0.10), transparent 70%);
-  pointer-events: none;
-  z-index: 0;
+.wf-fab:hover {
+  transform: scale(1.06);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
-/* ── Mobile bottom dock: hide on sm+, explicit height ───────────────────── */
-.wf-bottom-dock {
-  display: flex;
-  min-height: 0 !important;
-  height: auto !important;
-  flex-direction: row !important;
-}
-@media (min-width: 640px) {
-  .wf-bottom-dock {
-    display: none !important;
-  }
+/* =========================================================================
+   RECHARTS OVERRIDES
+   ========================================================================= */
+
+.wf-root .recharts-cartesian-grid-horizontal line,
+.wf-root .recharts-cartesian-grid-vertical line {
+  stroke: var(--wf-border);
 }
 
-/* ── Mobile top bar: hide on sm+, explicit height ───────────────────────── */
-.wf-mobile-topbar {
-  display: flex;
-  min-height: 0 !important;
-  height: auto !important;
-}
-@media (min-width: 640px) {
-  .wf-mobile-topbar {
-    display: none !important;
-  }
+.wf-root .recharts-text {
+  fill: var(--wf-muted);
 }
 
-/* ── Desktop header: show only on sm+ ──────────────────────────────────── */
-.wf-desktop-header {
-  display: none;
-  flex-direction: column;
-  flex-shrink: 0;
-  min-height: 0 !important;
-  height: auto !important;
-}
-@media (min-width: 640px) {
-  .wf-desktop-header {
-    display: flex !important;
-  }
+.wf-root .recharts-legend-item-text {
+  color: var(--wf-muted);
 }
 
-/* ==========================================================================
-   LIGHT MODE — data-theme="light" on .wf-root
-   ========================================================================== */
+/* =========================================================================
+   RANGE INPUT
+   ========================================================================= */
 
-.wf-root[data-theme="light"] {
-  --wf-bg:          #F0F4F8;
-  --wf-surface:     rgba(255, 255, 255, 0.80);
-  --wf-surface-solid: #FFFFFF;
-  --wf-border:      rgba(0, 0, 0, 0.08);
-  --wf-border-hi:   rgba(0, 0, 0, 0.14);
-  --wf-cyan:        #0891B2;
-  --wf-cyan-dim:    rgba(8, 145, 178, 0.12);
-  --wf-pink:        #DB2777;
-  --wf-pink-dim:    rgba(219, 39, 119, 0.12);
-  --wf-emerald:     #059669;
-  --wf-emerald-dim: rgba(5, 150, 105, 0.12);
-  --wf-text:        #0F172A;
-  --wf-muted:       #64748B;
-}
-
-/* Canvas */
-.wf-root[data-theme="light"] {
-  background: linear-gradient(135deg, #F0F4F8 0%, #E2EAF4 100%) !important;
-  color: #0F172A !important;
-}
-
-/* Glass cards */
-.wf-root[data-theme="light"] .wf-glass {
-  background: rgba(255, 255, 255, 0.85) !important;
-  backdrop-filter: blur(16px) !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
-  color: #0F172A !important;
-}
-.wf-root[data-theme="light"] .wf-glass:hover {
-  border-color: rgba(8, 145, 178, 0.30) !important;
-}
-
-/* Inputs */
-.wf-root[data-theme="light"] .wf-input {
-  background: rgba(0, 0, 0, 0.04) !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
-  color: #0F172A !important;
-}
-.wf-root[data-theme="light"] .wf-input:focus {
-  border-color: #0891B2 !important;
-  background: rgba(8, 145, 178, 0.04) !important;
-}
-.wf-root[data-theme="light"] .wf-input::placeholder {
-  color: #94A3B8 !important;
-}
-
-/* Select */
-.wf-root[data-theme="light"] .wf-select {
-  background: rgba(0, 0, 0, 0.05) !important;
-  border-color: rgba(0, 0, 0, 0.10) !important;
-  color: #0F172A !important;
-}
-
-/* Icon buttons */
-.wf-root[data-theme="light"] .wf-icon-btn {
-  background: rgba(0, 0, 0, 0.05) !important;
-  border-color: rgba(0, 0, 0, 0.10) !important;
-  color: #64748B !important;
-}
-.wf-root[data-theme="light"] .wf-icon-btn:hover {
-  background: rgba(8, 145, 178, 0.10) !important;
-  border-color: rgba(8, 145, 178, 0.30) !important;
-  color: #0891B2 !important;
-}
-
-/* Ghost button */
-.wf-root[data-theme="light"] .wf-btn-ghost {
-  background: rgba(0, 0, 0, 0.04) !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
-  color: #64748B !important;
-}
-
-/* Primary button */
-.wf-root[data-theme="light"] .wf-btn-primary {
-  background: linear-gradient(135deg, #0891B2 0%, #0369A1 100%) !important;
-  box-shadow: 0 4px 14px rgba(8, 145, 178, 0.30) !important;
-}
-
-/* FAB */
-.wf-root[data-theme="light"] .wf-fab {
-  background: linear-gradient(135deg, #0891B2 0%, #0369A1 100%) !important;
-  box-shadow: 0 8px 24px rgba(8, 145, 178, 0.35) !important;
-}
-
-/* Tab active */
-.wf-root[data-theme="light"] .wf-tab.active {
-  background: rgba(8, 145, 178, 0.12) !important;
-  color: #0891B2 !important;
-}
-
-/* Top nav areas */
-.wf-root[data-theme="light"] .wf-desktop-header {
-  background: rgba(240, 244, 248, 0.90) !important;
-  border-bottom-color: rgba(0, 0, 0, 0.07) !important;
-}
-.wf-root[data-theme="light"] .wf-dock {
-  background: rgba(255, 255, 255, 0.85) !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
-}
-.wf-root[data-theme="light"] .wf-utility-bar {
-  background: rgba(240, 244, 248, 0.80) !important;
-  border-bottom-color: rgba(0, 0, 0, 0.06) !important;
-}
-
-/* Modal */
-.wf-root[data-theme="light"] .wf-modal {
-  background: #FFFFFF !important;
-  border-color: rgba(0, 0, 0, 0.10) !important;
-  color: #0F172A !important;
-}
-.wf-root[data-theme="light"] .wf-modal-title {
-  color: #0F172A !important;
-}
-
-/* Mobile top bar + bottom dock in light mode */
-.wf-root[data-theme="light"] .wf-mobile-topbar {
-  background: rgba(240, 244, 248, 0.92) !important;
-  border-bottom-color: rgba(0, 0, 0, 0.07) !important;
-}
-.wf-root[data-theme="light"] .wf-bottom-dock {
-  background: rgba(255, 255, 255, 0.92) !important;
-  border-top-color: rgba(0, 0, 0, 0.10) !important;
-}
-
-/* Recharts */
-.wf-root[data-theme="light"] .recharts-cartesian-grid-horizontal line,
-.wf-root[data-theme="light"] .recharts-cartesian-grid-vertical line {
-  stroke: rgba(0, 0, 0, 0.08) !important;
-}
-.wf-root[data-theme="light"] .recharts-text { fill: #64748B !important; }
-.wf-root[data-theme="light"] .recharts-legend-item-text { color: #64748B !important; }
-
-/* Text helpers in light */
-.wf-root[data-theme="light"] .wf-stat { color: #0F172A !important; }
-.wf-root[data-theme="light"] .wf-data { color: #0F172A !important; }
-
-/* Scrollbar */
-.wf-root[data-theme="light"] ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Progress bars — slightly adjusted for light */
-.wf-root[data-theme="light"] .wf-progress-track {
-  background: rgba(0, 0, 0, 0.10) !important;
-}
-
-/* ── Range input track — light mode override ────────────────────────────── */
-.wf-root[data-theme="light"] input[type="range"] {
-  background: rgba(0, 0, 0, 0.15) !important;
-}
-.wf-root[data-theme="light"] input[type="range"]::-webkit-slider-thumb {
-  background: #0891B2 !important;
-  box-shadow: 0 0 6px rgba(8, 145, 178, 0.4) !important;
-}
-.wf-root[data-theme="light"] input[type="range"]::-moz-range-thumb {
-  background: #0891B2 !important;
-}
-
-/* Range track fill indicator for light mode */
-.wf-root[data-theme="light"] input[type="range"]::-webkit-slider-runnable-track {
-  background: rgba(0, 0, 0, 0.12);
+.wf-root input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
   height: 6px;
   border-radius: 9999px;
+  background: var(--wf-border);
+  outline: none;
+  width: 100%;
+}
+
+.wf-root input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--wf-primary-cta);
+  cursor: pointer;
+  border: 2px solid var(--wf-bg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.wf-root input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--wf-primary-cta);
+  cursor: pointer;
+  border: 2px solid var(--wf-bg);
+}
+
+/* =========================================================================
+   SCROLLBAR
+   ========================================================================= */
+
+.wf-root ::-webkit-scrollbar { width: 6px; height: 6px; }
+.wf-root ::-webkit-scrollbar-track { background: transparent; }
+.wf-root ::-webkit-scrollbar-thumb {
+  background: var(--wf-border-hi);
+  border-radius: 9999px;
+}
+
+/* =========================================================================
+   ANIMATIONS
+   ========================================================================= */
+
+@keyframes wf-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }

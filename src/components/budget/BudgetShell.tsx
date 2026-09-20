@@ -118,7 +118,7 @@ export default function BudgetShell({ children }: BudgetShellProps) {
           }}>
             <img src="/wave-cute.gif" alt="Goodbye" style={{ width:120, height:120, objectFit:"contain" }} />
             <div style={{ textAlign:"center" }}>
-              <p style={{ color:"#22D3EE", fontSize:"0.65rem", letterSpacing:"0.2em", textTransform:"uppercase", margin:"0 0 6px" }}>
+              <p style={{ color:"var(--wf-cyan)", fontSize:"0.65rem", letterSpacing:"0.2em", textTransform:"uppercase", margin:"0 0 6px" }}>
                 See you next time
               </p>
               <h2 style={{ color:"#F1F5F9", fontSize:"1.25rem", fontWeight:700, margin:0 }}>

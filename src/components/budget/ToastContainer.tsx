@@ -17,7 +17,7 @@ const colors = {
     info:    { bg: "rgba(59,130,246,0.12)", border: "rgba(59,130,246,0.3)", text: "#1D4ED8" },
   },
   dark: {
-    success: { bg: "rgba(0,201,122,0.15)", border: "rgba(0,201,122,0.35)", text: "#00E699" },
+    success: { bg: "rgba(0,201,122,0.15)", border: "rgba(0,201,122,0.35)", text: "var(--wf-emerald)" },
     error:   { bg: "rgba(255,82,82,0.15)",  border: "rgba(255,82,82,0.35)",  text: "#FF5252" },
     info:    { bg: "rgba(59,130,246,0.15)", border: "rgba(59,130,246,0.35)", text: "#60A5FA" },
   },

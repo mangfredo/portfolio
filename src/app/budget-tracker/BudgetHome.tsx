@@ -50,8 +50,8 @@ function PeriodCard({ period, currencySymbol, onClick }: {
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background:"rgba(34,211,238,0.12)", border:"1px solid rgba(34,211,238,0.20)" }}>
-              <CalendarBlank size={18} color="#22D3EE" weight="fill" />
+              style={{ background:"var(--wf-cyan-dim)", border:"1px solid rgba(56,189,248,0.20)" }}>
+              <CalendarBlank size={18} color="var(--wf-cyan)" weight="fill" />
             </div>
             <div>
               <p className="font-semibold text-sm leading-tight" style={{ color:"var(--wf-text)" }}>{period.label}</p>
@@ -71,7 +71,7 @@ function PeriodCard({ period, currencySymbol, onClick }: {
             </div>
             <div className="flex justify-between text-xs">
               <span style={{ color:"var(--wf-muted)" }}>{burnRate.toFixed(0)}% spent</span>
-              <span className="wf-data font-semibold" style={{ color: isOver ? "#EC4899" : "#10B981" }}>
+              <span className="wf-data font-semibold" style={{ color: isOver ? "var(--wf-pink)" : "var(--wf-emerald)" }}>
                 {isOver ? "-" : "+"}{currencySymbol}{fmt(Math.abs(remaining))} {isOver ? "over" : "left"}
               </span>
             </div>
@@ -116,7 +116,7 @@ function BudgetHomeInner() {
         <motion.div initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }} className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-1" style={{ color:"#22D3EE" }}>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-1" style={{ color:"var(--wf-cyan)" }}>
                 Overview
               </p>
               <h1 className="font-bold text-2xl tracking-tight" style={{ color:"var(--wf-text)" }}>
@@ -148,8 +148,8 @@ function BudgetHomeInner() {
             style={{ borderStyle:"dashed" }}
           >
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
-              style={{ background:"rgba(34,211,238,0.12)", border:"1px solid rgba(34,211,238,0.20)" }}>
-              <Wallet size={28} color="#22D3EE" weight="fill" />
+              style={{ background:"var(--wf-cyan-dim)", border:"1px solid rgba(56,189,248,0.20)" }}>
+              <Wallet size={28} color="var(--wf-cyan)" weight="fill" />
             </div>
             <p className="font-bold text-lg mb-2" style={{ color:"var(--wf-text)" }}>No periods yet</p>
             <p className="text-sm mb-8" style={{ color:"var(--wf-muted)" }}>

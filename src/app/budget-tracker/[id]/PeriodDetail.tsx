@@ -20,7 +20,7 @@ import NumericInput, { parseNumeric } from "@/components/budget/NumericInput";
 
 interface Props { id: string; }
 
-const CAT_COLORS = ["#22D3EE","#EC4899","#10B981","#F59E0B","#8B5CF6","#F97316","#06B6D4","#84CC16","#A855F7","#14B8A6"];
+const CAT_COLORS = ["var(--wf-cyan)","var(--wf-pink)","var(--wf-emerald)","#F59E0B","#8B5CF6","#F97316","#06B6D4","#84CC16","#A855F7","#14B8A6"];
 
 const fmt = (n: number) =>
   n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -149,7 +149,7 @@ function PeriodDetailInner({ id }: Props) {
           </button>
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-1" style={{ color:"#22D3EE" }}>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-1" style={{ color:"var(--wf-cyan)" }}>
                 Pay Period
               </p>
               <h1 className="font-bold text-2xl tracking-tight" style={{ color:"var(--wf-text)" }}>
@@ -177,14 +177,14 @@ function PeriodDetailInner({ id }: Props) {
                 Available Balance
               </p>
               <p className="wf-data font-bold" style={{ fontSize:"2.5rem", lineHeight:1.1,
-                color: isOver ? "#EC4899" : "#22D3EE" }}>
+                color: isOver ? "var(--wf-pink)" : "var(--wf-cyan)" }}>
                 {budget > 0
                   ? <AnimatedValue value={Math.abs(remaining)} prefix={isOver ? `-${currencySymbol}` : currencySymbol}/>
                   : "—"}
               </p>
               {budget === 0 && (
                 <button onClick={() => { setBudgetInput(""); setShowBudgetModal(true); }}
-                  className="text-xs font-semibold mt-2" style={{ color:"#22D3EE" }}>
+                  className="text-xs font-semibold mt-2" style={{ color:"var(--wf-cyan)" }}>
                   Set budget →
                 </button>
               )}
@@ -198,11 +198,11 @@ function PeriodDetailInner({ id }: Props) {
                   <div className={`wf-progress-fill ${progressColor}`}
                     style={{ width:`${Math.min(burnRate,100)}%` }}/>
                 </div>
-                <p className="text-xs font-semibold" style={{ color: isOver ? "#EC4899" : "#94A3B8" }}>
+                <p className="text-xs font-semibold" style={{ color: isOver ? "var(--wf-pink)" : "#94A3B8" }}>
                   {burnRate.toFixed(1)}% of {currencySymbol}{fmt(budget)}
                   {budget > 0 && (
                     <button onClick={() => { setBudgetInput(String(budget)); setShowBudgetModal(true); }}
-                      className="ml-2" style={{ color:"#22D3EE" }}>
+                      className="ml-2" style={{ color:"var(--wf-cyan)" }}>
                       <Pencil size={11}/>
                     </button>
                   )}
@@ -216,9 +216,9 @@ function PeriodDetailInner({ id }: Props) {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))", gap:16, marginBottom:24 }}>
           {[
             { label:"Total Budget", value: budget > 0 ? `${currencySymbol}${fmt(budget)}` : "—", color:"var(--wf-text)" },
-            { label:"Total Spent",  value: `${currencySymbol}${fmt(total)}`, color:"#EC4899" },
+            { label:"Total Spent",  value: `${currencySymbol}${fmt(total)}`, color:"var(--wf-pink)" },
             { label:"Remaining",    value: budget > 0 ? `${isOver?"-":""}${currencySymbol}${fmt(Math.abs(remaining))}` : "—",
-              color: budget===0?"#94A3B8":isOver?"#EC4899":"#10B981" },
+              color: budget===0?"#94A3B8":isOver?"var(--wf-pink)":"var(--wf-emerald)" },
           ].map(({ label, value, color }, i) => (
             <motion.div key={label} className="wf-glass p-4"
               initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:i*0.06 }}>
@@ -234,7 +234,7 @@ function PeriodDetailInner({ id }: Props) {
             {/* Balance waterfall — AreaChart showing running balance */}
             <motion.div className="wf-glass p-5" initial={{ opacity:0, x:-20 }} animate={{ opacity:1, x:0 }}>
               <div className="flex items-center gap-2 mb-4">
-                <ChartBar size={15} color="#22D3EE"/>
+                <ChartBar size={15} color="var(--wf-cyan)"/>
                 <div>
                   <p className="font-semibold text-sm" style={{ color:"var(--wf-text)" }}>Cash Flow</p>
                   <p className="text-xs" style={{ color:"var(--wf-muted)" }}>Balance waterfall</p>
@@ -245,8 +245,8 @@ function PeriodDetailInner({ id }: Props) {
                   <AreaChart data={cashflowData} margin={{ top:4, right:8, left:0, bottom:0 }}>
                     <defs>
                       <linearGradient id="wfCashArea" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#22D3EE" stopOpacity={0.4}/>
-                        <stop offset="100%" stopColor="#22D3EE" stopOpacity={0.02}/>
+                        <stop offset="0%" stopColor="var(--wf-cyan)" stopOpacity={0.4}/>
+                        <stop offset="100%" stopColor="var(--wf-cyan)" stopOpacity={0.02}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid horizontal vertical={false} strokeDasharray="4 4"/>
@@ -255,9 +255,9 @@ function PeriodDetailInner({ id }: Props) {
                     <YAxis tick={{ fontSize:10, fill:"var(--wf-muted)" }} axisLine={false} tickLine={false}
                       tickFormatter={v=>`${currencySymbol}${(v/1000).toFixed(0)}k`} width={48}/>
                     <Tooltip content={<GlassTooltip sym={currencySymbol}/>}/>
-                    <Area type="monotone" dataKey="balance" name="Balance" stroke="#22D3EE" strokeWidth={2}
+                    <Area type="monotone" dataKey="balance" name="Balance" stroke="var(--wf-cyan)" strokeWidth={2}
                       fill="url(#wfCashArea)" dot={false}
-                      activeDot={{ r:5, fill:"#22D3EE", stroke:"rgba(15,23,42,0.8)", strokeWidth:2 }}/>
+                      activeDot={{ r:5, fill:"var(--wf-cyan)", stroke:"rgba(15,23,42,0.8)", strokeWidth:2 }}/>
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -267,7 +267,7 @@ function PeriodDetailInner({ id }: Props) {
             {pieData.length > 0 && (
               <motion.div className="wf-glass p-5" initial={{ opacity:0, x:20 }} animate={{ opacity:1, x:0 }}>
                 <div className="flex items-center gap-2 mb-4">
-                  <Tag size={15} color="#22D3EE"/>
+                  <Tag size={15} color="var(--wf-cyan)"/>
                   <p className="font-semibold text-sm" style={{ color:"var(--wf-text)" }}>Expense Allocation</p>
                 </div>
                 <div style={{ width:"100%", height:220 }}>
@@ -334,9 +334,9 @@ function PeriodDetailInner({ id }: Props) {
 
               {/* Total */}
               <div style={{ display:"grid", gridTemplateColumns:"1fr auto", padding:"14px 20px",
-                background:"rgba(236,72,153,0.06)", borderTop:"1px solid rgba(255,255,255,0.06)" }}>
-                <span className="text-xs font-bold uppercase tracking-wider" style={{ color:"#EC4899" }}>Total Spent</span>
-                <span className="wf-data text-sm font-bold text-right" style={{ color:"#EC4899" }}>
+                background:"rgba(244,63,94,0.06)", borderTop:"1px solid rgba(255,255,255,0.06)" }}>
+                <span className="text-xs font-bold uppercase tracking-wider" style={{ color:"var(--wf-pink)" }}>Total Spent</span>
+                <span className="wf-data text-sm font-bold text-right" style={{ color:"var(--wf-pink)" }}>
                   {currencySymbol}{fmt(total)}
                 </span>
               </div>
@@ -345,7 +345,7 @@ function PeriodDetailInner({ id }: Props) {
               <div style={{ display:"grid", gridTemplateColumns:"1fr auto", padding:"14px 20px" }}>
                 <span className="text-xs font-bold uppercase tracking-wider" style={{ color:"var(--wf-muted)" }}>Remaining</span>
                 <span className="wf-data text-sm font-bold text-right"
-                  style={{ color: budget===0?"#94A3B8":isOver?"#EC4899":"#10B981" }}>
+                  style={{ color: budget===0?"#94A3B8":isOver?"var(--wf-pink)":"var(--wf-emerald)" }}>
                   {budget > 0 ? `${isOver?"-":""}${currencySymbol}${fmt(Math.abs(remaining))}` : "—"}
                 </span>
               </div>
@@ -403,12 +403,12 @@ function PeriodDetailInner({ id }: Props) {
               <div className="flex flex-col gap-1 pt-1">
                 <button onClick={() => { togglePaid(editingId); closeItemModal(); }}
                   className="text-xs font-semibold py-2 transition-opacity hover:opacity-70 text-left"
-                  style={{ color:"#22D3EE" }}>
+                  style={{ color:"var(--wf-cyan)" }}>
                   {expenses.find(e=>e.id===editingId)?.paid ? "Mark as unpaid" : "Mark as paid ✓"}
                 </button>
                 <button onClick={() => { deleteExpense(editingId); closeItemModal(); }}
                   className="text-xs font-semibold py-2 transition-opacity hover:opacity-70 text-left"
-                  style={{ color:"#EC4899" }}>
+                  style={{ color:"var(--wf-pink)" }}>
                   Delete this item
                 </button>
               </div>

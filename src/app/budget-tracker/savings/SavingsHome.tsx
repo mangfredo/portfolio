@@ -19,7 +19,7 @@ import NumericInput, { parseNumeric } from "@/components/budget/NumericInput";
 const fmt = (n: number) =>
   n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-const GOAL_COLORS = ["#EC4899","#10B981","#22D3EE","#F59E0B","#8B5CF6","#F97316","#06B6D4","#84CC16"];
+const GOAL_COLORS = ["var(--wf-pink)","var(--wf-emerald)","var(--wf-cyan)","#F59E0B","#8B5CF6","#F97316","#06B6D4","#84CC16"];
 
 const STATUS: Record<GoalStatus, { label: string; cls: string }> = {
   achieved:   { label:"Goal Met",    cls:"wf-badge-emerald" },
@@ -130,7 +130,7 @@ function SavingsHomeInner() {
       <motion.div initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }} className="mb-8">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-1" style={{ color:"#22D3EE" }}>Finance</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-1" style={{ color:"var(--wf-cyan)" }}>Finance</p>
             <h1 className="font-bold text-2xl tracking-tight" style={{ color:"var(--wf-text)" }}>
               Savings Goals
               {goals.length > 0 && (
@@ -152,8 +152,8 @@ function SavingsHomeInner() {
           className="wf-glass flex flex-col items-center justify-center py-24 px-8 text-center"
           style={{ borderStyle:"dashed" }}>
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
-            style={{ background:"rgba(34,211,238,0.12)", border:"1px solid rgba(34,211,238,0.20)" }}>
-            <PiggyBank size={28} color="#22D3EE" weight="fill"/>
+            style={{ background:"var(--wf-cyan-dim)", border:"1px solid rgba(56,189,248,0.20)" }}>
+            <PiggyBank size={28} color="var(--wf-cyan)" weight="fill"/>
           </div>
           <p className="font-bold text-lg mb-2" style={{ color:"var(--wf-text)" }}>No savings goals yet</p>
           <p className="text-sm mb-8" style={{ color:"var(--wf-muted)" }}>Create your first goal and start saving toward it.</p>
@@ -227,7 +227,7 @@ function SavingsHomeInner() {
                           <span className="w-2 h-2 rounded-full" style={{ background:item.color, flexShrink:0 }}/>
                           <span className="text-xs font-medium" style={{ color:"var(--wf-text)" }}>{item.goal.name}</span>
                         </div>
-                        <span className="wf-data text-xs font-bold" style={{ color:"#10B981" }}>
+                        <span className="wf-data text-xs font-bold" style={{ color:"var(--wf-emerald)" }}>
                           +{currencySymbol}{fmt(item.amount)}
                         </span>
                       </div>
@@ -255,7 +255,7 @@ function SavingsHomeInner() {
                   <GoalIconPicker
                     selected={form.icon}
                     onChange={(key) => setForm(f => ({ ...f, icon: key }))}
-                    color="#22D3EE"
+                    color="var(--wf-cyan)"
                   />
                   <input type="text" {...fp("name")} placeholder="e.g. Emergency Fund" autoFocus className="wf-input" style={{ flex:1 }}
                     onKeyDown={e=>{if(e.key==="Enter")handleAdd();}}/>

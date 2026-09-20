@@ -67,7 +67,7 @@ function LoanDetailInner({ id }: Props) {
   // Find where actual ends and projected begins (for chart styling)
   const splitIdx    = curveData.findLastIndex((p) => p.actual);
 
-  const progressColor = metrics.pctPaid >= 100 ? "#00C97A"
+  const progressColor = metrics.pctPaid >= 100 ? "var(--wf-emerald)"
     : metrics.pctPaid > 50 ? teal : "#F59E0B";
 
   const freqLabel = loan.paymentFrequency === "twice-monthly"
@@ -145,7 +145,7 @@ function LoanDetailInner({ id }: Props) {
           </div>
           <button onClick={() => setShowDeleteLoan(true)}
             className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
-            style={{ color:"var(--wf-pink)", background:"var(--wf-pink-dim)", border:"1px solid rgba(236,72,153,0.20)" }}>
+            style={{ color:"var(--wf-pink)", background:"var(--wf-pink-dim)", border:"1px solid rgba(244,63,94,0.20)" }}>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M2 3h8M5 3V2h2v1M4 3l.5 7h3L8 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>

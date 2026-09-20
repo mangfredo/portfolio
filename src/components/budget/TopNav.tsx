@@ -100,7 +100,7 @@ export default function TopNav({
                 <Icon size={14} weight={activeTab === id ? "fill" : "regular"} />
                 {label}
                 {activeTab === id && (
-                  <span style={{ width:6, height:6, borderRadius:"50%", background:"#22D3EE", flexShrink:0 }} />
+                  <span style={{ width:6, height:6, borderRadius:"50%", background:"var(--wf-cyan)", flexShrink:0 }} />
                 )}
               </button>
             ))}
@@ -159,10 +159,10 @@ export default function TopNav({
                           display:"flex", alignItems:"center", gap:8,
                           width:"100%", padding:"8px 12px", textAlign:"left",
                           background: c.code === currency
-                            ? "rgba(34,211,238,0.15)"
+                            ? "var(--wf-cyan-dim)"
                             : "transparent",
                           color: c.code === currency
-                            ? "#22D3EE"
+                            ? "var(--wf-cyan)"
                             : isDark ? "#F1F5F9" : "#121A2C",
                           fontSize:"0.8rem", fontWeight: c.code === currency ? 700 : 400,
                           fontFamily:"var(--font-outfit,system-ui)", cursor:"pointer",
@@ -248,14 +248,14 @@ export default function TopNav({
               <div style={{
                 width:40, height:28, borderRadius:14, display:"flex",
                 alignItems:"center", justifyContent:"center",
-                background: isActive ? "rgba(34,211,238,0.18)" : "transparent",
+                background: isActive ? "var(--wf-cyan-dim)" : "transparent",
                 transition:"background 200ms ease",
               }}>
-                <Icon size={20} color={isActive ? "#22D3EE" : "#64748B"} weight={isActive ? "fill" : "regular"}/>
+                <Icon size={20} color={isActive ? "var(--wf-cyan)" : "#64748B"} weight={isActive ? "fill" : "regular"}/>
               </div>
               <span style={{
                 fontSize:"0.625rem", fontWeight:600,
-                color: isActive ? "#22D3EE" : "#64748B",
+                color: isActive ? "var(--wf-cyan)" : "#64748B",
                 letterSpacing:"0.02em",
               }}>{label}</span>
             </button>
@@ -271,12 +271,12 @@ export default function TopNav({
           <div style={{
             width:40, height:28, borderRadius:14, display:"flex",
             alignItems:"center", justifyContent:"center",
-            background: menuOpen ? "rgba(34,211,238,0.18)" : "transparent",
+            background: menuOpen ? "var(--wf-cyan-dim)" : "transparent",
             transition:"background 200ms ease",
           }}>
-            <List size={20} color={menuOpen ? "#22D3EE" : "#64748B"} weight="regular"/>
+            <List size={20} color={menuOpen ? "var(--wf-cyan)" : "#64748B"} weight="regular"/>
           </div>
-          <span style={{ fontSize:"0.625rem", fontWeight:600, color: menuOpen ? "#22D3EE" : "#64748B" }}>More</span>
+          <span style={{ fontSize:"0.625rem", fontWeight:600, color: menuOpen ? "var(--wf-cyan)" : "#64748B" }}>More</span>
         </button>
       </nav>
 
@@ -351,18 +351,18 @@ export default function TopNav({
                         display:"flex", alignItems:"center", gap:12,
                         width:"100%", padding:"10px 14px", textAlign:"left",
                         background: c.code === currency
-                          ? "rgba(34,211,238,0.12)"
+                          ? "var(--wf-cyan-dim)"
                           : (isDark ? "transparent" : i % 2 === 0 ? "#FFFFFF" : "rgba(0,0,0,0.02)"),
                         borderBottom: i < CURRENCIES.length - 1
                           ? (isDark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)")
                           : "none",
-                        color: c.code === currency ? "#22D3EE" : (isDark ? "#F1F5F9" : "#0F172A"),
+                        color: c.code === currency ? "var(--wf-cyan)" : (isDark ? "#F1F5F9" : "#0F172A"),
                         fontFamily:"var(--font-outfit,system-ui)", cursor:"pointer",
                       }}>
                       <span style={{ fontSize:"1rem", width:24, textAlign:"center", flexShrink:0 }}>{c.symbol}</span>
                       <span style={{ fontWeight: c.code === currency ? 700 : 500, fontSize:"0.875rem" }}>{c.code}</span>
                       <span style={{ fontSize:"0.75rem", color: isDark ? "#64748B" : "#94A3B8", marginLeft:"auto" }}>{c.name}</span>
-                      {c.code === currency && <span style={{ color:"#22D3EE", flexShrink:0 }}>✓</span>}
+                      {c.code === currency && <span style={{ color:"var(--wf-cyan)", flexShrink:0 }}>✓</span>}
                     </button>
                   ))}
                 </div>
@@ -376,9 +376,9 @@ export default function TopNav({
                 {(["dark","light"] as const).map(t => (
                   <button key={t} onClick={() => setTheme(t)}
                     style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"10px 0", borderRadius:10, border:"1px solid", fontWeight:600, fontSize:"0.875rem", cursor:"pointer", transition:"all 150ms ease",
-                      background: theme === t ? "rgba(34,211,238,0.15)" : (isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)"),
-                      borderColor: theme === t ? "rgba(34,211,238,0.40)" : (isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)"),
-                      color: theme === t ? "#22D3EE" : (isDark ? "#94A3B8" : "#64748B"),
+                      background: theme === t ? "var(--wf-cyan-dim)" : (isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)"),
+                      borderColor: theme === t ? "rgba(56,189,248,0.40)" : (isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)"),
+                      color: theme === t ? "var(--wf-cyan)" : (isDark ? "#94A3B8" : "#64748B"),
                     }}>
                     {t === "dark" ? <Moon size={15}/> : <Sun size={15}/>}
                     {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -390,11 +390,11 @@ export default function TopNav({
             {/* Load sample + clear data */}
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:12 }}>
               <button onClick={() => { onReset(); setMenuOpen(false); }}
-                style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"10px 0", borderRadius:10, background:"rgba(34,211,238,0.10)", border:"1px solid rgba(34,211,238,0.20)", color:"#22D3EE", fontWeight:600, fontSize:"0.8rem", cursor:"pointer" }}>
+                style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"10px 0", borderRadius:10, background:"rgba(34,211,238,0.10)", border:"1px solid rgba(56,189,248,0.20)", color:"var(--wf-cyan)", fontWeight:600, fontSize:"0.8rem", cursor:"pointer" }}>
                 <ArrowCounterClockwise size={14}/> Load Sample
               </button>
               <button onClick={() => { onClear(); setMenuOpen(false); }} disabled={!hasData}
-                style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"10px 0", borderRadius:10, background:"rgba(236,72,153,0.10)", border:"1px solid rgba(236,72,153,0.20)", color:"#EC4899", fontWeight:600, fontSize:"0.8rem", cursor: hasData ? "pointer" : "not-allowed", opacity: hasData ? 1 : 0.4 }}>
+                style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"10px 0", borderRadius:10, background:"rgba(244,63,94,0.10)", border:"1px solid rgba(244,63,94,0.20)", color:"var(--wf-pink)", fontWeight:600, fontSize:"0.8rem", cursor: hasData ? "pointer" : "not-allowed", opacity: hasData ? 1 : 0.4 }}>
                 <X size={14}/> Clear Data
               </button>
             </div>

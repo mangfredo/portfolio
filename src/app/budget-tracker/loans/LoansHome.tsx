@@ -151,7 +151,7 @@ function LoansHomeInner() {
     <div className="px-6 pt-6 pb-24 mx-auto" style={{ maxWidth:1200 }}>
       {/* Header */}
       <motion.div initial={{ opacity:0, y:-10 }} animate={{ opacity:1, y:0 }} className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-1" style={{ color:"#22D3EE" }}>Finance</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-1" style={{ color:"var(--wf-cyan)" }}>Finance</p>
         <h1 className="font-bold text-2xl tracking-tight" style={{ color:"var(--wf-text)" }}>Loan Repayment</h1>
       </motion.div>
 
@@ -163,8 +163,8 @@ function LoansHomeInner() {
           <motion.div className="wf-glass p-5" initial={{ opacity:0, x:-20 }} animate={{ opacity:1, x:0 }}>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background:"rgba(34,211,238,0.12)" }}>
-                <CreditCard size={16} color="#22D3EE" weight="fill" />
+                style={{ background:"var(--wf-cyan-dim)" }}>
+                <CreditCard size={16} color="var(--wf-cyan)" weight="fill" />
               </div>
               <p className="font-semibold text-sm" style={{ color:"var(--wf-text)" }}>Repayment Calculator</p>
             </div>
@@ -175,7 +175,7 @@ function LoansHomeInner() {
                 <button onClick={() => setSelectedLoanId(null)}
                   className="text-xs px-3 py-1.5 rounded-full font-semibold transition-all"
                   style={{
-                    background: selectedLoanId === null ? "#22D3EE" : "rgba(255,255,255,0.06)",
+                    background: selectedLoanId === null ? "var(--wf-cyan)" : "rgba(255,255,255,0.06)",
                     color: selectedLoanId === null ? "#0F172A" : "#94A3B8",
                     border:"1px solid rgba(255,255,255,0.10)",
                   }}>Custom</button>
@@ -183,7 +183,7 @@ function LoansHomeInner() {
                   <button key={l.id} onClick={() => setSelectedLoanId(l.id)}
                     className="text-xs px-3 py-1.5 rounded-full font-semibold transition-all"
                     style={{
-                      background: selectedLoanId === l.id ? "#22D3EE" : "rgba(255,255,255,0.06)",
+                      background: selectedLoanId === l.id ? "var(--wf-cyan)" : "rgba(255,255,255,0.06)",
                       color: selectedLoanId === l.id ? "#0F172A" : "#94A3B8",
                       border:"1px solid rgba(255,255,255,0.10)",
                     }}>{l.name}</button>
@@ -242,7 +242,7 @@ function LoansHomeInner() {
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                 style={{ background:"rgba(16,185,129,0.12)" }}>
-                <TrendDown size={16} color="#10B981" weight="fill" />
+                <TrendDown size={16} color="var(--wf-emerald)" weight="fill" />
               </div>
               <div>
                 <p className="font-semibold text-sm" style={{ color:"var(--wf-text)" }}>Accelerate Payoff</p>
@@ -252,7 +252,7 @@ function LoansHomeInner() {
             <div className="mb-4">
               <div className="flex justify-between mb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider" style={{ color:"var(--wf-muted)" }}>Monthly Extra</span>
-                <span className="text-sm font-bold" style={{ color:"#10B981" }}>
+                <span className="text-sm font-bold" style={{ color:"var(--wf-emerald)" }}>
                   +{currencySymbol}{(parseNumeric(form.extra)||0).toLocaleString(undefined,{maximumFractionDigits:0})}
                 </span>
               </div>
@@ -260,17 +260,17 @@ function LoansHomeInner() {
                 max={projLoan ? Math.round(monthlyOutflow(projLoan) * 2) : 1000}
                 step={50} value={parseNumeric(form.extra)||0}
                 onChange={e=>setForm(f=>({...f,extra:e.target.value}))}
-                style={{ width:"100%", accentColor:"#10B981" } as React.CSSProperties}/>
+                style={{ width:"100%", accentColor:"var(--wf-emerald)" } as React.CSSProperties}/>
             </div>
             {metrics && extra > 0 && (
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
                 <div className="rounded-xl p-3" style={{ background:"rgba(16,185,129,0.10)", border:"1px solid rgba(16,185,129,0.20)" }}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color:"var(--wf-muted)" }}>Saved</p>
-                  <p className="wf-data text-sm font-bold" style={{ color:"#10B981" }}>{currencySymbol}{fmt(metrics.saved)}</p>
+                  <p className="wf-data text-sm font-bold" style={{ color:"var(--wf-emerald)" }}>{currencySymbol}{fmt(metrics.saved)}</p>
                 </div>
-                <div className="rounded-xl p-3" style={{ background:"rgba(34,211,238,0.10)", border:"1px solid rgba(34,211,238,0.20)" }}>
+                <div className="rounded-xl p-3" style={{ background:"rgba(34,211,238,0.10)", border:"1px solid rgba(56,189,248,0.20)" }}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color:"var(--wf-muted)" }}>Time Saved</p>
-                  <p className="wf-data text-sm font-bold" style={{ color:"#22D3EE" }}>{metrics.timeSaved} mo</p>
+                  <p className="wf-data text-sm font-bold" style={{ color:"var(--wf-cyan)" }}>{metrics.timeSaved} mo</p>
                 </div>
               </div>
             )}
@@ -280,7 +280,7 @@ function LoansHomeInner() {
         {/* Right: Chart */}
         <motion.div className="wf-glass p-5" initial={{ opacity:0, x:20 }} animate={{ opacity:1, x:0 }}>
           <div className="flex items-center gap-2 mb-4">
-            <ChartLine size={16} color="#22D3EE" />
+            <ChartLine size={16} color="var(--wf-cyan)" />
             <div>
               <p className="font-semibold text-sm" style={{ color:"var(--wf-text)" }}>Repayment Projection</p>
               <p className="text-xs" style={{ color:"var(--wf-muted)" }}>Principal vs Interest over lifecycle</p>
@@ -298,10 +298,10 @@ function LoansHomeInner() {
                     tickFormatter={v=>`${currencySymbol}${(v/1000).toFixed(0)}k`} width={48}/>
                   <Tooltip content={<GlassTooltip sym={currencySymbol}/>}/>
                   <Legend iconType="circle" iconSize={7} wrapperStyle={{ fontSize:"11px", paddingTop:8 }}/>
-                  <Line type="monotone" dataKey="principal" name="Principal" stroke="#22D3EE" strokeWidth={2} dot={false} activeDot={{ r:4 }}/>
-                  <Line type="monotone" dataKey="interest" name="Interest" stroke="#EC4899" strokeWidth={2} dot={false} activeDot={{ r:4 }}/>
+                  <Line type="monotone" dataKey="principal" name="Principal" stroke="var(--wf-cyan)" strokeWidth={2} dot={false} activeDot={{ r:4 }}/>
+                  <Line type="monotone" dataKey="interest" name="Interest" stroke="var(--wf-pink)" strokeWidth={2} dot={false} activeDot={{ r:4 }}/>
                   {accelData.length > 0 && (
-                    <Line type="monotone" dataKey="accelPrincipal" name="Accel. Principal" stroke="#10B981" strokeWidth={1.5} strokeDasharray="4 3" dot={false}/>
+                    <Line type="monotone" dataKey="accelPrincipal" name="Accel. Principal" stroke="var(--wf-emerald)" strokeWidth={1.5} strokeDasharray="4 3" dot={false}/>
                   )}
                 </LineChart>
               </ResponsiveContainer>
@@ -310,7 +310,7 @@ function LoansHomeInner() {
             <div style={{ height:300 }} className="flex flex-col items-center justify-center gap-3">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
                 style={{ background:"rgba(34,211,238,0.10)" }}>
-                <ChartLine size={22} color="#22D3EE" />
+                <ChartLine size={22} color="var(--wf-cyan)" />
               </div>
               <p className="text-sm text-center" style={{ color:"var(--wf-muted)" }}>
                 Fill in loan details on the left to see the projection.
@@ -325,8 +325,8 @@ function LoansHomeInner() {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))", gap:16, marginBottom:24 }}>
           {[
             { label:"Monthly Payment", value:`${currencySymbol}${fmt(metrics.pmt)}`, color:"var(--wf-text)" },
-            { label:"Total Interest",  value:`${currencySymbol}${fmt(metrics.totalInt)}`, color:"#EC4899" },
-            { label:"Payoff Date", value: metrics.payoff ? metrics.payoff.toLocaleDateString(undefined,{month:"short",year:"numeric"}) : "—", color:"#22D3EE" },
+            { label:"Total Interest",  value:`${currencySymbol}${fmt(metrics.totalInt)}`, color:"var(--wf-pink)" },
+            { label:"Payoff Date", value: metrics.payoff ? metrics.payoff.toLocaleDateString(undefined,{month:"short",year:"numeric"}) : "—", color:"var(--wf-cyan)" },
           ].map(({ label, value, color }, i) => (
             <motion.div key={label} className="wf-glass p-4"
               initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:i*0.06 }}>
@@ -419,7 +419,7 @@ function LoanCard({ loan, sym, isSelected, onSelect, onDetail, index }: {
       <div className="flex items-start justify-between mb-3">
         <p className="font-semibold text-sm" style={{ color:"var(--wf-text)" }}>{loan.name}</p>
         <button onClick={e=>{ e.stopPropagation(); onDetail(); }}
-          className="text-xs font-semibold flex items-center gap-1" style={{ color:"#22D3EE" }}>
+          className="text-xs font-semibold flex items-center gap-1" style={{ color:"var(--wf-cyan)" }}>
           Detail <ArrowRight size={11}/>
         </button>
       </div>
