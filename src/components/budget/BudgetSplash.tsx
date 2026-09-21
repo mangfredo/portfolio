@@ -2,36 +2,26 @@
 
 import React, { useEffect, useState } from "react";
 
-const SPLASH_KEY = "lf_splash_shown";
+export const SPLASH_KEY = "lf_splash_shown";
 
 export const BudgetSplash: React.FC = () => {
-  const alreadyShown =
-    typeof window !== "undefined"
-      ? sessionStorage.getItem(SPLASH_KEY) === "1"
-      : true;
-
-  const [phase, setPhase] = useState<"mounting" | "visible" | "fading" | "done">(
-    alreadyShown ? "done" : "mounting"
-  );
+  // Always start as "inactive" on both server and client — no hydration mismatch.
+  // useEffect runs only on the client and decides whether to show the splash.
+  const [show, setShow] = useState(false);
+  const [phase, setPhase] = useState<"mounting" | "visible" | "fading">("mounting");
 
   useEffect(() => {
-    if (alreadyShown) return;
+    // Already shown during this visit — skip
+    if (sessionStorage.getItem(SPLASH_KEY) === "1") return;
 
-    // Mark as shown for the rest of this browser session
+    // Mark as shown so navigating between tabs doesn't replay it
     sessionStorage.setItem(SPLASH_KEY, "1");
 
-    // Trigger entrance on next frame
+    // Show the splash
+    setShow(true);
     const rafId = requestAnimationFrame(() => setPhase("visible"));
-
-    // Start exit fade exactly when bar finishes (2500ms)
-    const fadeTimer = setTimeout(() => {
-      setPhase("fading");
-    }, 2500);
-
-    // Unmount right after snap fade (200ms)
-    const doneTimer = setTimeout(() => {
-      setPhase("done");
-    }, 2700);
+    const fadeTimer = setTimeout(() => setPhase("fading"), 2500);
+    const doneTimer = setTimeout(() => setShow(false), 2700);
 
     return () => {
       cancelAnimationFrame(rafId);
@@ -40,7 +30,7 @@ export const BudgetSplash: React.FC = () => {
     };
   }, []);
 
-  if (phase === "done") return null;
+  if (!show) return null;
 
   return (
     <div
@@ -70,11 +60,11 @@ export const BudgetSplash: React.FC = () => {
           transition: "transform 700ms cubic-bezier(0.16, 1, 0.3, 1), opacity 500ms ease",
         }}
       >
-        {/* Logo mark */}
+        {/* Logo */}
         <div style={{ marginBottom: 24 }}>
           <img
-            src="/budget-tracker-logo-navy.svg"
-            alt="LaanFlow logo"
+            src="/budget-tracker-logo-arrow.svg"
+            alt="LaanFlow"
             width={56}
             height={56}
             style={{ borderRadius: 16, display: "block" }}
@@ -97,7 +87,7 @@ export const BudgetSplash: React.FC = () => {
           <span style={{ color: "#38BDF8" }}>Flow</span>
         </div>
 
-        {/* Minimalist Line Pulse */}
+        {/* Progress bar */}
         <div
           style={{
             marginTop: 20,
@@ -115,9 +105,7 @@ export const BudgetSplash: React.FC = () => {
               inset: 0,
               backgroundColor: "#38BDF8",
               transform: phase === "mounting" ? "translateX(-100%)" : "translateX(0)",
-              transition: phase === "mounting"
-                ? "none"
-                : "transform 2500ms linear",
+              transition: phase === "mounting" ? "none" : "transform 2500ms linear",
             }}
           />
         </div>

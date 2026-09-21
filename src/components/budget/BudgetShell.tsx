@@ -9,6 +9,7 @@ import { LoadingOverlay, ConfirmModal } from "./BudgetModal";
 import { loadSampleDataForTab, clearTabData, hasTabData } from "@/lib/budgetSampleData";
 import { useBudgetSettings } from "@/hooks/useBudgetSettings";
 import { BudgetSettingsContext } from "@/context/BudgetSettingsContext";
+import { SPLASH_KEY } from "@/components/budget/BudgetSplash";
 import { useToast } from "@/hooks/useToast";
 
 interface BudgetShellProps {
@@ -72,6 +73,8 @@ export default function BudgetShell({ children }: BudgetShellProps) {
   };
 
   const doBack = () => {
+    // Clear the splash flag so it shows again when they re-enter LaanFlow
+    if (typeof window !== "undefined") sessionStorage.removeItem(SPLASH_KEY);
     setModal({ type: "none" });
     setLeaving(true);
     setTimeout(() => router.push("/"), 1800);
