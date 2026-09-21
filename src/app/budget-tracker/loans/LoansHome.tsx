@@ -218,10 +218,29 @@ function LoansHomeInner() {
                     placeholder="6.5%" style={inputStyle} disabled={selectedLoanId!==null}/>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color:"var(--wf-muted)" }}>Monthly Pmt</label>
-                  <NumericInput value={selectedLoanId ? String(loans.find(l=>l.id===selectedLoanId)?.monthlyPayment??"") : form.monthlyPayment}
+                  <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color:"var(--wf-muted)" }}>
+                    Monthly Total
+                  </label>
+                  <NumericInput
+                    value={selectedLoanId
+                      ? (() => {
+                          const l = loans.find(ln => ln.id === selectedLoanId);
+                          return l ? String(monthlyOutflow(l)) : "";
+                        })()
+                      : form.monthlyPayment
+                        ? String(parseNumeric(form.monthlyPayment) * (form.paymentFrequency === "twice-monthly" ? 2 : 1))
+                        : ""}
                     onChange={e=>setForm(f=>({...f,monthlyPayment:e.target.value}))}
                     placeholder={`${currencySymbol}489`} style={inputStyle} disabled={selectedLoanId!==null}/>
+                  {selectedLoanId && (() => {
+                    const l = loans.find(ln => ln.id === selectedLoanId);
+                    if (!l || l.paymentFrequency !== "twice-monthly") return null;
+                    return (
+                      <p style={{ fontSize:"0.7rem", color:"var(--wf-muted)", marginTop:4 }}>
+                        {currencySymbol}{fmt(l.monthlyPayment)} × 2/mo
+                      </p>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
@@ -367,17 +386,17 @@ function LoansHomeInner() {
                 {el}
               </div>
             ))}
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color:"var(--wf-muted)" }}>Payment ({currencySymbol})</label>
-                <NumericInput {...fp("monthlyPayment")} placeholder="0.00" className="wf-input wf-input-data"/>
-              </div>
+            <div className="flex flex-col gap-3">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color:"var(--wf-muted)" }}>Frequency</label>
                 <select {...fp("paymentFrequency")} className="wf-input" style={{ cursor:"pointer" }}>
-                  <option value="monthly" style={{ background:"#1E293B" }}>Once/month</option>
-                  <option value="twice-monthly" style={{ background:"#1E293B" }}>Twice/month</option>
+                  <option value="monthly" style={{ background:"#FEFEFE", color:"#0F172A" }}>Once / month</option>
+                  <option value="twice-monthly" style={{ background:"#FEFEFE", color:"#0F172A" }}>Twice / month</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color:"var(--wf-muted)" }}>Amount per payment ({currencySymbol})</label>
+                <NumericInput {...fp("monthlyPayment")} placeholder="0.00" className="wf-input wf-input-data"/>
               </div>
             </div>
             <div>
@@ -431,7 +450,9 @@ function LoanCard({ loan, sym, isSelected, onSelect, onDetail, index }: {
       </div>
       <div className="flex justify-between text-xs">
         <span style={{ color:"var(--wf-muted)" }}>{pct.toFixed(1)}% paid</span>
-        <span className="wf-data" style={{ color:"var(--wf-muted)" }}>{sym}{fmt(loan.monthlyPayment)}/mo</span>
+        <span className="wf-data" style={{ color:"var(--wf-muted)" }}>
+          {sym}{fmt(monthlyOutflow(loan))}/mo
+        </span>
       </div>
     </motion.div>
   );

@@ -295,33 +295,46 @@ function LoanDetailInner({ id }: Props) {
       {showEditLoan && (
         <Modal title="Edit Payment Plan" onClose={() => setShowEditLoan(false)}>
           <div className="space-y-4">
-            <p className="bt-text-muted text-xs" style={{ lineHeight: 1.6 }}>
+            <p className="text-xs" style={{ color:"var(--wf-muted)", lineHeight: 1.6 }}>
               Changing the payment plan only affects future projections. Existing logged payments and their balance impact remain unchanged.
             </p>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>
-                  Payment Amount ({currencySymbol})
-                </label>
-                <NumericInput value={editForm.monthlyPayment}
-                  onChange={(e) => setEditForm((f) => ({ ...f, monthlyPayment: e.target.value }))}
-                  autoFocus className="bt-input bt-data" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium uppercase tracking-wider mb-2" style={{ color: "#64748B" }}>Frequency</label>
-                <select value={editForm.paymentFrequency}
-                  onChange={(e) => setEditForm((f) => ({ ...f, paymentFrequency: e.target.value as PaymentFrequency }))}
-                  className="bt-input">
-                  <option value="monthly">Once a month</option>
-                  <option value="twice-monthly">Twice a month</option>
-                </select>
-              </div>
+
+            {/* Frequency — full width on top */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color:"var(--wf-muted)" }}>
+                Frequency
+              </label>
+              <select value={editForm.paymentFrequency}
+                onChange={(e) => setEditForm((f) => ({ ...f, paymentFrequency: e.target.value as PaymentFrequency }))}
+                className="wf-input">
+                <option value="monthly">Once a month</option>
+                <option value="twice-monthly">Twice a month</option>
+              </select>
             </div>
+
+            {/* Payment amount — full width below */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color:"var(--wf-muted)" }}>
+                Amount per payment ({currencySymbol})
+              </label>
+              <NumericInput value={editForm.monthlyPayment}
+                onChange={(e) => setEditForm((f) => ({ ...f, monthlyPayment: e.target.value }))}
+                autoFocus className="wf-input wf-data" />
+              {editForm.monthlyPayment && parseNumeric(editForm.monthlyPayment) > 0 && (
+                <p className="text-xs mt-1.5" style={{ color:"var(--wf-muted)" }}>
+                  Monthly total:{" "}
+                  <span style={{ color:"var(--wf-cyan)", fontWeight:600 }}>
+                    {currencySymbol}{(parseNumeric(editForm.monthlyPayment) * (editForm.paymentFrequency === "twice-monthly" ? 2 : 1)).toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 })}
+                  </span>
+                </p>
+              )}
+            </div>
+
             <div className="flex gap-3 pt-1">
-              <button onClick={() => setShowEditLoan(false)} className="bt-btn-ghost flex-1 py-2.5">Cancel</button>
+              <button onClick={() => setShowEditLoan(false)} className="wf-btn-ghost flex-1 py-2.5">Cancel</button>
               <button onClick={handleEditLoan}
                 disabled={!editForm.monthlyPayment || parseNumeric(editForm.monthlyPayment) <= 0}
-                className="bt-btn-primary flex-1 py-2.5">Save Plan</button>
+                className="wf-btn-primary flex-1 py-2.5">Save Plan</button>
             </div>
           </div>
         </Modal>

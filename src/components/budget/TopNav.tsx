@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import {
   ChartBar, CreditCard, PiggyBank,
-  Sun, Moon, ArrowCounterClockwise, X, Export, Upload, ArrowLeft,
+  Sun, Moon, ArrowCounterClockwise, X, DownloadSimple, UploadSimple, ArrowLeft,
   List,
 } from "@phosphor-icons/react";
 import { exportData, importData } from "@/lib/budgetBackup";
@@ -192,10 +192,10 @@ export default function TopNav({
             </button>
             <button onClick={() => { exportData(); onToast("Backup exported","success"); }}
               className="wf-icon-btn" title="Export data">
-              <Export size={14}/>
+              <DownloadSimple size={14}/>
             </button>
             <button onClick={() => fileRef.current?.click()} className="wf-icon-btn" title="Import data">
-              <Upload size={14}/>
+              <UploadSimple size={14}/>
             </button>
             <input ref={fileRef} type="file" accept=".json,application/json" style={{ display:"none" }} onChange={handleImport}/>
           </div>
@@ -403,11 +403,11 @@ export default function TopNav({
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:16 }}>
               <button onClick={() => { exportData(); onToast("Backup exported","success"); setMenuOpen(false); }}
                 style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"10px 0", borderRadius:10, background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)", border: isDark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(0,0,0,0.10)", color: isDark ? "#94A3B8" : "#64748B", fontWeight:600, fontSize:"0.8rem", cursor:"pointer" }}>
-                <Export size={14}/> Export
+                <DownloadSimple size={14}/> Export
               </button>
               <button onClick={() => { fileRef.current?.click(); }}
                 style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"10px 0", borderRadius:10, background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)", border: isDark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(0,0,0,0.10)", color: isDark ? "#94A3B8" : "#64748B", fontWeight:600, fontSize:"0.8rem", cursor:"pointer" }}>
-                <Upload size={14}/> Import
+                <UploadSimple size={14}/> Import
               </button>
             </div>
 
