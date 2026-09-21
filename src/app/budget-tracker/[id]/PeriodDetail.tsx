@@ -157,8 +157,12 @@ function PeriodDetailInner({ id }: Props) {
               </h1>
             </div>
             <button onClick={() => setShowDeleteConfirm(true)}
-              className="wf-icon-btn danger" title="Delete period">
-              <Trash size={14}/>
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+              style={{ color:"var(--wf-pink)", background:"var(--wf-pink-dim)", border:"1px solid rgba(244,63,94,0.20)" }}>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 3h8M5 3V2h2v1M4 3l.5 7h3L8 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Delete
             </button>
           </div>
         </motion.div>
