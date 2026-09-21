@@ -2,15 +2,15 @@
 
 import "./budget.css";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { CalendarBlank, Plus, CurrencyCircleDollar, ArrowRight, Wallet } from "@phosphor-icons/react";
+import { CalendarBlank, Plus, ArrowRight, Wallet } from "@phosphor-icons/react";
 import { usePeriods, useExpenses } from "@/hooks/useBudgetStore";
 import { useSwipeToClose } from "@/hooks/useSwipeToClose";
 import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
 import Modal from "@/components/budget/Modal";
 import BudgetShell from "@/components/budget/BudgetShell";
 import BudgetSplash from "@/components/budget/BudgetSplash";
+import { PeriodDetailInner } from "./[id]/PeriodDetail";
 
 const fmt = (n: number) =>
   n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -90,7 +90,7 @@ function PeriodCard({ period, currencySymbol, onClick }: {
 }
 
 function BudgetHomeInner() {
-  const router = useRouter();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const { currencySymbol } = useBudgetSettingsCtx();
   const { periods, addPeriod } = usePeriods();
   const [showAdd, setShowAdd] = useState(false);
@@ -104,8 +104,18 @@ function BudgetHomeInner() {
     const period = addPeriod(trimmed);
     setLabel("");
     setShowAdd(false);
-    router.push(`/budget-tracker/${period.id}`);
+    setSelectedId(period.id);
   };
+
+  // Render period detail inline — no route change, splash never replays
+  if (selectedId) {
+    return (
+      <>
+        <BudgetSplash />
+        <PeriodDetailInner id={selectedId} onBack={() => setSelectedId(null)} />
+      </>
+    );
+  }
 
   return (
     <>
@@ -174,7 +184,7 @@ function BudgetHomeInner() {
                   <PeriodCard
                     period={p}
                     currencySymbol={currencySymbol}
-                    onClick={() => router.push(`/budget-tracker/${p.id}`)}
+                    onClick={() => setSelectedId(p.id)}
                   />
                 </motion.div>
               ))}

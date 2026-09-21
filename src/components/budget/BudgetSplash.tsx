@@ -2,18 +2,25 @@
 
 import React, { useEffect, useState } from "react";
 
-// Module-level flag — survives SPA navigations, resets on page reload
-let splashShown = false;
+const SPLASH_KEY = "lf_splash_shown";
 
 export const BudgetSplash: React.FC = () => {
+  const alreadyShown =
+    typeof window !== "undefined"
+      ? sessionStorage.getItem(SPLASH_KEY) === "1"
+      : true;
+
   const [phase, setPhase] = useState<"mounting" | "visible" | "fading" | "done">(
-    splashShown ? "done" : "mounting"
+    alreadyShown ? "done" : "mounting"
   );
 
   useEffect(() => {
-    if (splashShown) return;
+    if (alreadyShown) return;
 
-    // Trigger initial entrance on next frame
+    // Mark as shown for the rest of this browser session
+    sessionStorage.setItem(SPLASH_KEY, "1");
+
+    // Trigger entrance on next frame
     const rafId = requestAnimationFrame(() => setPhase("visible"));
 
     // Start exit fade exactly when bar finishes (2500ms)
@@ -21,9 +28,8 @@ export const BudgetSplash: React.FC = () => {
       setPhase("fading");
     }, 2500);
 
-    // Unmount right after the snap fade (200ms)
+    // Unmount right after snap fade (200ms)
     const doneTimer = setTimeout(() => {
-      splashShown = true;
       setPhase("done");
     }, 2700);
 
@@ -67,7 +73,7 @@ export const BudgetSplash: React.FC = () => {
         {/* Logo mark */}
         <div style={{ marginBottom: 24 }}>
           <img
-            src="/budget-tracker-logo-arrow.svg"
+            src="/budget-tracker-logo-navy.svg"
             alt="LaanFlow logo"
             width={56}
             height={56}
