@@ -37,14 +37,18 @@ export const CURRENCIES: CurrencyOption[] = [
   { code: "MXN", symbol: "Mex$",name: "Mexican Peso" },
 ];
 
+import type { ViewMode } from "@/context/BudgetSettingsContext";
+
 interface BudgetSettings {
   theme: BtTheme;
   demoMode: boolean;
-  currency: string;        // ISO code e.g. "PHP"
-  currencySymbol: string;  // display symbol e.g. "₱"
+  currency: string;
+  currencySymbol: string;
+  viewMode: ViewMode;
   setTheme: (t: BtTheme) => void;
   setDemoMode: (v: boolean) => void;
   setCurrency: (code: string) => void;
+  setViewMode: (v: ViewMode) => void;
   reloadKey: number;
   bumpReload: () => void;
 }
@@ -52,6 +56,7 @@ interface BudgetSettings {
 const THEME_KEY    = "bt_theme";
 const DEMO_KEY     = "bt_demo";
 const CURRENCY_KEY = "bt_currency";
+const VIEW_KEY     = "bt_view_mode";
 
 const DEFAULT_CURRENCY = CURRENCIES[0]; // PHP
 
@@ -61,6 +66,7 @@ export function useBudgetSettings(): BudgetSettings {
   // Start with SSR-safe defaults so server HTML matches initial client render.
   // After mount, read localStorage and update if different.
   const [currency, setCurrencyState] = useState<string>(SSR_CURRENCY);
+  const [viewMode, setViewModeState] = useState<ViewMode>("cutoff");
   const [reloadKey, setReloadKey] = useState(0);
   const [mounted, setMounted] = useState(false);
 
@@ -96,6 +102,10 @@ export function useBudgetSettings(): BudgetSettings {
         })
         .catch(() => { /* fall back to PHP */ });
     }
+
+    const savedView = localStorage.getItem(VIEW_KEY);
+    if (savedView === "flexible" || savedView === "cutoff") setViewModeState(savedView);
+
     setMounted(true);
   }, []);
 
@@ -116,11 +126,16 @@ export function useBudgetSettings(): BudgetSettings {
     localStorage.setItem(CURRENCY_KEY, match.code);
   };
 
+  const setViewMode = (v: ViewMode) => {
+    setViewModeState(v);
+    localStorage.setItem(VIEW_KEY, v);
+  };
+
   const bumpReload = () => setReloadKey((k) => k + 1);
 
   return {
-    theme, demoMode, currency, currencySymbol,
-    setTheme, setDemoMode, setCurrency,
+    theme, demoMode, currency, currencySymbol, viewMode,
+    setTheme, setDemoMode, setCurrency, setViewMode,
     reloadKey, bumpReload,
   };
 }

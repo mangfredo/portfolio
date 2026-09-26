@@ -72,6 +72,7 @@
   --wf-emerald-dim:      rgba(5, 150, 105, 0.10);
   --wf-pink:             #E11D48;
   --wf-pink-dim:         rgba(225, 29, 72, 0.10);
+  --wf-amber:            #D97706;
 
   --wf-text:             #0F172A;
   --wf-muted:            #64748B;
@@ -527,4 +528,36 @@ a.wf-glass:hover {
 @keyframes wf-fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+
+/* =========================================================================
+   FLEXIBLE VIEW — PERIOD ACCORDION HEADER
+   ========================================================================= */
+
+/* Header row: single line on desktop, wraps on mobile */
+.fv-period-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+/* Stats block: hidden when accordion is open (via inline style),
+   right-aligned on desktop, full-width second line on mobile */
+.fv-period-stats {
+  display: flex;
+  gap: 16px;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 639px) {
+  .fv-period-header {
+    flex-wrap: wrap;
+  }
+  .fv-period-stats {
+    width: 100%;
+    justify-content: flex-start;
+    padding-left: 54px; /* align with label (checkbox + drag handle width) */
+  }
 }

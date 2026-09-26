@@ -35,7 +35,7 @@ export default function TopNav({
   onBack, onPayPeriods, onLoans, onSavings,
   onReset, onClear, onToast,
 }: TopNavProps) {
-  const { theme, setTheme, currency, setCurrency } = useBudgetSettingsCtx();
+  const { theme, setTheme, currency, setCurrency, viewMode, setViewMode } = useBudgetSettingsCtx();
   const isDark = theme === "dark";
   const fileRef = useRef<HTMLInputElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -121,6 +121,28 @@ export default function TopNav({
           </button>
 
           <div style={{ flex:1 }} />
+
+          {/* View mode toggle — only shown on Pay Periods tab */}
+          {activeTab === "pay-periods" && (
+            <div style={{
+              display:"flex", alignItems:"center", gap:2,
+              background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+              border: `1px solid ${isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)"}`,
+              borderRadius:8, padding:2, marginRight:4,
+            }}>
+              {(["cutoff","flexible"] as const).map(v => (
+                <button key={v} onClick={() => setViewMode(v)} style={{
+                  padding:"3px 10px", borderRadius:6, fontSize:"0.7rem", fontWeight:600,
+                  cursor:"pointer", border:"none", transition:"all 150ms ease",
+                  background: viewMode === v ? (isDark ? "#1E293B" : "#FFFFFF") : "transparent",
+                  color: viewMode === v ? "var(--wf-cyan)" : "var(--wf-muted)",
+                  boxShadow: viewMode === v ? (isDark ? "0 1px 3px rgba(0,0,0,0.4)" : "0 1px 3px rgba(0,0,0,0.1)") : "none",
+                }}>
+                  {v === "cutoff" ? "Per Cut-off" : "Flexible"}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
             {/* Custom currency picker */}
@@ -386,6 +408,25 @@ export default function TopNav({
                 ))}
               </div>
             </div>
+
+            {/* View mode toggle — only for Pay Periods tab */}
+            {activeTab === "pay-periods" && (
+              <div style={{ marginBottom:16 }}>
+                <p style={{ fontSize:"0.7rem", fontWeight:600, textTransform:"uppercase", letterSpacing:"0.1em", color: isDark ? "#94A3B8" : "#64748B", marginBottom:8 }}>View Mode</p>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                  {(["cutoff","flexible"] as const).map(v => (
+                    <button key={v} onClick={() => setViewMode(v)} style={{
+                      padding:"10px 0", borderRadius:10, border:"1px solid", fontWeight:600, fontSize:"0.875rem", cursor:"pointer", transition:"all 150ms ease",
+                      background: viewMode === v ? "rgba(34,211,238,0.15)" : (isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)"),
+                      borderColor: viewMode === v ? "rgba(34,211,238,0.40)" : (isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)"),
+                      color: viewMode === v ? "var(--wf-cyan)" : (isDark ? "#94A3B8" : "#64748B"),
+                    }}>
+                      {v === "cutoff" ? "Per Cut-off" : "Flexible"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Load sample + clear data */}
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:12 }}>
