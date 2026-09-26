@@ -33,8 +33,8 @@ interface ContextMenuItem {
 }
 
 function ContextMenu({
-  x, y, items, onClose,
-}: { x: number; y: number; items: ContextMenuItem[]; onClose: () => void }) {
+  x, y, items, onClose, isDark = true,
+}: { x: number; y: number; items: ContextMenuItem[]; onClose: () => void; isDark?: boolean }) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,12 +62,12 @@ function ContextMenu({
         left: adjustedX,
         top: adjustedY,
         zIndex: 9999,
-        background: "#1E293B",
-        border: "1px solid rgba(255,255,255,0.12)",
+        background: isDark ? "#1E293B" : "#FFFFFF",
+        border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)"}`,
         borderRadius: 10,
         padding: "4px 0",
         minWidth: 160,
-        boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
+        boxShadow: isDark ? "0 12px 32px rgba(0,0,0,0.5)" : "0 12px 32px rgba(0,0,0,0.15)",
         fontFamily: "var(--font-outfit, system-ui)",
       }}
     >
@@ -83,11 +83,11 @@ function ContextMenu({
             display: "flex", alignItems: "center", gap: 10,
             width: "100%", padding: "8px 14px", textAlign: "left",
             background: "none", border: "none", cursor: "pointer",
-            color: item.danger ? "#F43F5E" : "#F1F5F9",
+            color: item.danger ? "#F43F5E" : (isDark ? "#F1F5F9" : "#1E293B"),
             fontSize: "0.875rem", fontWeight: 500,
             transition: "background 100ms ease",
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = item.danger ? "rgba(244,63,94,0.12)" : "rgba(255,255,255,0.07)"; }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = item.danger ? "rgba(244,63,94,0.12)" : (isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)"); }}
           onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "none"; }}
         >
           {item.icon && <span style={{ opacity: 0.7, display:"flex", alignItems:"center" }}>{item.icon}</span>}
@@ -188,7 +188,8 @@ function PeriodAccordion({
     setEditingLabel(null);
   };
 
-  const isDark = true; // Flexible view always uses the current theme via CSS vars
+  const { theme } = useBudgetSettingsCtx();
+  const isDark = theme === "dark";
   const textMain = "var(--wf-text)";
   const textMuted = "var(--wf-muted)";
 
@@ -509,10 +510,11 @@ function PeriodAccordion({
 
 // ── Gig card (side income entry) ─────────────────────────────────────────
 
-function GigCard({ gig, currencySymbol, onDelete }: {
+function GigCard({ gig, currencySymbol, onDelete, isDark }: {
   gig: Gig;
   currencySymbol: string;
   onDelete: (id: string) => void;
+  isDark: boolean;
 }) {
   const { items, addItem, updateItem, deleteItem, togglePaid, total } = useGigItems(gig.id);
   const [isOpen, setIsOpen] = useState(false);
@@ -770,6 +772,7 @@ function GigCard({ gig, currencySymbol, onDelete }: {
           x={gigCtx.x}
           y={gigCtx.y}
           onClose={() => setGigCtx(null)}
+          isDark={isDark}
           items={gigCtx.target.type === "gig" ? [
             {
               label: "Rename",
@@ -835,7 +838,8 @@ interface FlexibleViewProps {
 }
 
 export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProps) {
-  const { currencySymbol } = useBudgetSettingsCtx();
+  const { currencySymbol, theme } = useBudgetSettingsCtx();
+  const isDark = theme === "dark";
   const { periods, reorderPeriods, deletePeriod, updatePeriodMeta } = usePeriods();
   const { gigs, deleteGig } = useGigs();
 
@@ -1015,6 +1019,7 @@ export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProp
           x={ctxMenu.x}
           y={ctxMenu.y}
           onClose={() => setCtxMenu(null)}
+          isDark={isDark}
           items={ctxMenu.target.type === "group" ? [
             {
               label: "Rename",
@@ -1227,7 +1232,7 @@ export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProp
 
                 {/* Gig cards for this month */}
                 {gigs.filter(g => g.monthKey === key).map(g => (
-                  <GigCard key={g.id} gig={g} currencySymbol={currencySymbol} onDelete={deleteGig} />
+                  <GigCard key={g.id} gig={g} currencySymbol={currencySymbol} onDelete={deleteGig} isDark={isDark} />
                 ))}
 
                 <div style={{ display:"flex", gap:12, marginTop:8, flexWrap:"wrap" }}>

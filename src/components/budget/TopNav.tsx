@@ -226,10 +226,10 @@ export default function TopNav({
 
       {/* ── Mobile: slim top bar — logo only, everything else in hamburger ── */}
       <header className="wf-mobile-topbar sticky top-0 z-40" style={{
-        background:"rgba(15,23,42,0.90)",
+        background: isDark ? "rgba(15,23,42,0.90)" : "rgba(248,250,252,0.92)",
         backdropFilter:"blur(16px)",
         WebkitBackdropFilter:"blur(16px)",
-        borderBottom:"1px solid rgba(255,255,255,0.07)",
+        borderBottom: isDark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.08)",
         padding:"10px 16px",
         alignItems:"center",
         justifyContent:"space-between",
@@ -252,10 +252,10 @@ export default function TopNav({
       {/* ── Mobile: bottom tab dock (fixed, iOS-style) ───────────────────── */}
       <nav className="wf-bottom-dock" style={{
         position:"fixed", bottom:0, left:0, right:0, zIndex:50,
-        background:"rgba(15,23,42,0.92)",
+        background: isDark ? "rgba(15,23,42,0.92)" : "rgba(248,250,252,0.95)",
         backdropFilter:"blur(20px)",
         WebkitBackdropFilter:"blur(20px)",
-        borderTop:"1px solid rgba(255,255,255,0.10)",
+        borderTop: isDark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(0,0,0,0.08)",
         alignItems:"center", justifyContent:"space-around",
         padding:"8px 0 max(8px, env(safe-area-inset-bottom))",
       }}>

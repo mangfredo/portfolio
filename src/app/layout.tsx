@@ -95,6 +95,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${geistMono.variable} ${jetbrainsMono.variable} ${playfair.variable} ${outfit.variable} h-full`}
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
     >
       <body className="min-h-full flex flex-col">
         <script

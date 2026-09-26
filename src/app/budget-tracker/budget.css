@@ -559,5 +559,16 @@ a.wf-glass:hover {
     width: 100%;
     justify-content: flex-start;
     padding-left: 54px; /* align with label (checkbox + drag handle width) */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Extra narrow screens (DevTools emulator edge case) */
+@media (max-width: 374px) {
+  .fv-period-stats {
+    gap: 10px;
+    padding-left: 28px;
+    font-size: 0.7rem;
   }
 }
