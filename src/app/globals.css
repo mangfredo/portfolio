@@ -7,7 +7,7 @@
   --font-data: var(--font-jetbrains);
 }
 
-:root {
+:root, html {
   --bg: #0b0f0e;
   --fg: #e8e4df;
   --fg-muted: #8a8578;
@@ -20,7 +20,7 @@
   --grain-opacity: 0.035;
 }
 
-[data-theme="light"] {
+html[data-theme="light"], [data-theme="light"] {
   --bg: #f5f2ed;
   --fg: #1a1d1c;
   --fg-muted: #6b6560;
@@ -37,16 +37,18 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
+html, body {
   background-color: var(--bg);
   color: var(--fg);
+}
+
+body {
   font-family: var(--font-sans), system-ui, sans-serif;
   font-size: 17px;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease, color 0.3s ease;
-  transition: var(--theme-transition, background-color 0.3s ease, color 0.3s ease);
 }
 
 /* Film grain overlay */

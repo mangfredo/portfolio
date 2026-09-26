@@ -96,7 +96,7 @@ export default function RootLayout({
       className={`${inter.variable} ${geistMono.variable} ${jetbrainsMono.variable} ${playfair.variable} ${outfit.variable} h-full`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-[#0a0a0a]">
+      <body className="min-h-full flex flex-col">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
