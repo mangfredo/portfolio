@@ -4,13 +4,53 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 const themes = [
   {
+    id: "blueprint",
+    label: "Blueprint",
+    headerBg: "color-mix(in srgb, var(--ink) 4%, var(--paper-raised))",
+    headerBorder: "var(--line)",
+    bodyBg: "var(--paper-raised)",
+    border: "var(--line)",
+    radius: "0",
+    titleBar: (
+      <div className="flex items-center gap-2">
+        {/* Blueprint chrome: status dot only, no traffic lights */}
+        <span
+          className="font-mono text-[0.65rem] tracking-[0.04em]"
+          style={{ color: "var(--ink-soft)" }}
+        >
+          ~/rivalhr/scripts — zsh
+        </span>
+      </div>
+    ),
+    titleText: "",
+    titleRight: (
+      <span
+        style={{
+          width: "6px",
+          height: "6px",
+          background: "var(--accent-2)",
+          display: "inline-block",
+          flexShrink: 0,
+        }}
+        title="success"
+        aria-label="Success"
+      />
+    ),
+    prompt: "$",
+    promptColor: "var(--accent-2)",
+    textColor: "var(--ink-soft)",
+    successColor: "var(--accent-2)",
+    arrowColor: "var(--accent)",
+    errorColor: "var(--accent)",
+  },
+  {
     id: "macos",
     label: "macOS",
     headerBg: "var(--card-bg)",
     headerBorder: "var(--card-border)",
     bodyBg: "var(--card-bg)",
     border: "var(--card-border)",
-    radius: "0.5rem",
+    radius: "0",
     titleBar: (
       <div className="flex items-center gap-2">
         <span className="w-3 h-3 rounded-full" style={{ background: "#ff5f57" }} />
@@ -33,7 +73,7 @@ const themes = [
     headerBorder: "#404040",
     bodyBg: "#1a1a2e",
     border: "#404040",
-    radius: "0.5rem",
+    radius: "0",
     titleBar: (
       <div className="flex items-center gap-1.5">
         <span className="w-2.5 h-2.5 rounded-sm border" style={{ borderColor: "#666", background: "transparent" }} />
@@ -56,7 +96,7 @@ const themes = [
     headerBorder: "#012456",
     bodyBg: "#012456",
     border: "#1a3a6a",
-    radius: "0.5rem",
+    radius: "0",
     titleBar: (
       <div className="flex items-center gap-3">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2">
@@ -100,7 +140,7 @@ const themes = [
     headerBorder: "#5c2d4f",
     bodyBg: "#300a24",
     border: "#5c2d4f",
-    radius: "0.75rem",
+    radius: "0",
     titleBar: (
       <div className="flex items-center gap-2">
         <span className="w-3 h-3 rounded-full" style={{ background: "#e95420" }} />
@@ -355,20 +395,12 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
   const [cmdHistoryIdx, setCmdHistoryIdx] = useState(-1);
   const [cursorPos, setCursorPos] = useState(0);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; hasSelection: boolean } | null>(null);
-  const [demoActive, setDemoActive] = useState(false);
-  const [demoCursorPos, setDemoCursorPos] = useState<{ x: number; y: number } | null>(null);
-  const [demoTyping, setDemoTyping] = useState("");
   const cancelRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
-  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const demoAbortRef = useRef(false);
   const userInteractedRef = useRef(false);
   const terminalVisibleRef = useRef(true);
   const outerRef = useRef<HTMLDivElement>(null);
-  const demoGenRef = useRef(0);
-  const runDemoRef = useRef<() => void>(() => {});
-  const demoStoppedRef = useRef(false);
 
   const theme = themes[themeIndex];
 
@@ -491,197 +523,19 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
   }
 
   // Track terminal visibility — only run demo when visible
+  // Track terminal visibility — used for scroll-away cleanup only
   useEffect(() => {
     const el = outerRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         terminalVisibleRef.current = entry.isIntersecting;
-        if (!entry.isIntersecting) {
-          // Cancel any running demo when scrolled away — increment gen to kill old callbacks
-          demoGenRef.current++;
-          demoAbortRef.current = true;
-          setDemoActive(false);
-          setDemoCursorPos(null);
-          setDemoTyping("");
-          setUserInput("");
-          setCursorPos(0);
-          setHistory([]);
-          if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-        } else {
-          // Scrolled back into view — start fresh idle timer (only if not permanently stopped)
-          if (!demoStoppedRef.current) {
-            demoAbortRef.current = false;
-            if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-            idleTimerRef.current = setTimeout(() => {
-              if (terminalVisibleRef.current && !demoAbortRef.current && !demoStoppedRef.current) {
-                runDemoRef.current();
-              }
-            }, 5000);
-          }
-        }
       },
       { threshold: 0.3 }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Idle demo — types "help" with a fake cursor after 5s of inactivity
-  const startIdleTimer = useCallback(() => {
-    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-    demoAbortRef.current = false;
-    idleTimerRef.current = setTimeout(() => {
-      if (phase === "interactive" && !demoActive && !demoAbortRef.current && terminalVisibleRef.current) {
-        runDemo();
-      }
-    }, 5000);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, demoActive]);
-
-  const cancelDemo = useCallback(() => {
-    demoAbortRef.current = true;
-    setDemoActive(false);
-    setDemoCursorPos(null);
-    setDemoTyping("");
-  }, []);
-
-  const runDemo = useCallback(() => {
-    demoAbortRef.current = false;
-    setDemoActive(true);
-    const gen = ++demoGenRef.current;
-
-    const body = bodyRef.current;
-    if (!body) return;
-
-    const startX = 200;
-    const startY = 50;
-    const targetX = 60;
-    const terminalHeight = 40 + Math.min(body?.clientHeight ?? 200, 350);
-    const targetY = terminalHeight - 30;
-
-    const aborted = () => demoAbortRef.current || demoGenRef.current !== gen;
-    const cleanup = () => { setDemoActive(false); setDemoCursorPos(null); setDemoTyping(""); };
-
-    // Step 1: Show cursor at starting position
-    setDemoCursorPos({ x: startX, y: startY });
-
-    // Step 2: Move cursor to input area
-    setTimeout(() => {
-      if (aborted()) { cleanup(); return; }
-      setDemoCursorPos({ x: targetX, y: targetY });
-    }, 400);
-
-    // Step 3: Start typing after cursor arrives
-    setTimeout(() => {
-      if (aborted()) { cleanup(); return; }
-      const word = "help";
-      let i = 0;
-      function typeChar() {
-        if (aborted()) { cleanup(); return; }
-        i++;
-        setDemoTyping(word.slice(0, i));
-        setUserInput(word.slice(0, i));
-        setCursorPos(i);
-        if (i < word.length) {
-          setTimeout(typeChar, 80 + Math.random() * 60);
-        } else {
-          // Step 4: Submit "help" after a pause
-          setTimeout(() => {
-            if (aborted()) { cleanup(); return; }
-            handleCommand(word);
-            setDemoTyping("");
-
-            // Step 5: Wait, then type "clear"
-            setTimeout(() => {
-              if (aborted()) { cleanup(); return; }
-
-              // Move cursor back to input position
-              const newTargetY = 40 + Math.min(body?.clientHeight ?? 200, 350) - 30;
-              setDemoCursorPos({ x: targetX, y: newTargetY });
-
-              // Wait for cursor to arrive (700ms transition + buffer)
-              setTimeout(() => {
-                if (aborted()) { cleanup(); return; }
-                const clearWord = "clear";
-                let j = 0;
-                function typeClear() {
-                  if (aborted()) { cleanup(); return; }
-                  j++;
-                  setUserInput(clearWord.slice(0, j));
-                  setCursorPos(j);
-                  if (j < clearWord.length) {
-                    setTimeout(typeClear, 80 + Math.random() * 60);
-                  } else {
-                    // Submit "clear"
-                    setTimeout(() => {
-                      if (aborted()) { cleanup(); return; }
-                      setHistory([]);
-                      setUserInput("");
-                      setCursorPos(0);
-                      setDemoCursorPos(null);
-                      setDemoActive(false);
-
-                      // Demo finished — no restart
-                    }, 400);
-                  }
-                }
-                typeClear();
-              }, 900);
-            }, 3000);
-          }, 500);
-        }
-      }
-      typeChar();
-    }, 1200);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Keep runDemoRef always pointing to latest runDemo
-  runDemoRef.current = runDemo;
-
-  // Start idle timer when terminal becomes interactive
-  useEffect(() => {
-    if (phase === "interactive") {
-      // Idle demo disabled — user can explore on their own
-      return () => {};
-    }
-    return () => {
-      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-    };
-  }, [phase]);
-
-  // Cancel demo on any real user interaction with the terminal
-  useEffect(() => {
-    const body = bodyRef.current;
-    if (!body) return;
-    if (phase !== "interactive") return;
-
-    function onInteract() {
-      userInteractedRef.current = true;
-      demoStoppedRef.current = true;
-      demoGenRef.current++;
-      demoAbortRef.current = true;
-      if (demoActive) {
-        setDemoActive(false);
-        setDemoCursorPos(null);
-        setDemoTyping("");
-        setUserInput("");
-        setCursorPos(0);
-        setHistory([]);
-      }
-      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-    }
-
-    body.addEventListener("click", onInteract);
-    body.addEventListener("keydown", onInteract);
-    return () => {
-      body.removeEventListener("click", onInteract);
-      body.removeEventListener("keydown", onInteract);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, demoActive]);
 
   // Close context menu on click anywhere or scroll
   useEffect(() => {
@@ -889,13 +743,14 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
   return (
     <div ref={outerRef} className="w-full relative">
       {/* Theme toggle button */}
+      {/* Theme cycle button — positioned top-right of terminal */}
       <button
         onClick={cycleTheme}
-        className="absolute -top-3 -right-3 z-10 px-2.5 py-1 rounded-full font-mono text-[0.6rem] uppercase tracking-wider border transition-all hover:scale-105 cursor-pointer select-none"
+        className="absolute -top-3 -right-3 z-10 px-2.5 py-1 font-mono text-[0.6rem] uppercase tracking-wider border transition-colors cursor-pointer select-none"
         style={{
-          background: "var(--card-bg)",
-          borderColor: "var(--card-border)",
-          color: "var(--fg-muted)",
+          background: "var(--paper-raised)",
+          borderColor: "var(--line)",
+          color: "var(--ink-soft)",
         }}
         aria-label="Switch terminal theme"
         title={`Current: ${theme.label}. Click to switch.`}
@@ -914,13 +769,18 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
       >
         {/* Header */}
         <div
-          className="flex items-center gap-3 px-4 py-2.5 border-b transition-all duration-300"
+          className="flex items-center justify-between gap-3 px-4 py-2.5 border-b transition-all duration-300"
           style={{ background: theme.headerBg, borderColor: theme.headerBorder }}
         >
-          {theme.titleBar}
-          <span className="ml-1 font-mono text-xs truncate transition-colors duration-300" style={{ color: theme.textColor }}>
-            {theme.titleText}
-          </span>
+          <div className="flex items-center gap-3 min-w-0">
+            {theme.titleBar}
+            {theme.titleText && (
+              <span className="ml-1 font-mono text-xs truncate transition-colors duration-300" style={{ color: theme.textColor }}>
+                {theme.titleText}
+              </span>
+            )}
+          </div>
+          {"titleRight" in theme && theme.titleRight}
         </div>
 
         {/* Body */}
@@ -1038,13 +898,13 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
           {/* Right-click context menu */}
           {contextMenu && (
             <div
-              className="absolute z-50 rounded-md border shadow-lg py-1 font-mono text-xs min-w-[160px]"
+              className="absolute z-50 border py-1 font-mono text-xs min-w-[160px]"
               style={{
                 left: contextMenu.x,
                 top: contextMenu.y,
-                background: "var(--card-bg)",
-                borderColor: "var(--card-border)",
-                color: "var(--fg-muted)",
+                background: "var(--paper-raised)",
+                borderColor: "var(--line)",
+                color: "var(--ink-soft)",
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -1084,27 +944,6 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
         </div>
       </div>
 
-      {/* Fake demo cursor — positioned on the outer terminal container, outside scroll */}
-      {demoActive && demoCursorPos && (
-        <div
-          className="absolute pointer-events-none z-50"
-          style={{
-            left: demoCursorPos.x,
-            top: demoCursorPos.y,
-            transition: "left 0.7s ease-out, top 0.7s ease-out",
-          }}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M5 3l14 8-6 2-4 6-4-16z"
-              fill="white"
-              stroke="black"
-              strokeWidth="1.5"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-      )}
     </div>
   );
 }

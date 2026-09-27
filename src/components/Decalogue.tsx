@@ -12,52 +12,80 @@ const scripts = [
   { num: "11", name: "Database Batch Uploader", desc: "Automates bulk page uploads to the internal database. Handled a 300-page upload in under an hour — a task that would have taken an entire shift manually." },
 ];
 
+const impact = [
+  "Reduced repetitive manual steps across multiple workflows",
+  "Improved speed of ticket handling and QA preparation",
+  "Minimized human error in navigation, data entry, and status updates",
+  "Tools actively used within team workflows",
+];
+
 export default function Decalogue() {
   return (
-    <section id="automation" className="relative py-20 sm:py-36 px-6 sm:px-10">
-      <div className="max-w-7xl mx-auto">
-        <p className="sel-invert annotation mb-4">Automation</p>
+    <section id="automation" className="py-20 sm:py-32 px-6 sm:px-10">
+      <div style={{ maxWidth: "1120px", marginInline: "auto" }}>
+
+        {/* ── Section divider ── */}
+        <div className="flex items-center gap-0 mb-16" aria-hidden="false">
+          <span style={{ width: "1px", height: "8px", background: "var(--line)", flexShrink: 0 }} />
+          <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+          <span
+            className="px-3 font-mono"
+            style={{ fontSize: "0.72rem", color: "var(--ink-soft)", letterSpacing: "0.06em", flexShrink: 0 }}
+          >
+            — 04 · automation —
+          </span>
+          <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+          <span style={{ width: "1px", height: "8px", background: "var(--line)", flexShrink: 0 }} />
+        </div>
+
         <h2
-          className="text-3xl sm:text-4xl font-bold leading-tight mb-3"
-          style={{ fontFamily: "var(--font-playfair), serif" }}
+          className="mb-3"
+          style={{ fontSize: "clamp(1.5rem, 3vw, 1.75rem)", fontWeight: 500 }}
         >
           Workflow Automation Systems
         </h2>
-        <p className="sel-muted text-base mb-4" style={{ color: "var(--fg-muted)" }}>
+        <p className="mb-4" style={{ color: "var(--ink-soft)", fontSize: "1rem", lineHeight: 1.7 }}>
           Built at Rival HR — a collection of production-used browser automation
           scripts that eliminate repetitive QA and development tasks.
         </p>
 
         {/* NDA notice */}
-        <div
-          className="flex items-start gap-3 p-4 rounded-lg border mb-12"
-          style={{
-            borderColor: "color-mix(in srgb, var(--fg-muted) 15%, transparent)",
-            background: "color-mix(in srgb, var(--bg) 60%, var(--card-bg))",
-          }}
-        >
-          <span className="sel-muted text-sm select-none" style={{ color: "var(--fg-muted)" }}>
-            🔒
-          </span>
-          <p className="sel-muted text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>
+        <div className="bp-nda mb-12">
+          <span style={{ flexShrink: 0 }} aria-hidden="true">🔒</span>
+          <p>
             These tools were developed under NDA for internal use. Source code
             and live demos cannot be shared publicly.
           </p>
         </div>
 
-        {/* Two-column list — not cards, more like a manifest */}
-        <div className="grid sm:grid-cols-2 gap-x-10 gap-y-8 reveal-stagger">
+        {/* ── Script list — hairline rows, not cards ── */}
+        <div className="border-t" style={{ borderColor: "var(--line)" }}>
           {scripts.map((s) => (
-            <div key={s.num} className="reveal flex gap-4">
+            <div
+              key={s.num}
+              className="flex gap-5 py-4 border-b"
+              style={{ borderColor: "var(--line)" }}
+            >
               <span
-                className="sel-accent shrink-0 font-mono text-xs mt-1.5"
-                style={{ color: "var(--accent)" }}
+                className="font-mono flex-shrink-0"
+                style={{
+                  fontSize: "0.72rem",
+                  color: "var(--accent-2)",
+                  letterSpacing: "0.06em",
+                  paddingTop: "2px",
+                  minWidth: "2rem",
+                }}
               >
                 {s.num}
               </span>
               <div>
-                <h3 className="text-base font-medium mb-1">{s.name}</h3>
-                <p className="sel-muted text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>
+                <h3
+                  className="font-mono mb-1"
+                  style={{ fontSize: "0.9rem", fontWeight: 500, color: "var(--ink)" }}
+                >
+                  {s.name}
+                </h3>
+                <p style={{ fontSize: "0.875rem", color: "var(--ink-soft)", lineHeight: 1.6 }}>
                   {s.desc}
                 </p>
               </div>
@@ -65,22 +93,34 @@ export default function Decalogue() {
           ))}
         </div>
 
-        {/* Impact — horizontal rule style */}
-        <div className="mt-16">
-          <div className="hr-char font-mono text-xs tracking-wider">IMPACT</div>
-          <div className="grid sm:grid-cols-2 gap-4 mt-6">
-            {[
-              "Reduced repetitive manual steps across multiple workflows",
-              "Improved speed of ticket handling and QA preparation",
-              "Minimized human error in navigation, data entry, and status updates",
-              "Tools actively used within team workflows",
-            ].map((item) => (
-              <p key={item} className="sel-muted flex gap-2 text-sm" style={{ color: "var(--fg-muted)" }}>
-                <span className="sel-accent" style={{ color: "var(--accent-bright)" }}>✓</span> {item}
+        {/* ── Impact ── */}
+        <div className="mt-12">
+          {/* Inline divider label */}
+          <div className="flex items-center gap-0 mb-6" aria-hidden="true">
+            <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+            <span
+              className="px-3 font-mono"
+              style={{ fontSize: "0.68rem", letterSpacing: "0.12em", color: "var(--ink-soft)", textTransform: "uppercase", flexShrink: 0 }}
+            >
+              IMPACT
+            </span>
+            <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-x-10 gap-y-3">
+            {impact.map((item) => (
+              <p
+                key={item}
+                className="bp-impact-item"
+                style={{ fontSize: "0.875rem" }}
+              >
+                <span style={{ color: "var(--accent-2)", flexShrink: 0 }} aria-hidden="true">✓</span>
+                {item}
               </p>
             ))}
           </div>
         </div>
+
       </div>
     </section>
   );

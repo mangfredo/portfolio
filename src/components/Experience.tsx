@@ -1,3 +1,5 @@
+import DimDate from "./DimDate";
+
 const experience = [
   {
     company: "Rival HR",
@@ -5,6 +7,7 @@ const experience = [
     role: "Technical Solutions Engineer",
     period: "Aug 2025 – Present",
     location: "Remote",
+    current: true,
     description:
       "Develop and maintain production systems across frontend and backend environments. Build dynamic form logic, automation scripts, and internal tooling to improve operational efficiency.",
     highlights: [
@@ -21,6 +24,7 @@ const experience = [
     role: "Website Developer Intern",
     period: "Jan 2025 – May 2025",
     location: "On-site",
+    current: false,
     description:
       "Developed an admin dashboard with full CRUD functionality. Built dynamic forms and interfaces for managing content and user data with responsive UI for non-technical users.",
     highlights: [
@@ -36,6 +40,7 @@ const experience = [
     role: "Full-Stack Developer",
     period: "2021 – Present",
     location: "Remote",
+    current: false,
     description:
       "Designed and delivered full-stack systems, internal platforms, and workflow automation solutions for multiple clients across different industries.",
     highlights: [
@@ -58,94 +63,131 @@ const education = {
   ],
 };
 
+/* ── Dimension-line section divider ── */
+function SheetDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-0 my-12" aria-hidden="true">
+      <span style={{ width: "1px", height: "8px", background: "var(--line)", flexShrink: 0 }} />
+      <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+      <span
+        className="px-3 font-mono"
+        style={{ fontSize: "0.72rem", color: "var(--ink-soft)", letterSpacing: "0.06em", flexShrink: 0 }}
+      >
+        {label}
+      </span>
+      <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+      <span style={{ width: "1px", height: "8px", background: "var(--line)", flexShrink: 0 }} />
+    </div>
+  );
+}
+
 export default function Experience() {
   return (
-    <section id="experience" className="relative py-20 sm:py-36 px-6 sm:px-10">
-      <div className="max-w-7xl mx-auto">
-        <p className="sel-invert annotation mb-4">Experience</p>
+    <section id="experience" className="py-20 sm:py-32 px-6 sm:px-10">
+      <div style={{ maxWidth: "1120px", marginInline: "auto" }}>
+
+        {/* ── Section header as dimension-line divider ── */}
+        <div className="flex items-center gap-0 mb-16" aria-hidden="false">
+          <span style={{ width: "1px", height: "8px", background: "var(--line)", flexShrink: 0 }} />
+          <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+          <span
+            className="px-3 font-mono"
+            style={{ fontSize: "0.72rem", color: "var(--ink-soft)", letterSpacing: "0.06em", flexShrink: 0 }}
+          >
+            — 01 · experience —
+          </span>
+          <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+          <span style={{ width: "1px", height: "8px", background: "var(--line)", flexShrink: 0 }} />
+        </div>
+
         <h2
-          className="text-3xl sm:text-4xl font-bold leading-tight mb-16"
-          style={{ fontFamily: "var(--font-playfair), serif" }}
+          className="mb-12"
+          style={{ fontSize: "clamp(1.5rem, 3vw, 1.75rem)", fontWeight: 500 }}
         >
           Where I&apos;ve worked
         </h2>
 
-        {/* Timeline */}
-        <div className="relative">
-          {/* Vertical line */}
+        {/* ── Vertical rail ───────────────────────────────────────── */}
+        <div className="relative reveal-stagger">
+          {/* Rail line */}
           <div
-            className="absolute left-[7px] top-2 bottom-2 w-px hidden sm:block"
-            style={{ background: "var(--card-border)" }}
+            className="absolute hidden sm:block"
+            style={{
+              left: 0,
+              top: "10px",
+              bottom: "10px",
+              width: "1px",
+              background: "var(--line)",
+            }}
             aria-hidden="true"
           />
 
-          <div className="space-y-12 reveal-stagger">
+          <div className="space-y-0">
             {experience.map((job, i) => (
               <div key={i} className="reveal relative sm:pl-10">
-                {/* Timeline dot */}
+                {/* Rail node */}
                 <div
-                  className="absolute left-0 top-[10px] w-[15px] h-[15px] rounded-full border-2 hidden sm:block"
+                  className="absolute hidden sm:block"
                   style={{
-                    borderColor: "var(--accent)",
-                    background: "var(--bg)",
+                    left: "-5px",
+                    top: "10px",
+                    width: "11px",
+                    height: "11px",
+                    border: `1.5px solid var(--accent)`,
+                    background: job.current ? "var(--accent)" : "var(--paper)",
                   }}
                   aria-hidden="true"
                 />
 
-                {/* Card */}
+                {/* Role panel */}
                 <div
-                  className="rounded-xl border p-6 sm:p-8 transition-colors hover:border-[var(--accent)]"
+                  className="border p-6 sm:p-8 mb-0"
                   style={{
-                    background: "var(--card-bg)",
-                    borderColor: "var(--card-border)",
+                    borderColor: "var(--line)",
+                    background: "var(--paper-raised)",
+                    marginBottom: i < experience.length - 1 ? "1px" : 0,
                   }}
                 >
-                  {/* Header */}
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
                     <div>
-                      <h3 className="text-xl font-bold">{job.company}</h3>
-                      <p
-                        className="sel-invert font-medium text-base"
-                        style={{ color: "var(--terracotta)" }}
+                      <h3
+                        className="font-mono mb-1"
+                        style={{ fontSize: "1.05rem", fontWeight: 500, color: "var(--ink)" }}
                       >
+                        {job.company}
+                      </h3>
+                      <p style={{ color: "var(--accent)", fontSize: "0.9rem" }}>
                         {job.role}
                       </p>
                     </div>
                     <div className="flex flex-col sm:items-end gap-1">
+                      <DimDate label={job.period} />
                       <span
-                        className="sel-accent font-mono text-xs uppercase tracking-wider"
-                        style={{ color: "var(--accent-bright)" }}
-                      >
-                        {job.period}
-                      </span>
-                      <span
-                        className="sel-muted font-mono text-xs"
-                        style={{ color: "var(--fg-muted)" }}
+                        className="font-mono"
+                        style={{ fontSize: "0.68rem", color: "var(--ink-soft)" }}
                       >
                         {job.location} · {job.type}
                       </span>
                     </div>
                   </div>
 
-                  {/* Description */}
                   <p
-                    className="sel-muted text-sm leading-relaxed mb-4"
-                    style={{ color: "var(--fg-muted)" }}
+                    className="text-sm mb-4"
+                    style={{ color: "var(--ink-soft)", lineHeight: 1.7 }}
                   >
                     {job.description}
                   </p>
 
-                  {/* Highlights */}
                   <ul className="space-y-2 mb-5">
                     {job.highlights.map((h, j) => (
                       <li
                         key={j}
-                        className="sel-muted flex gap-2 text-sm leading-relaxed"
-                        style={{ color: "var(--fg-muted)" }}
+                        className="flex gap-2 text-sm"
+                        style={{ color: "var(--ink-soft)", lineHeight: 1.6 }}
                       >
                         <span
-                          className="sel-accent shrink-0 mt-0.5"
-                          style={{ color: "var(--accent-bright)" }}
+                          style={{ color: "var(--accent-2)", flexShrink: 0, marginTop: "2px" }}
+                          aria-hidden="true"
                         >
                           ▹
                         </span>
@@ -154,75 +196,71 @@ export default function Experience() {
                     ))}
                   </ul>
 
-                  {/* Tags */}
+                  {/* BOM chips */}
                   <div className="flex flex-wrap gap-2">
                     {job.tags.map((t) => (
-                      <span
-                        key={t}
-                        className="sel-muted px-2.5 py-1 text-xs font-mono rounded border"
-                        style={{
-                          color: "var(--fg-muted)",
-                          borderColor: "var(--card-border)",
-                          background: "color-mix(in srgb, var(--accent) 3%, transparent)",
-                        }}
-                      >
-                        {t}
-                      </span>
+                      <span key={t} className="bp-chip">{t}</span>
                     ))}
                   </div>
                 </div>
+
+                {/* Dimension-line divider between roles */}
+                {i < experience.length - 1 && (
+                  <div
+                    className="flex items-center"
+                    style={{ height: "32px" }}
+                    aria-hidden="true"
+                  >
+                    <div style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Education */}
-        <div className="mt-20">
-          <div className="hr-char font-mono text-xs tracking-wider">EDUCATION</div>
-          <div
-            className="mt-6 rounded-xl border p-6 sm:p-8 reveal"
-            style={{
-              background: "var(--card-bg)",
-              borderColor: "var(--card-border)",
-            }}
-          >
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
-              <div>
-                <h3 className="text-lg font-bold">{education.degree}</h3>
-                <p className="sel-muted text-sm" style={{ color: "var(--fg-muted)" }}>
-                  {education.school}
-                </p>
-              </div>
-              <span
-                className="sel-accent font-mono text-xs uppercase tracking-wider"
-                style={{ color: "var(--accent-bright)" }}
-              >
-                {education.period}
-              </span>
-            </div>
+        {/* ── Education ─────────────────────────────────────────────── */}
+        <SheetDivider label="Education" />
 
-            {/* Certifications */}
-            <div className="mt-4">
-              <p
-                className="sel-accent font-mono text-xs uppercase tracking-wider mb-3"
-                style={{ color: "var(--accent-bright)" }}
+        <div
+          className="border p-6 sm:p-8 reveal"
+          style={{ borderColor: "var(--line)", background: "var(--paper-raised)" }}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
+            <div>
+              <h3
+                className="font-mono mb-1"
+                style={{ fontSize: "1rem", fontWeight: 500, color: "var(--ink)" }}
               >
-                Certifications
+                {education.degree}
+              </h3>
+              <p style={{ fontSize: "0.875rem", color: "var(--ink-soft)" }}>
+                {education.school}
               </p>
-              <div className="space-y-1.5">
-                {education.certifications.map((cert) => (
-                  <p
-                    key={cert}
-                    className="sel-muted flex gap-2 text-sm"
-                    style={{ color: "var(--fg-muted)" }}
-                  >
-                    <span style={{ color: "var(--accent)" }}>✓</span> {cert}
-                  </p>
-                ))}
-              </div>
             </div>
+            <DimDate label={education.period} />
+          </div>
+
+          <p
+            className="font-mono mb-3"
+            style={{ fontSize: "0.68rem", letterSpacing: "0.1em", color: "var(--ink-soft)", textTransform: "uppercase" }}
+          >
+            Certifications
+          </p>
+          <div className="space-y-1.5">
+            {education.certifications.map((cert) => (
+              <p
+                key={cert}
+                className="flex gap-2 text-sm"
+                style={{ color: "var(--ink-soft)" }}
+              >
+                <span style={{ color: "var(--accent-2)" }} aria-hidden="true">✓</span>
+                {cert}
+              </p>
+            ))}
           </div>
         </div>
+
       </div>
     </section>
   );

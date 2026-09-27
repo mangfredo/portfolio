@@ -3,7 +3,7 @@ import LazyVideo from "./LazyVideo";
 
 const projects = [
   {
-    num: "01",
+    sheet: "01",
     title: "The Offer Letter Engine",
     why: "I was watching a colleague spend an entire afternoon manually converting a Word document into JavaScript. Same structure every time, same rules, same mistakes. I thought: this should take seconds, not hours.",
     story:
@@ -18,7 +18,7 @@ const projects = [
     link: null,
   },
   {
-    num: "02",
+    sheet: "02",
     title: "Enterprise Workflow Automation Suite",
     why: "Every developer on the team was doing the same 15-click dance through Jira, QA tools, and internal systems — multiple times a day. Nobody questioned it because 'that's just how it works.' I questioned it.",
     story:
@@ -33,7 +33,7 @@ const projects = [
     link: { href: "#automation", label: "See all tools" },
   },
   {
-    num: "03",
+    sheet: "03",
     title: "Smart Quote Replacer — VS Code Extension",
     why: "Contract files needed specific typographic quotation marks — straight, curly, styled. Getting them wrong caused rendering issues. Getting them right by hand was tedious and error-prone. So I built an extension that does it automatically.",
     story:
@@ -49,66 +49,105 @@ const projects = [
   },
 ];
 
+const TOTAL = projects.length;
+
 export default function Projects() {
   return (
-    <section id="work" className="relative py-20 sm:py-36 px-6 sm:px-10">
-      <div className="max-w-7xl mx-auto">
-        <p className="sel-invert annotation mb-4">Work</p>
+    <section id="work" className="py-20 sm:py-32 px-6 sm:px-10">
+      <div style={{ maxWidth: "1120px", marginInline: "auto" }}>
+
+        {/* ── Section divider ── */}
+        <div className="flex items-center gap-0 mb-16" aria-hidden="false">
+          <span style={{ width: "1px", height: "8px", background: "var(--line)", flexShrink: 0 }} />
+          <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+          <span
+            className="px-3 font-mono"
+            style={{ fontSize: "0.72rem", color: "var(--ink-soft)", letterSpacing: "0.06em", flexShrink: 0 }}
+          >
+            — 02 · work —
+          </span>
+          <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+          <span style={{ width: "1px", height: "8px", background: "var(--line)", flexShrink: 0 }} />
+        </div>
+
         <h2
-          className="text-3xl sm:text-4xl font-bold leading-tight mb-6"
-          style={{ fontFamily: "var(--font-playfair), serif" }}
+          className="mb-4"
+          style={{ fontSize: "clamp(1.5rem, 3vw, 1.75rem)", fontWeight: 500 }}
         >
           War Stories
         </h2>
         <p
-          className="sel-muted text-lg max-w-2xl mb-16 leading-relaxed"
-          style={{ color: "var(--fg-muted)" }}
+          className="mb-16"
+          style={{
+            color: "var(--ink-soft)",
+            maxWidth: "560px",
+            lineHeight: 1.7,
+            fontSize: "1rem",
+          }}
         >
           Not a list of features. These are the problems I found, the systems I
           built to solve them, and what happened after.
         </p>
 
-        <div className="space-y-20">
-          {projects.map((p) => (
-            <article key={p.num} className="reveal war-story rounded-xl border p-8 sm:p-10" style={{ background: "var(--card-bg)", borderColor: "var(--card-border)" }}>
-              {/* Header row */}
-              <div className="flex items-start gap-6 mb-6">
-                <span
-                  className="shrink-0 font-mono text-5xl font-bold leading-none select-none"
-                  style={{ color: "color-mix(in srgb, var(--accent) 20%, transparent)" }}
-                >
-                  {p.num}
-                </span>
+        <div className="space-y-0">
+          {projects.map((p, idx) => (
+            <article
+              key={p.sheet}
+              className="reveal border p-8 sm:p-10"
+              style={{
+                borderColor: "var(--line)",
+                background: "var(--paper-raised)",
+                marginBottom: idx < projects.length - 1 ? "1px" : 0,
+              }}
+            >
+              {/* Header row: circled ref flag + leader + title + leader-line callout */}
+              <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
                 <div className="flex-1">
+                  {/* §8-C: Circled reference flag connecting to case-study title */}
+                  <div className="flex items-center gap-0 mb-3">
+                    <div className="bp-ref-flag">
+                      <div className="bp-ref-flag__circle">
+                        <span className="bp-ref-flag__num">{p.sheet}</span>
+                      </div>
+                      <span
+                        className="bp-ref-flag__caption"
+                        aria-label={`Sheet ${p.sheet} of ${TOTAL}`}
+                      >
+                        SHEET {p.sheet} OF {String(TOTAL).padStart(2, "0")}
+                      </span>
+                    </div>
+                    {/* Short leader from circle into heading */}
+                    <div className="bp-ref-leader hidden sm:flex">
+                      <div className="bp-ref-leader__line" />
+                    </div>
+                  </div>
                   <h3
-                    className="text-2xl sm:text-3xl font-bold mb-1"
-                    style={{ fontFamily: "var(--font-playfair), serif" }}
+                    className="font-mono"
+                    style={{ fontSize: "clamp(1.1rem, 2.2vw, 1.4rem)", fontWeight: 500, color: "var(--ink)" }}
                   >
                     {p.title}
                   </h3>
-                  <div className="flex items-center gap-3 mt-2">
-                    <span
-                      className="sel-invert font-mono text-2xl font-bold"
-                      style={{ color: "var(--terracotta)" }}
-                    >
-                      {p.metric}
-                    </span>
-                    <span
-                      className="sel-muted font-mono text-xs uppercase tracking-wider"
-                      style={{ color: "var(--fg-muted)" }}
-                    >
-                      {p.metricLabel}
-                    </span>
-                  </div>
+                </div>
+
+                {/* Leader-line callout for the metric */}
+                <div
+                  className="flex items-center flex-shrink-0"
+                  aria-label={`${p.metric} ${p.metricLabel}`}
+                >
+                  <span className="bp-leader-line" aria-hidden="true" />
+                  <span className="bp-leader-dot" aria-hidden="true" />
+                  <span className="bp-leader-value">{p.metric}</span>
+                  <span className="bp-leader-label">{p.metricLabel}</span>
                 </div>
               </div>
 
-              {/* The "why" — personal motivation */}
+              {/* Motivation quote */}
               <blockquote
-                className="sel-muted border-l-2 pl-5 mb-6 text-base italic leading-relaxed"
+                className="border-l-2 pl-5 mb-6 text-base italic"
                 style={{
-                  borderColor: "var(--terracotta)",
-                  color: "var(--fg-muted)",
+                  borderColor: "var(--accent)",
+                  color: "var(--ink-soft)",
+                  lineHeight: 1.75,
                 }}
               >
                 {p.why}
@@ -116,69 +155,60 @@ export default function Projects() {
 
               {/* Story */}
               <p
-                className="sel-muted text-base leading-relaxed mb-4"
-                style={{ color: "var(--fg-muted)" }}
+                className="text-base mb-4"
+                style={{ color: "var(--ink-soft)", lineHeight: 1.75 }}
               >
                 {p.story}
               </p>
 
               {/* Aftermath */}
-              <p className="text-base leading-relaxed mb-6">
+              <p className="text-base mb-6" style={{ lineHeight: 1.75 }}>
                 <span
-                  className="sel-accent font-mono text-xs uppercase tracking-wider mr-2"
-                  style={{ color: "var(--accent-bright)" }}
+                  className="font-mono mr-2"
+                  style={{
+                    fontSize: "0.68rem",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "var(--accent-2)",
+                  }}
                 >
                   Aftermath:
                 </span>
-                <span className="sel-muted" style={{ color: "var(--fg-muted)" }}>{p.aftermath}</span>
+                <span style={{ color: "var(--ink-soft)" }}>{p.aftermath}</span>
               </p>
 
               {/* NDA notice */}
               {p.nda && (
-                <div
-                  className="flex items-start gap-3 p-4 rounded-lg border mb-6"
-                  style={{
-                    borderColor: "color-mix(in srgb, var(--fg-muted) 15%, transparent)",
-                    background: "color-mix(in srgb, var(--bg) 60%, var(--card-bg))",
-                  }}
-                >
-                  <span className="sel-muted text-sm select-none" style={{ color: "var(--fg-muted)" }}>
-                    🔒
-                  </span>
-                  <p className="sel-muted text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>
-                    {p.nda}
-                  </p>
+                <div className="bp-nda mb-6">
+                  <span style={{ flexShrink: 0 }} aria-hidden="true">🔒</span>
+                  <p>{p.nda}</p>
                 </div>
               )}
 
-              {/* Video — lazy loaded only when visible */}
+              {/* Video */}
               {p.video && (
-                <LazyVideo
-                  src={p.video}
-                  className="rounded-lg overflow-hidden border mb-6"
-                />
+                <div className="mb-6 border" style={{ borderColor: "var(--line)" }}>
+                  <LazyVideo src={p.video} className="overflow-hidden" />
+                </div>
               )}
 
-              {/* Tags + link */}
-              <div className="flex flex-wrap items-center gap-3">
+              {/* BOM chips + link */}
+              <div className="flex flex-wrap items-center gap-2">
                 {p.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="sel-accent px-3 py-1 text-xs font-mono rounded border"
-                    style={{
-                      color: "var(--accent-bright)",
-                      background: "color-mix(in srgb, var(--accent) 5%, transparent)",
-                      borderColor: "color-mix(in srgb, var(--accent) 12%, transparent)",
-                    }}
-                  >
-                    {t}
-                  </span>
+                  <span key={t} className="bp-chip">{t}</span>
                 ))}
                 {p.link && (
                   <a
                     href={p.link.href}
-                    className="sel-accent ml-auto font-mono text-xs uppercase tracking-wider transition-colors hover:text-[var(--accent-bright)]"
-                    style={{ color: "var(--accent)" }}
+                    className="ml-auto font-mono text-xs transition-colors"
+                    style={{
+                      color: "var(--accent)",
+                      letterSpacing: "0.06em",
+                      fontSize: "0.72rem",
+                      textDecoration: "underline",
+                      textDecorationColor: "var(--line)",
+                      textUnderlineOffset: "3px",
+                    }}
                   >
                     {p.link.label} →
                   </a>

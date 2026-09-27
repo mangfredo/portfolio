@@ -7,15 +7,14 @@ import PersonalProjects from "@/components/PersonalProjects";
 import Decalogue from "@/components/Decalogue";
 import Footer from "@/components/Footer";
 import RevealObserver from "@/components/RevealObserver";
-import CursorGlow from "@/components/CursorGlow";
-import SelectionInverter from "@/components/SelectionInverter";
+import SheetFrame from "@/components/SheetFrame";
 
 export default function Home() {
   return (
     <>
-      <SelectionInverter />
       <RevealObserver />
-      <CursorGlow />
+      {/* Sheet-frame corner registration ticks — decorative, hidden < 600px */}
+      <SheetFrame />
       <Navbar />
       <main className="flex-1">
         <Hero />

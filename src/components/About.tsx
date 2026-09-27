@@ -1,66 +1,74 @@
 const stack = [
-  { category: "// LANGUAGES & RUNTIMES", items: ["TypeScript", "JavaScript", "Python", "C#", "PHP", "Node.js"] },
-  { category: "// VIEW LAYERS & DESIGN", items: ["React", "Next.js", "Tailwind CSS", "HTML/CSS", "React Native"] },
-  { category: "// BACKEND & DATA", items: ["Express", "Django", "REST APIs", "PostgreSQL", "MS SQL", "MySQL", "MongoDB", "Firebase"] },
-  { category: "// INFRASTRUCTURE & TOOLING", items: ["Docker", "Kubernetes", "Git", "CI/CD", "VS Code Extensions", "Jira"] },
-  { category: "// APPROACH", items: ["AI-Native Development", "Automation-First", "Clean Architecture", "TDD", "Async Remote"] },
+  {
+    category: "Languages & Runtimes",
+    items: ["TypeScript", "JavaScript", "Python", "C#", "PHP", "Node.js"],
+  },
+  {
+    category: "View Layers & Design",
+    items: ["React", "Next.js", "Tailwind CSS", "HTML/CSS", "React Native"],
+  },
+  {
+    category: "Backend & Data",
+    items: ["Express", "Django", "REST APIs", "PostgreSQL", "MS SQL", "MySQL", "MongoDB", "Firebase"],
+  },
+  {
+    category: "Infrastructure & Tooling",
+    items: ["Docker", "Kubernetes", "Git", "CI/CD", "VS Code Extensions", "Jira"],
+  },
+  {
+    category: "Approach",
+    items: ["AI-Native Development", "Automation-First", "Clean Architecture", "TDD", "Async Remote"],
+  },
 ];
 
 export default function About() {
   return (
-    <section id="about" className="relative py-20 sm:py-36 px-6 sm:px-10">
-      <div className="max-w-7xl mx-auto">
+    <section id="about" className="py-20 sm:py-32 px-6 sm:px-10">
+      <div style={{ maxWidth: "1120px", marginInline: "auto" }}>
         <div className="grid md:grid-cols-[1fr_1.2fr] gap-16 md:gap-24">
-          {/* Left — narrative */}
+
+          {/* ── Left: narrative ───────────────────────────────────── */}
           <div>
-            <p className="sel-invert annotation mb-4">About</p>
+            <p className="annotation mb-4">About</p>
             <h2
-              className="text-3xl sm:text-4xl font-bold leading-tight mb-8"
-              style={{ fontFamily: "var(--font-playfair), serif" }}
+              className="mb-8 leading-tight"
+              style={{ fontSize: "clamp(1.5rem, 3vw, 1.75rem)", fontWeight: 500 }}
             >
-              Engineer who ships
-              <br />
-              <em className="sel-invert not-italic" style={{ color: "var(--terracotta)" }}>
-                real impact
-              </em>
+              Engineer who ships real impact
             </h2>
 
-            <div className="sel-muted space-y-5 text-base leading-relaxed" style={{ color: "var(--fg-muted)" }}>
+            <div className="space-y-5" style={{ color: "var(--ink-soft)", lineHeight: 1.7 }}>
               <p>
-                I work across the full stack with TypeScript, Node.js, and React — but my real focus is automation and internal tooling. I like finding the slow, repetitive process that everyone just accepts, and replacing it with something that runs in seconds.
+                I work across the full stack with TypeScript, Node.js, and React — but my real
+                focus is automation and internal tooling. I like finding the slow, repetitive
+                process that everyone just accepts, and replacing it with something that runs in
+                seconds.
               </p>
               <p>
-                Based in the Philippines, working remotely with teams across timezones. I'm comfortable async, I communicate clearly, and I don't need hand-holding to get things done.
+                Based in the Philippines, working remotely with teams across timezones. I&apos;m
+                comfortable async, I communicate clearly, and I don&apos;t need hand-holding to
+                get things done.
               </p>
               <p>
-                I care about the craft. Clean code, semantic HTML, accessible interfaces, fast load times. Not because a checklist says so, but because that's what separates software that works from software that <em>lasts</em>.
+                I care about the craft. Clean code, semantic HTML, accessible interfaces, fast
+                load times. Not because a checklist says so, but because that&apos;s what
+                separates software that works from software that <em>lasts</em>.
               </p>
             </div>
           </div>
 
-          {/* Right — stack, not a bento grid */}
+          {/* ── Right: Legend component ───────────────────────────── */}
           <div>
-            <p className="annotation mb-6">Core Stack</p>
-            <div className="space-y-6 reveal-stagger">
+            <p className="annotation mb-4">Core Stack</p>
+
+            {/* Legend — map/drawing legend style */}
+            <div className="bp-legend">
               {stack.map((group) => (
-                <div key={group.category} className="reveal">
-                  <h3
-                    className="sel-accent font-mono text-xs uppercase tracking-[0.15em] mb-3"
-                    style={{ color: "var(--accent-bright)" }}
-                  >
-                    {group.category}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
+                <div key={group.category} className="bp-legend-group">
+                  <p className="bp-legend-heading">{group.category}</p>
+                  <div className="bp-legend-items">
                     {group.items.map((item) => (
-                      <span
-                        key={item}
-                        className="sel-muted px-3 py-1.5 text-sm font-mono rounded border transition-colors hover:border-[var(--accent)]"
-                        style={{
-                          background: "var(--card-bg)",
-                          borderColor: "var(--card-border)",
-                          color: "var(--fg-muted)",
-                        }}
-                      >
+                      <span key={item} className="bp-chip">
                         {item}
                       </span>
                     ))}
@@ -69,6 +77,7 @@ export default function About() {
               ))}
             </div>
           </div>
+
         </div>
       </div>
     </section>

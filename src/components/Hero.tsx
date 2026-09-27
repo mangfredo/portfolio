@@ -10,199 +10,206 @@ export default function Hero() {
   const [showAnnotation, setShowAnnotation] = useState(false);
 
   useEffect(() => {
-    // Small delay so the page renders first, then trigger animation
     const timer = setTimeout(() => setRevealed(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
-  // Start terminal typing after heading animation completes
   useEffect(() => {
     if (!revealed) return;
     const timer = setTimeout(() => setTerminalReady(true), 900);
     return () => clearTimeout(timer);
   }, [revealed]);
 
-  // Words for the heading with their line breaks
-  const lines = [
-    { words: ["I", "build", "the", "tools"], color: undefined },
-    { words: ["that", "build", "the"], color: undefined },
-    { words: ["product."], color: "var(--terracotta)" },
+  const lines: { words: string[]; accent?: boolean }[] = [
+    { words: ["I", "build", "the", "tools"] },
+    { words: ["that", "build", "the"] },
+    { words: ["product."], accent: true },
   ];
 
-  // Calculate global word index for stagger
   let globalIndex = 0;
 
   return (
-    <section className="relative min-h-screen flex items-center px-6 sm:px-10 pt-20 pb-12 overflow-hidden">
-      {/* Subtle gradient wash — asymmetric, not centered */}
+    <section
+      className="relative min-h-screen flex items-center px-6 sm:px-10 overflow-hidden"
+      style={{ paddingTop: "6rem", paddingBottom: "4rem" }}
+      aria-label="Introduction"
+    >
       <div
-        className="absolute top-0 right-0 w-[70%] h-[80%] pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 70% at 80% 20%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 70%)",
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute bottom-0 left-0 w-[50%] h-[40%] pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 80% at 20% 90%, color-mix(in srgb, var(--terracotta) 5%, transparent), transparent 70%)",
-        }}
-        aria-hidden="true"
-      />
+        className="relative w-full"
+        style={{ maxWidth: "1120px", marginInline: "auto" }}
+      >
+        <div className="grid md:grid-cols-[1.1fr_0.9fr] gap-12 md:gap-20 items-start">
 
-      <div className="relative max-w-7xl mx-auto w-full grid md:grid-cols-[1.1fr_0.9fr] gap-12 md:gap-20 items-end">
-        {/* Left — Text heavy, asymmetric on desktop, centered on mobile */}
-        <div className="text-center md:text-left">
-          {/* Mobile-only photo */}
-          <div
-            className={`md:hidden w-28 h-28 rounded-full overflow-hidden border-2 select-none pointer-events-none mb-6 mx-auto hero-fade ${revealed ? "visible" : ""}`}
-            style={{
-              borderColor: "var(--accent)",
-              boxShadow: "0 0 24px color-mix(in srgb, var(--accent) 25%, transparent)",
-              transitionDelay: "0ms",
-            }}
-          >
-            <Image
-              src="/profile.jpg"
-              alt="Tristan Sereño"
-              width={112}
-              height={112}
-              className="w-full h-full object-cover"
-              priority
-            />
-          </div>
+          {/* ── LEFT: text ───────────────────────────────────────── */}
+          <div className="text-left relative">
 
-          <p
-            className={`sel-invert font-mono text-xs tracking-[0.25em] uppercase mb-6 hero-fade ${revealed ? "visible" : ""}`}
-            style={{ color: "var(--accent-bright)", transitionDelay: "50ms" }}
-          >
-            <span className="sr-only">Tristan Sereño — </span>Software Engineer · Full-Stack Developer
-          </p>
+            {/* Mobile photo */}
+            <div
+              className={`md:hidden w-24 h-24 overflow-hidden border mb-8 hero-fade ${revealed ? "visible" : ""}`}
+              style={{ borderColor: "var(--line)", transitionDelay: "0ms" }}
+            >
+              <Image
+                src="/profile.jpg"
+                alt="Tristan Sereño"
+                width={96}
+                height={96}
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
 
-          <h1
-            className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.05] tracking-tight mb-8"
-            style={{ fontFamily: "var(--font-playfair), serif" }}
-          >
-            <span className="sr-only">Tristan Sereño: </span>
-            {lines.map((line, lineIdx) => (
-              <span key={lineIdx}>
-                {line.words.map((word) => {
-                  const idx = globalIndex++;
-                  return (
-                    <span
-                      key={`${lineIdx}-${word}-${idx}`}
-                      className={`hero-word ${revealed ? "revealed" : ""} ${line.color ? "sel-invert" : ""}`}
-                      style={{
-                        color: line.color || undefined,
-                        animationDelay: revealed ? `${idx * 90}ms` : undefined,
-                      }}
-                    >
-                      {word}
-                      {/* Add space after each word except last in line */}
-                      {word !== line.words[line.words.length - 1] ? "\u00A0" : ""}
-                    </span>
-                  );
-                })}
-                {lineIdx < lines.length - 1 && <br />}
-              </span>
-            ))}
-          </h1>
+            {/* Headline */}
+            <h1
+              className="mb-8 leading-[1.05] tracking-tight"
+              style={{ fontSize: "clamp(2.6rem, 6vw, 3.5rem)", fontWeight: 500 }}
+            >
+              <span className="sr-only">Tristan Sereño: </span>
+              {lines.map((line, lineIdx) => (
+                <span key={lineIdx} style={{ display: "block" }}>
+                  {line.words.map((word) => {
+                    const idx = globalIndex++;
+                    return (
+                      <span
+                        key={`${lineIdx}-${word}-${idx}`}
+                        className={`hero-word ${revealed ? "revealed" : ""}`}
+                        style={{
+                          animationDelay: revealed ? `${idx * 90}ms` : undefined,
+                          color: line.accent ? "var(--accent)" : "var(--ink)",
+                          /* annotation-style underline on "product." */
+                          ...(line.accent
+                            ? {
+                                textDecoration: "underline",
+                                textDecorationColor: "var(--accent)",
+                                textDecorationThickness: "2px",
+                                textUnderlineOffset: "5px",
+                              }
+                            : {}),
+                        }}
+                      >
+                        {word}
+                        {word !== line.words[line.words.length - 1] ? "\u00A0" : ""}
+                      </span>
+                    );
+                  })}
+                </span>
+              ))}
+            </h1>
 
-          <p
-            className={`text-lg sm:text-xl leading-relaxed max-w-xl mb-10 mx-auto md:mx-0 sel-muted hero-fade ${revealed ? "visible" : ""}`}
-            style={{ color: "var(--fg-muted)", transitionDelay: "800ms" }}
-          >
-            5+ years turning complex business problems into clean, fast systems.
-            One recent project cut a 6-hour manual process down to under 10
-            minutes — a{" "}
-            <span className="font-medium" style={{ color: "var(--fg)" }}>
-              97% efficiency gain
-            </span>{" "}
-            that freed the team to focus on work that actually matters.
-          </p>
-
-          <div
-            className={`flex flex-wrap items-center justify-center md:justify-start gap-4 hero-fade ${revealed ? "visible" : ""}`}
-            style={{ transitionDelay: "1000ms" }}
-          >
-            <a
-              href="#work"
-              className="sel-btn magnetic-btn inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-md transition-colors"
+            {/* Body copy */}
+            <p
+              className={`max-w-xl mb-4 hero-fade ${revealed ? "visible" : ""}`}
               style={{
-                background: "var(--accent)",
-                color: "var(--bg)",
+                color: "var(--ink-soft)",
+                lineHeight: 1.7,
+                fontSize: "1rem",
+                transitionDelay: "800ms",
               }}
             >
-              See the work
-              <svg
-                width="14"
-                height="14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path d="M7 17L17 7M17 7H7M17 7v10" />
-              </svg>
-            </a>
-            <a
-              href="#automation"
-              className="sel-btn sel-btn-outline magnetic-btn inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-md border transition-colors hover:border-[var(--accent)]"
+              5+ years turning complex business problems into clean, fast systems.
+              One recent project cut a 6-hour manual process down to under 10 minutes.
+            </p>
+
+            {/* Leader-line callout for the 97% metric */}
+            <div
+              className={`flex items-center mb-8 hero-fade ${revealed ? "visible" : ""}`}
+              style={{ transitionDelay: "900ms", gap: "0" }}
+              aria-label="97% efficiency gain"
+            >
+              <span className="bp-leader-line" aria-hidden="true" />
+              <span className="bp-leader-dot" aria-hidden="true" />
+              <span className="bp-leader-value">97%</span>
+              <span className="bp-leader-label">efficiency gain</span>
+            </div>
+
+            {/* CTA buttons */}
+            <div
+              className={`flex flex-wrap gap-3 mb-10 hero-fade ${revealed ? "visible" : ""}`}
+              style={{ transitionDelay: "1000ms" }}
+            >
+              <a href="#work" className="bp-btn bp-btn--primary">
+                See the work
+              </a>
+              <a href="#automation" className="bp-btn bp-btn--outline">
+                Automation suite
+              </a>
+            </div>
+
+            {/* Terminal — mobile version below buttons */}
+            <div
+              className={`md:hidden hero-fade ${revealed ? "visible" : ""}`}
+              style={{ transitionDelay: "1100ms" }}
+            >
+              <Terminal startTyping={terminalReady} onComplete={() => setShowAnnotation(true)} />
+              {showAnnotation && (
+                <p
+                  className="font-mono text-xs mt-3 rotate-[-1.5deg] inline-block"
+                  style={{ color: "var(--ink-soft)", fontSize: "0.68rem" }}
+                >
+                  ↑ this used to take 6 hours by hand
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* ── RIGHT: photo + terminal ───────────────────────────── */}
+          <div className="hidden md:flex flex-col items-center gap-6 relative">
+
+            {/* §8-E: Stamp badge — top-right of the right column, clears the headline */}
+            <div
+              className={`self-end hero-fade ${revealed ? "visible" : ""}`}
+              style={{ transitionDelay: "1200ms" }}
+              aria-hidden="true"
+            >
+              <div className="bp-stamp">
+                <span className="bp-stamp__line1">Available</span>
+                <span className="bp-stamp__line2">2026</span>
+              </div>
+            </div>
+
+            {/* Profile photo — hairline border, no radius */}
+            <div
+              className={`overflow-hidden border flex-shrink-0 hero-fade ${revealed ? "visible" : ""}`}
               style={{
-                borderColor: "var(--card-border)",
-                color: "var(--fg-muted)",
+                width: "clamp(140px, 16vw, 200px)",
+                height: "clamp(140px, 16vw, 200px)",
+                borderColor: "var(--line)",
+                transitionDelay: "300ms",
               }}
             >
-              Automation suite
-            </a>
-          </div>
-        </div>
+              <Image
+                src="/profile.jpg"
+                alt="Tristan Sereño"
+                width={200}
+                height={200}
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
 
-        {/* Right — Photo + Terminal */}
-        <div className="hidden md:flex flex-col items-center justify-between gap-6 relative w-full h-full">
-          {/* Profile photo */}
-          <div
-            className={`w-48 h-48 rounded-full overflow-hidden border-2 select-none pointer-events-none shrink-0 hero-fade ${revealed ? "visible" : ""}`}
-            style={{
-              borderColor: "var(--accent)",
-              boxShadow: "0 0 24px color-mix(in srgb, var(--accent) 25%, transparent)",
-              transitionDelay: "400ms",
-            }}
-          >
-            <Image
-              src="/profile.jpg"
-              alt="Tristan Sereño"
-              width={192}
-              height={192}
-              className="w-full h-full object-cover"
-              priority
-            />
-          </div>
+            {/* Terminal */}
+            <div
+              className={`w-full hero-fade ${revealed ? "visible" : ""}`}
+              style={{ transitionDelay: "650ms" }}
+            >
+              <Terminal startTyping={terminalReady} onComplete={() => setShowAnnotation(true)} />
+            </div>
 
-          {/* Terminal with theme switcher */}
-          <div
-            className={`w-full hero-fade ${revealed ? "visible" : ""}`}
-            style={{ transitionDelay: "700ms" }}
-          >
-            <Terminal startTyping={terminalReady} onComplete={() => setShowAnnotation(true)} />
-          </div>
+            {/* Annotation note */}
+            <div
+              className={`absolute -bottom-8 -left-4 font-mono text-xs rotate-[-2deg] hero-fade ${showAnnotation ? "visible" : ""}`}
+              style={{ color: "var(--ink-soft)", fontSize: "0.68rem", transitionDelay: "0ms" }}
+              aria-hidden="true"
+            >
+              ↑ this used to take 6 hours by hand
+            </div>
 
-          {/* Annotation — appears after terminal animation completes */}
-          <div
-            className={`sel-muted absolute -bottom-8 -left-4 font-mono text-xs rotate-[-2deg] hero-fade ${showAnnotation ? "visible" : ""}`}
-            style={{ color: "var(--fg-muted)", transitionDelay: "0ms" }}
-          >
-            ↑ this used to take 6 hours by hand
-          </div>
-
-          {/* Try it annotation — appears shortly after */}
-          <div
-            className={`sel-accent absolute -bottom-8 right-0 font-mono text-xs rotate-[1.5deg] hero-fade ${showAnnotation ? "visible" : ""}`}
-            style={{ color: "var(--accent)", transitionDelay: "600ms" }}
-          >
-            try typing &quot;help&quot; ↑
+            <div
+              className={`absolute -bottom-8 right-0 font-mono text-xs rotate-[1.5deg] hero-fade ${showAnnotation ? "visible" : ""}`}
+              style={{ color: "var(--accent)", fontSize: "0.68rem", transitionDelay: "600ms" }}
+              aria-hidden="true"
+            >
+              try typing &quot;help&quot; ↑
+            </div>
           </div>
         </div>
       </div>
