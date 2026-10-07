@@ -1,7 +1,7 @@
 "use client";
 
 import "./budget.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CalendarBlank, Plus, ArrowRight, Wallet } from "@phosphor-icons/react";
 import { usePeriods, useExpenses, useGigs } from "@/hooks/useBudgetStore";
@@ -105,6 +105,11 @@ function BudgetHomeInner() {
   // Sort state for Per Cut-off view — must be at top level, before any returns
   const [sortBy, setSortBy] = useState<"createdAt" | "monthKey">("createdAt");
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
+
+  // Clear selected period when switching view modes so we don't auto-open a detail
+  useEffect(() => {
+    setSelectedId(null);
+  }, [viewMode]);
 
   useSwipeToClose("/");
 

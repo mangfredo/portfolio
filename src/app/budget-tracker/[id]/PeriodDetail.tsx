@@ -74,7 +74,7 @@ export function PeriodDetailInner({ id, onBack }: Props & { onBack?: () => void 
   const router = useRouter();
   const goBack = onBack ?? (() => router.push("/budget-tracker"));
   const { currencySymbol } = useBudgetSettingsCtx();
-  const { periods, updateBudget, deletePeriod } = usePeriods();
+  const { periods, updateBudget, deletePeriod, mounted } = usePeriods();
   const { expenses, addExpense, updateExpense, deleteExpense, togglePaid, total } = useExpenses(id);
 
   useSwipeToClose("/budget-tracker");
@@ -135,7 +135,13 @@ export function PeriodDetailInner({ id, onBack }: Props & { onBack?: () => void 
     : burnRate > 80 ? "wf-progress-fill-warn"
     : "wf-progress-fill";
 
-  if (!period && periods.length > 0) { goBack(); return null; }
+  // Don't auto-navigate away while delete modal is open — the period lookup may
+  // momentarily fail during state batching, which would unmount the modal.
+  // Also wait until mounted (localStorage loaded) before deciding to redirect.
+  if (!period && periods.length > 0 && !showDeleteConfirm && mounted) {
+    goBack();
+    return null;
+  }
 
   return (
     <>
@@ -432,7 +438,11 @@ export function PeriodDetailInner({ id, onBack }: Props & { onBack?: () => void 
           title={`Delete "${period?.label}"?`}
           message="This will permanently remove this period and all its expenses."
           confirmLabel="Delete" danger isDark={true}
-          onConfirm={() => { deletePeriod(id); goBack(); }}
+          onConfirm={() => {
+            deletePeriod(id);
+            // Delay navigation to allow state updater to flush
+            setTimeout(() => goBack(), 50);
+          }}
           onCancel={() => setShowDeleteConfirm(false)}
         />
       )}

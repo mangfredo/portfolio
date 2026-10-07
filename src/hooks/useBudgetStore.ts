@@ -66,13 +66,15 @@ function save<T>(key: string, value: T): void {
 // ── Periods ────────────────────────────────────────────────────────────────
 
 export function usePeriods() {
+  // Start empty for SSR hydration, then load from localStorage after mount
   const [periods, setPeriods] = useState<Period[]>([]);
+  const [mounted, setMounted] = useState(false);
   const { reloadKey } = useBudgetSettingsCtx();
 
   const reload = () => setPeriods(load<Period[]>(PERIODS_KEY, []));
 
-  // Initial load on mount
-  useEffect(() => { reload(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Initial load on mount — also sets mounted flag
+  useEffect(() => { reload(); setMounted(true); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     reload();
@@ -170,7 +172,7 @@ export function usePeriods() {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
-  return { periods: sorted, addPeriod, updateBudget, updatePeriodMeta, reorderPeriods, deletePeriod, reloadPeriods };
+  return { periods: sorted, addPeriod, updateBudget, updatePeriodMeta, reorderPeriods, deletePeriod, reloadPeriods, mounted };
 }
 
 // ── Expenses ───────────────────────────────────────────────────────────────
