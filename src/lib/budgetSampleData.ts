@@ -15,6 +15,9 @@ function buildSamplePeriods(): { periods: Period[]; expenses: Record<string, Exp
   const yr   = now.getFullYear();
   const mo   = now.getMonth();
   const name = MONTHS[mo];
+  
+  // Build monthKey in YYYY-MM format
+  const monthKey = `${yr}-${String(mo + 1).padStart(2, "0")}`;
 
   const midId  = `demo-${yr}-${mo + 1}-mid`;
   const endDay = new Date(yr, mo + 1, 0).getDate();
@@ -26,12 +29,14 @@ function buildSamplePeriods(): { periods: Period[]; expenses: Record<string, Exp
       label: `${name} ${endDay}, ${yr}`,
       budget: 32000,
       createdAt: new Date(yr, mo, 16).toISOString(),
+      monthKey, // Required for FlexibleView grouping
     },
     {
       id: midId,
       label: `${name} 15, ${yr}`,
       budget: 20000,
       createdAt: new Date(yr, mo, 1).toISOString(),
+      monthKey, // Required for FlexibleView grouping
     },
   ];
 
@@ -147,6 +152,9 @@ export function clearTabData(tab: ActiveTab) {
   if (tab === "pay-periods") {
     localStorage.removeItem("bt_periods");
     allKeys.filter((k) => k.startsWith("bt_items_")).forEach((k) => localStorage.removeItem(k));
+    // Also clear gigs (side gigs) and their items
+    localStorage.removeItem("bt_gigs");
+    allKeys.filter((k) => k.startsWith("bt_gig_items_")).forEach((k) => localStorage.removeItem(k));
   } else if (tab === "loans") {
     localStorage.removeItem("bt_loans");
     allKeys.filter((k) => k.startsWith("bt_loan_payments_")).forEach((k) => localStorage.removeItem(k));

@@ -572,3 +572,43 @@ a.wf-glass:hover {
     font-size: 0.7rem;
   }
 }
+
+/* =========================================================================
+   GIG CARD — MOBILE FIXES
+   ========================================================================= */
+
+/* Gig header row */
+.fv-gig-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 639px) {
+  .fv-gig-header {
+    flex-wrap: wrap;
+  }
+  
+  /* On mobile, the label button needs a minimum width so it doesn't collapse */
+  .fv-gig-header .fv-gig-label-btn {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  
+  /* Stats wrap to new line on mobile, same as periods */
+  .fv-gig-header .fv-period-stats {
+    width: 100%;
+    justify-content: flex-start;
+    padding-left: 40px; /* align with label after GIG badge */
+    margin-top: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 374px) {
+  .fv-gig-header .fv-period-stats {
+    padding-left: 28px;
+  }
+}

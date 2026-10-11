@@ -21,6 +21,7 @@ export interface Expense {
   amount: number;
   paid?: boolean;
   sectionKey?: "s1" | "buffer"; // default "s1" — backwards compatible
+  sortOrder?: number; // manual sort order for drag-and-drop
 }
 
 // ── Gig (side income stream) ───────────────────────────────────────────────
@@ -31,6 +32,7 @@ export interface Gig {
   income: number;      // expected income amount
   monthKey?: string;   // "YYYY-MM" — used for grouping in FlexibleView
   createdAt: string;
+  sortOrder?: number;  // manual sort order for drag-and-drop
 }
 
 export interface GigItem {
@@ -38,6 +40,7 @@ export interface GigItem {
   name: string;
   amount: number;
   paid?: boolean;
+  sortOrder?: number; // manual sort order for drag-and-drop
 }
 
 const PERIODS_KEY = "bt_periods";
@@ -233,16 +236,35 @@ export function useExpenses(periodId: string) {
     });
   };
 
+  /** Reorder expenses by setting sortOrder based on provided id array */
+  const reorderExpenses = (orderedIds: string[]) => {
+    setExpenses((prev) => {
+      const next = prev.map((e) => {
+        const idx = orderedIds.indexOf(e.id);
+        return idx >= 0 ? { ...e, sortOrder: idx } : e;
+      });
+      save(itemsKey(periodId), next);
+      return next;
+    });
+  };
+
   // All expenses — for Per Cut-off view (unchanged)
   const total = expenses.reduce((sum, e) => sum + e.amount, 0);
 
+  // Sort helper — respects sortOrder if present
+  const sortByOrder = (items: Expense[]) => {
+    const hasSortOrder = items.some(e => e.sortOrder !== undefined);
+    if (!hasSortOrder) return items;
+    return [...items].sort((a, b) => (a.sortOrder ?? 999999) - (b.sortOrder ?? 999999));
+  };
+
   // Section-aware helpers for Flexible View
-  const s1Expenses = expenses.filter(e => (e.sectionKey ?? "s1") === "s1");
-  const bufferExpenses = expenses.filter(e => e.sectionKey === "buffer");
+  const s1Expenses = sortByOrder(expenses.filter(e => (e.sectionKey ?? "s1") === "s1"));
+  const bufferExpenses = sortByOrder(expenses.filter(e => e.sectionKey === "buffer"));
   const s1Total = s1Expenses.reduce((sum, e) => sum + e.amount, 0);
   const bufferAllocated = bufferExpenses.reduce((sum, e) => sum + e.amount, 0);
 
-  return { expenses, addExpense, updateExpense, deleteExpense, togglePaid, total, s1Expenses, bufferExpenses, s1Total, bufferAllocated };
+  return { expenses, addExpense, updateExpense, deleteExpense, togglePaid, reorderExpenses, total, s1Expenses, bufferExpenses, s1Total, bufferAllocated };
 }
 
 // ── Gigs ───────────────────────────────────────────────────────────────────
@@ -306,12 +328,33 @@ export function useGigs() {
     }, 0);
   };
 
-  // Sort newest first
-  const sorted = [...gigs].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  /** Reorder gigs by setting sortOrder based on provided id array */
+  const reorderGigs = (orderedIds: string[]) => {
+    setGigs((prev) => {
+      const next = prev.map((g) => {
+        const idx = orderedIds.indexOf(g.id);
+        return idx >= 0 ? { ...g, sortOrder: idx } : g;
+      });
+      save(GIGS_KEY, next);
+      return next;
+    });
+    setTimeout(() => {
+      if (typeof window !== "undefined") window.dispatchEvent(new Event("bt_reload"));
+    }, 0);
+  };
 
-  return { gigs: sorted, addGig, updateGig, deleteGig };
+  // Sort: if any gig has sortOrder, use it; otherwise fall back to createdAt desc
+  const hasSortOrder = gigs.some(g => g.sortOrder !== undefined);
+  const sorted = [...gigs].sort((a, b) => {
+    if (hasSortOrder) {
+      const ao = a.sortOrder ?? 999999;
+      const bo = b.sortOrder ?? 999999;
+      if (ao !== bo) return ao - bo;
+    }
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
+  return { gigs: sorted, addGig, updateGig, deleteGig, reorderGigs };
 }
 
 // ── Gig Items ──────────────────────────────────────────────────────────────
@@ -362,7 +405,208 @@ export function useGigItems(gigId: string) {
     });
   };
 
+  /** Reorder gig items by setting sortOrder based on provided id array */
+  const reorderItems = (orderedIds: string[]) => {
+    setItems((prev) => {
+      const next = prev.map((i) => {
+        const idx = orderedIds.indexOf(i.id);
+        return idx >= 0 ? { ...i, sortOrder: idx } : i;
+      });
+      save(gigItemsKey(gigId), next);
+      return next;
+    });
+  };
+
   const total = items.reduce((sum, i) => sum + i.amount, 0);
 
-  return { items, addItem, updateItem, deleteItem, togglePaid, total };
+  // Sort: if any item has sortOrder, use it; otherwise keep original order
+  const hasSortOrder = items.some(i => i.sortOrder !== undefined);
+  const sortedItems = hasSortOrder
+    ? [...items].sort((a, b) => (a.sortOrder ?? 999999) - (b.sortOrder ?? 999999))
+    : items;
+
+  return { items: sortedItems, addItem, updateItem, deleteItem, togglePaid, reorderItems, total };
+}
+
+// ── Copy Utilities ─────────────────────────────────────────────────────────
+
+/**
+ * Copy all periods, gigs, and their items from a source month to a target month.
+ * Merges with existing data (does not replace).
+ */
+export function copyMonthBudget(sourceMonthKey: string, targetMonthKey: string): void {
+  // Load all periods and filter by source month
+  const allPeriods = load<Period[]>(PERIODS_KEY, []);
+  const sourcePeriods = allPeriods.filter(p => p.monthKey === sourceMonthKey);
+  
+  if (sourcePeriods.length === 0) {
+    console.warn(`copyMonthBudget: No periods found for month ${sourceMonthKey}`);
+    return;
+  }
+
+  const newPeriods: Period[] = [];
+  const expenseMappings: Array<{ sourceId: string; newId: string }> = [];
+
+  // Create new periods for target month
+  for (const src of sourcePeriods) {
+    // Adjust label: replace source month with target month in the label
+    // e.g., "October 15" -> "November 15" if copying Oct to Nov
+    const [srcYear, srcMonth] = sourceMonthKey.split("-").map(Number);
+    const [tgtYear, tgtMonth] = targetMonthKey.split("-").map(Number);
+    const srcMonthName = new Date(srcYear, srcMonth - 1).toLocaleString("default", { month: "long" });
+    const tgtMonthName = new Date(tgtYear, tgtMonth - 1).toLocaleString("default", { month: "long" });
+    
+    let newLabel = src.label;
+    if (src.label.includes(srcMonthName)) {
+      newLabel = src.label.replace(srcMonthName, tgtMonthName);
+    } else {
+      // If label doesn't contain month name, prefix with target month
+      newLabel = `${tgtMonthName} ${src.label}`;
+    }
+
+    const newPeriod: Period = {
+      id: crypto.randomUUID(),
+      label: newLabel,
+      budget: src.budget,
+      createdAt: new Date().toISOString(),
+      monthKey: targetMonthKey,
+      section1Label: src.section1Label,
+      bufferLabel: src.bufferLabel,
+      sortOrder: src.sortOrder,
+    };
+    
+    newPeriods.push(newPeriod);
+    expenseMappings.push({ sourceId: src.id, newId: newPeriod.id });
+  }
+
+  // Save new periods (merge with existing)
+  const updatedPeriods = [...allPeriods, ...newPeriods];
+  save(PERIODS_KEY, updatedPeriods);
+
+  // Copy expenses for each period
+  for (const mapping of expenseMappings) {
+    const sourceExpenses = load<Expense[]>(itemsKey(mapping.sourceId), []);
+    const newExpenses: Expense[] = sourceExpenses.map(e => ({
+      ...e,
+      id: crypto.randomUUID(),
+      paid: false, // Reset paid status for copied expenses
+    }));
+    save(itemsKey(mapping.newId), newExpenses);
+  }
+
+  // Load all gigs and filter by source month
+  const allGigs = load<Gig[]>(GIGS_KEY, []);
+  const sourceGigs = allGigs.filter(g => g.monthKey === sourceMonthKey);
+  
+  const newGigs: Gig[] = [];
+  const gigMappings: Array<{ sourceId: string; newId: string }> = [];
+
+  // Create new gigs for target month
+  for (const src of sourceGigs) {
+    const newGig: Gig = {
+      id: crypto.randomUUID(),
+      label: src.label,
+      income: src.income,
+      monthKey: targetMonthKey,
+      createdAt: new Date().toISOString(),
+      sortOrder: src.sortOrder,
+    };
+    
+    newGigs.push(newGig);
+    gigMappings.push({ sourceId: src.id, newId: newGig.id });
+  }
+
+  // Save new gigs (merge with existing)
+  if (newGigs.length > 0) {
+    const updatedGigs = [...allGigs, ...newGigs];
+    save(GIGS_KEY, updatedGigs);
+
+    // Copy gig items for each gig
+    for (const mapping of gigMappings) {
+      const sourceItems = load<GigItem[]>(gigItemsKey(mapping.sourceId), []);
+      const newItems: GigItem[] = sourceItems.map(i => ({
+        ...i,
+        id: crypto.randomUUID(),
+        paid: false, // Reset paid status for copied items
+      }));
+      save(gigItemsKey(mapping.newId), newItems);
+    }
+  }
+
+  // Dispatch reload event for UI sync
+  setTimeout(() => {
+    if (typeof window !== "undefined") window.dispatchEvent(new Event("bt_reload"));
+  }, 0);
+}
+
+
+/**
+ * Copy a single period's budget and expenses to specified dates across months.
+ * Each target creates a new period with the specified monthKey and day.
+ */
+export function copyPeriodBudget(
+  sourcePeriodId: string,
+  targets: Array<{ monthKey: string; day: number }>
+): void {
+  // Load source period
+  const allPeriods = load<Period[]>(PERIODS_KEY, []);
+  const sourcePeriod = allPeriods.find(p => p.id === sourcePeriodId);
+  
+  if (!sourcePeriod) {
+    console.warn(`copyPeriodBudget: Period ${sourcePeriodId} not found`);
+    return;
+  }
+
+  if (targets.length === 0) {
+    console.warn("copyPeriodBudget: No targets specified");
+    return;
+  }
+
+  // Load source period's expenses
+  const sourceExpenses = load<Expense[]>(itemsKey(sourcePeriodId), []);
+
+  const newPeriods: Period[] = [];
+  const expenseMappings: Array<{ newId: string }> = [];
+
+  // Create new period for each target
+  for (const target of targets) {
+    const [year, month] = target.monthKey.split("-").map(Number);
+    const monthName = new Date(year, month - 1).toLocaleString("default", { month: "long" });
+    
+    // Create label like "November 15" or "December 30"
+    const newLabel = `${monthName} ${target.day}`;
+
+    const newPeriod: Period = {
+      id: crypto.randomUUID(),
+      label: newLabel,
+      budget: sourcePeriod.budget,
+      createdAt: new Date().toISOString(),
+      monthKey: target.monthKey,
+      section1Label: sourcePeriod.section1Label,
+      bufferLabel: sourcePeriod.bufferLabel,
+      // Don't copy sortOrder — let new periods sort naturally
+    };
+    
+    newPeriods.push(newPeriod);
+    expenseMappings.push({ newId: newPeriod.id });
+  }
+
+  // Save new periods (merge with existing)
+  const updatedPeriods = [...allPeriods, ...newPeriods];
+  save(PERIODS_KEY, updatedPeriods);
+
+  // Copy expenses to each new period
+  for (const mapping of expenseMappings) {
+    const newExpenses: Expense[] = sourceExpenses.map(e => ({
+      ...e,
+      id: crypto.randomUUID(),
+      paid: false, // Reset paid status for copied expenses
+    }));
+    save(itemsKey(mapping.newId), newExpenses);
+  }
+
+  // Dispatch reload event for UI sync
+  setTimeout(() => {
+    if (typeof window !== "undefined") window.dispatchEvent(new Event("bt_reload"));
+  }, 0);
 }

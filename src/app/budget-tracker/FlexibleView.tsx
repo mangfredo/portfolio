@@ -3,11 +3,282 @@
 import "./budget.css";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, CaretDown, CaretRight, Wallet, DotsSixVertical } from "@phosphor-icons/react";
-import { usePeriods, useExpenses, useGigs, useGigItems, type Period, type Expense, type Gig } from "@/hooks/useBudgetStore";
+import { Plus, CaretDown, CaretRight, Wallet, DotsSixVertical, ArrowUp, ArrowDown } from "@phosphor-icons/react";
+import { usePeriods, useExpenses, useGigs, useGigItems, type Period, type Expense, type Gig, copyMonthBudget, copyPeriodBudget } from "@/hooks/useBudgetStore";
 import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
 import Modal from "@/components/budget/Modal";
+import { CopyBudgetModal } from "./CopyBudgetModal";
 import NumericInput, { parseNumeric } from "@/components/budget/NumericInput";
+
+// ── Touch drag helper ─────────────────────────────────────────────────────
+// Creates touch handlers for mobile drag-and-drop reordering
+
+function useTouchDragReorder<T extends { id: string }>(
+  items: T[],
+  onReorder: (newOrder: string[]) => void,
+  itemRefs: React.MutableRefObject<Map<string, HTMLElement>>
+) {
+  const [touchDragId, setTouchDragId] = useState<string | null>(null);
+  const [touchDragOverId, setTouchDragOverId] = useState<string | null>(null);
+  const longPressRef = useRef<NodeJS.Timeout | null>(null);
+  const isDraggingRef = useRef(false);
+
+  const getTouchHandlers = useCallback((itemId: string) => ({
+    onTouchStart: (e: React.TouchEvent) => {
+      const touch = e.touches[0];
+      const startY = touch.clientY;
+      
+      // Long press to initiate drag (150ms)
+      longPressRef.current = setTimeout(() => {
+        isDraggingRef.current = true;
+        setTouchDragId(itemId);
+        if (navigator.vibrate) navigator.vibrate(30);
+        
+        // Visual feedback on the row
+        const row = itemRefs.current.get(itemId);
+        if (row) {
+          row.style.opacity = "0.8";
+          row.style.background = "rgba(34,211,238,0.12)";
+        }
+      }, 150);
+    },
+    onTouchMove: (e: React.TouchEvent) => {
+      // Cancel long press if finger moves before 150ms
+      if (!isDraggingRef.current && longPressRef.current) {
+        clearTimeout(longPressRef.current);
+        longPressRef.current = null;
+        return;
+      }
+      
+      if (!isDraggingRef.current) return;
+      
+      e.preventDefault(); // Prevent scrolling while dragging
+      
+      const touch = e.touches[0];
+      
+      // Find which item we're over
+      let foundId: string | null = null;
+      itemRefs.current.forEach((el, id) => {
+        if (id === itemId) return;
+        const rect = el.getBoundingClientRect();
+        if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+          foundId = id;
+        }
+      });
+      
+      setTouchDragOverId(foundId);
+    },
+    onTouchEnd: (e: React.TouchEvent) => {
+      if (longPressRef.current) {
+        clearTimeout(longPressRef.current);
+        longPressRef.current = null;
+      }
+      
+      // Reset visual feedback
+      const row = itemRefs.current.get(itemId);
+      if (row) {
+        row.style.opacity = "";
+        row.style.background = "";
+      }
+      
+      if (isDraggingRef.current && touchDragId === itemId && touchDragOverId) {
+        // Perform reorder
+        const fromIdx = items.findIndex(i => i.id === itemId);
+        const toIdx = items.findIndex(i => i.id === touchDragOverId);
+        
+        if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
+          const newOrder = items.map(i => i.id);
+          newOrder.splice(fromIdx, 1);
+          newOrder.splice(toIdx, 0, itemId);
+          onReorder(newOrder);
+        }
+      }
+      
+      isDraggingRef.current = false;
+      setTouchDragId(null);
+      setTouchDragOverId(null);
+    },
+    onTouchCancel: () => {
+      if (longPressRef.current) {
+        clearTimeout(longPressRef.current);
+        longPressRef.current = null;
+      }
+      
+      const row = itemRefs.current.get(itemId);
+      if (row) {
+        row.style.opacity = "";
+        row.style.background = "";
+      }
+      
+      isDraggingRef.current = false;
+      setTouchDragId(null);
+      setTouchDragOverId(null);
+    },
+  }), [items, onReorder, itemRefs, touchDragId, touchDragOverId]);
+
+  return { touchDragId, touchDragOverId, getTouchHandlers };
+}
+
+// Simple drag handle component that works on both desktop and mobile
+interface DragHandleProps {
+  itemId: string;
+  itemRefs: React.MutableRefObject<Map<string, HTMLElement>>;
+  onReorder: (fromId: string, toId: string) => void;
+  size?: number;
+}
+
+function DragHandle({ itemId, itemRefs, onReorder, size = 16 }: DragHandleProps) {
+  const handleRef = useRef<HTMLSpanElement>(null);
+  const longPressRef = useRef<NodeJS.Timeout | null>(null);
+  const isDraggingRef = useRef(false);
+  const rowRef = useRef<HTMLElement | null>(null);
+  const itemIdRef = useRef(itemId);
+  const itemRefsRef = useRef(itemRefs);
+  const onReorderRef = useRef(onReorder);
+
+  // Keep refs in sync
+  useEffect(() => {
+    itemIdRef.current = itemId;
+    itemRefsRef.current = itemRefs;
+    onReorderRef.current = onReorder;
+  }, [itemId, itemRefs, onReorder]);
+
+  useEffect(() => {
+    const handle = handleRef.current;
+    if (!handle) return;
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDraggingRef.current) return;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const touch = e.touches[0];
+      const refsMap = itemRefsRef.current.current;
+      
+      // Highlight items we're over
+      refsMap.forEach((el, id) => {
+        if (id === itemIdRef.current) return;
+        const rect = el.getBoundingClientRect();
+        const isOver = touch.clientY >= rect.top && touch.clientY <= rect.bottom;
+        el.style.background = isOver ? "rgba(34,211,238,0.2)" : "";
+        el.style.outline = isOver ? "2px solid rgba(34,211,238,0.5)" : "";
+      });
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      // Remove document-level listeners
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("touchcancel", handleTouchCancel);
+      
+      if (longPressRef.current) {
+        clearTimeout(longPressRef.current);
+        longPressRef.current = null;
+      }
+      
+      // Reset visual feedback on all items
+      itemRefsRef.current.current.forEach((el) => {
+        el.style.opacity = "";
+        el.style.background = "";
+        el.style.boxShadow = "";
+        el.style.outline = "";
+      });
+      
+      if (isDraggingRef.current) {
+        const touch = e.changedTouches[0];
+        
+        let targetId: string | null = null;
+        itemRefsRef.current.current.forEach((el, id) => {
+          if (id === itemIdRef.current) return;
+          const rect = el.getBoundingClientRect();
+          if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+            targetId = id;
+          }
+        });
+        
+        if (targetId) {
+          onReorderRef.current(itemIdRef.current, targetId);
+        }
+      }
+      
+      isDraggingRef.current = false;
+      rowRef.current = null;
+    };
+
+    const handleTouchCancel = () => {
+      // Remove document-level listeners
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("touchcancel", handleTouchCancel);
+      
+      if (longPressRef.current) {
+        clearTimeout(longPressRef.current);
+        longPressRef.current = null;
+      }
+      
+      itemRefsRef.current.current.forEach((el) => {
+        el.style.opacity = "";
+        el.style.background = "";
+        el.style.boxShadow = "";
+        el.style.outline = "";
+      });
+      
+      isDraggingRef.current = false;
+      rowRef.current = null;
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+      
+      const refsMap = itemRefsRef.current.current;
+      rowRef.current = refsMap.get(itemIdRef.current) ?? null;
+      
+      isDraggingRef.current = true;
+      try { if (navigator.vibrate) navigator.vibrate(30); } catch {}
+      
+      if (rowRef.current) {
+        rowRef.current.style.opacity = "0.8";
+        rowRef.current.style.background = "rgba(34,211,238,0.15)";
+        rowRef.current.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+      }
+      
+      document.addEventListener("touchmove", handleTouchMove, { passive: false });
+      document.addEventListener("touchend", handleTouchEnd, { passive: true });
+      document.addEventListener("touchcancel", handleTouchCancel, { passive: true });
+    };
+
+    // Only touchstart on the handle itself
+    handle.addEventListener("touchstart", handleTouchStart, { passive: false });
+
+    return () => {
+      handle.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("touchcancel", handleTouchCancel);
+    };
+  }, []);
+
+  return (
+    <span
+      ref={handleRef}
+      style={{ 
+        color: "var(--wf-muted)", 
+        cursor: "grab", 
+        flexShrink: 0, 
+        display: "flex", 
+        alignItems: "center",
+        touchAction: "none",
+        padding: "8px",
+        marginLeft: "-8px",
+        marginRight: "-4px",
+      }}
+      title="Drag to reorder"
+    >
+      <DotsSixVertical size={size} />
+    </span>
+  );
+}
 
 const fmt = (n: number) =>
   n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -103,6 +374,7 @@ function ContextMenu({
 function PeriodAccordion({
   period, isOpen, isChecked, onToggleOpen, onToggleCheck, currencySymbol,
   onDragStart, onDragOver, onDrop, isDraggingOver, onContextMenu,
+  onTouchDragStart, onTouchDrop, itemRefs,
 }: {
   period: Period;
   isOpen: boolean;
@@ -115,8 +387,11 @@ function PeriodAccordion({
   onDrop?: () => void;
   isDraggingOver?: boolean;
   onContextMenu?: (e: React.MouseEvent) => void;
+  onTouchDragStart?: () => void;
+  onTouchDrop?: (targetId: string) => void;
+  itemRefs?: React.MutableRefObject<Map<string, HTMLElement>>;
 }) {
-  const { expenses, addExpense, updateExpense, deleteExpense, togglePaid, s1Expenses, bufferExpenses, s1Total, bufferAllocated } = useExpenses(period.id);
+  const { expenses, addExpense, updateExpense, deleteExpense, togglePaid, reorderExpenses, s1Expenses, bufferExpenses, s1Total, bufferAllocated } = useExpenses(period.id);
   const { periods, updateBudget, updatePeriodMeta } = usePeriods();
 
   const budget = period.budget;
@@ -140,6 +415,57 @@ function PeriodAccordion({
   // Section label editing
   const [editingLabel, setEditingLabel] = useState<"s1" | "buffer" | null>(null);
   const [labelInput, setLabelInput] = useState("");
+
+  // Expense drag state
+  const expenseDragId = useRef<string | null>(null);
+  const [expenseDragOverId, setExpenseDragOverId] = useState<string | null>(null);
+  const expenseItemRefs = useRef<Map<string, HTMLElement>>(new Map());
+
+  const handleExpenseDragStart = (id: string) => { expenseDragId.current = id; };
+  const handleExpenseDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setExpenseDragOverId(id);
+  };
+  const handleExpenseDrop = (targetId: string, section: "s1" | "buffer") => {
+    if (!expenseDragId.current || expenseDragId.current === targetId) {
+      expenseDragId.current = null;
+      setExpenseDragOverId(null);
+      return;
+    }
+    const sectionExpenses = section === "s1" ? s1Expenses : bufferExpenses;
+    const allIds = sectionExpenses.map(e => e.id);
+    const fromIdx = allIds.indexOf(expenseDragId.current);
+    const toIdx = allIds.indexOf(targetId);
+    if (fromIdx < 0 || toIdx < 0) {
+      expenseDragId.current = null;
+      setExpenseDragOverId(null);
+      return;
+    }
+    const reordered = [...allIds];
+    reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, expenseDragId.current);
+    // Merge with other section to preserve full order
+    const otherSection = section === "s1" ? bufferExpenses : s1Expenses;
+    reorderExpenses([...reordered, ...otherSection.map(e => e.id)]);
+    expenseDragId.current = null;
+    setExpenseDragOverId(null);
+  };
+
+  // Touch handlers for expense items (mobile support)
+  const handleExpenseTouchDrop = (fromId: string, toId: string, section: "s1" | "buffer") => {
+    if (!fromId || fromId === toId) return;
+    const sectionExpenses = section === "s1" ? s1Expenses : bufferExpenses;
+    const allIds = sectionExpenses.map(e => e.id);
+    const fromIdx = allIds.indexOf(fromId);
+    const toIdx = allIds.indexOf(toId);
+    if (fromIdx < 0 || toIdx < 0) return;
+    const reordered = [...allIds];
+    reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, fromId);
+    const otherSection = section === "s1" ? bufferExpenses : s1Expenses;
+    reorderExpenses([...reordered, ...otherSection.map(e => e.id)]);
+  };
 
   const openAdd = (section: "s1" | "buffer") => {
     setAddSection(section);
@@ -197,6 +523,7 @@ function PeriodAccordion({
     <>
       {/* Collapsed header row */}
       <div
+        ref={(el) => { if (el && itemRefs) itemRefs.current.set(period.id, el); }}
         draggable
         onDragStart={onDragStart}
         onDragOver={onDragOver}
@@ -211,13 +538,20 @@ function PeriodAccordion({
           transition:"background 150ms ease",
         }}
       >
-        {/* Drag handle */}
-        <span
-          style={{ color:"var(--wf-border)", cursor:"grab", flexShrink:0, display:"flex", alignItems:"center" }}
-          title="Drag to reorder"
-        >
-          <DotsSixVertical size={16} />
-        </span>
+        {/* Drag handle - supports both desktop drag and mobile touch */}
+        {itemRefs && (
+          <DragHandle
+            itemId={period.id}
+            itemRefs={itemRefs}
+            onReorder={(fromId, toId) => onTouchDrop?.(toId)}
+            size={16}
+          />
+        )}
+        {!itemRefs && (
+          <span style={{ color:"var(--wf-muted)", cursor:"grab", flexShrink:0, display:"flex", alignItems:"center" }}>
+            <DotsSixVertical size={16} />
+          </span>
+        )}
         {/* Checkbox */}
         <button
           onClick={onToggleCheck}
@@ -338,7 +672,27 @@ function PeriodAccordion({
                 </div>
 
                 {s1Expenses.map(e => (
-                  <div key={e.id} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid var(--wf-border)", gap:8 }}>
+                  <div
+                    key={e.id}
+                    ref={(el) => { if (el) expenseItemRefs.current.set(e.id, el); }}
+                    draggable
+                    onDragStart={() => handleExpenseDragStart(e.id)}
+                    onDragOver={(ev) => handleExpenseDragOver(ev, e.id)}
+                    onDrop={() => handleExpenseDrop(e.id, "s1")}
+                    style={{
+                      display:"flex", alignItems:"center", justifyContent:"space-between",
+                      padding:"4px 0", borderBottom:"1px solid var(--wf-border)", gap:8,
+                      background: expenseDragOverId === e.id ? "rgba(34,211,238,0.06)" : "transparent",
+                      borderRadius: expenseDragOverId === e.id ? 4 : 0,
+                      transition: "background 150ms ease",
+                    }}
+                  >
+                    <DragHandle
+                      itemId={e.id}
+                      itemRefs={expenseItemRefs}
+                      onReorder={(fromId, toId) => handleExpenseTouchDrop(fromId, toId, "s1")}
+                      size={14}
+                    />
                     <button
                       onClick={() => openEdit(e)}
                       style={{
@@ -419,7 +773,27 @@ function PeriodAccordion({
               {/* Buffer items */}
               <div style={{ paddingLeft:8 }}>
                 {bufferExpenses.map(e => (
-                  <div key={e.id} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:"1px solid var(--wf-border)" }}>
+                  <div
+                    key={e.id}
+                    ref={(el) => { if (el) expenseItemRefs.current.set(e.id, el); }}
+                    draggable
+                    onDragStart={() => handleExpenseDragStart(e.id)}
+                    onDragOver={(ev) => handleExpenseDragOver(ev, e.id)}
+                    onDrop={() => handleExpenseDrop(e.id, "buffer")}
+                    style={{
+                      display:"flex", alignItems:"center", justifyContent:"space-between",
+                      padding:"4px 0", borderBottom:"1px solid var(--wf-border)",
+                      background: expenseDragOverId === e.id ? "rgba(16,185,129,0.08)" : "transparent",
+                      borderRadius: expenseDragOverId === e.id ? 4 : 0,
+                      transition: "background 150ms ease",
+                    }}
+                  >
+                    <DragHandle
+                      itemId={e.id}
+                      itemRefs={expenseItemRefs}
+                      onReorder={(fromId, toId) => handleExpenseTouchDrop(fromId, toId, "buffer")}
+                      size={14}
+                    />
                     <button
                       onClick={() => openEdit(e)}
                       style={{ textAlign:"left", background:"none", border:"none", cursor:"pointer", color: textMain, fontSize:"0.85rem", flex:1 }}
@@ -510,13 +884,20 @@ function PeriodAccordion({
 
 // ── Gig card (side income entry) ─────────────────────────────────────────
 
-function GigCard({ gig, currencySymbol, onDelete, isDark }: {
+function GigCard({ gig, currencySymbol, onDelete, isDark, onDragStart, onDragOver, onDrop, isDraggingOver, onTouchDragStart, onTouchDrop, itemRefs }: {
   gig: Gig;
   currencySymbol: string;
   onDelete: (id: string) => void;
   isDark: boolean;
+  onDragStart?: () => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: () => void;
+  isDraggingOver?: boolean;
+  onTouchDragStart?: () => void;
+  onTouchDrop?: (targetId: string) => void;
+  itemRefs?: React.MutableRefObject<Map<string, HTMLElement>>;
 }) {
-  const { items, addItem, updateItem, deleteItem, togglePaid, total } = useGigItems(gig.id);
+  const { items, addItem, updateItem, deleteItem, togglePaid, reorderItems, total } = useGigItems(gig.id);
   const [isOpen, setIsOpen] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
   const [itemName, setItemName] = useState("");
@@ -526,6 +907,52 @@ function GigCard({ gig, currencySymbol, onDelete, isDark }: {
   // Income edit — same pattern as period budget
   const [showIncome, setShowIncome] = useState(false);
   const [incomeInput, setIncomeInput] = useState("");
+
+  // Gig item drag state
+  const gigItemDragId = useRef<string | null>(null);
+  const [gigItemDragOverId, setGigItemDragOverId] = useState<string | null>(null);
+  const gigExpenseItemRefs = useRef<Map<string, HTMLElement>>(new Map());
+
+  const handleGigItemDragStart = (id: string) => { gigItemDragId.current = id; };
+  const handleGigItemDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setGigItemDragOverId(id);
+  };
+  const handleGigItemDrop = (targetId: string) => {
+    if (!gigItemDragId.current || gigItemDragId.current === targetId) {
+      gigItemDragId.current = null;
+      setGigItemDragOverId(null);
+      return;
+    }
+    const allIds = items.map(i => i.id);
+    const fromIdx = allIds.indexOf(gigItemDragId.current);
+    const toIdx = allIds.indexOf(targetId);
+    if (fromIdx < 0 || toIdx < 0) {
+      gigItemDragId.current = null;
+      setGigItemDragOverId(null);
+      return;
+    }
+    const reordered = [...allIds];
+    reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, gigItemDragId.current);
+    reorderItems(reordered);
+    gigItemDragId.current = null;
+    setGigItemDragOverId(null);
+  };
+
+  // Touch handlers for gig items (mobile support)
+  const handleGigItemTouchDrop = (fromId: string, toId: string) => {
+    if (!fromId || fromId === toId) return;
+    const allIds = items.map(i => i.id);
+    const fromIdx = allIds.indexOf(fromId);
+    const toIdx = allIds.indexOf(toId);
+    if (fromIdx < 0 || toIdx < 0) return;
+    const reordered = [...allIds];
+    reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, fromId);
+    reorderItems(reordered);
+  };
 
   const handleSaveIncome = () => {
     const val = parseNumeric(incomeInput);
@@ -572,12 +999,34 @@ function GigCard({ gig, currencySymbol, onDelete, isDark }: {
     <>
       {/* Gig header row */}
       <div
+        ref={(el) => { if (el && itemRefs) itemRefs.current.set(gig.id, el); }}
+        draggable
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
         onContextMenu={(e) => { e.preventDefault(); setGigCtx({ x: e.clientX, y: e.clientY, target: { type:"gig" } }); }}
+        className="fv-gig-header"
         style={{
-        display:"flex", alignItems:"center", gap:10,
         padding:"10px 0", borderBottom:"1px solid var(--wf-border)",
         cursor:"default",
+        background: isDraggingOver ? "rgba(245,158,11,0.08)" : "transparent",
+        borderRadius: isDraggingOver ? 6 : 0,
+        transition: "background 150ms ease",
       }}>
+        {/* Drag handle - supports both desktop drag and mobile touch */}
+        {itemRefs && (
+          <DragHandle
+            itemId={gig.id}
+            itemRefs={itemRefs}
+            onReorder={(fromId, toId) => onTouchDrop?.(toId)}
+            size={16}
+          />
+        )}
+        {!itemRefs && (
+          <span style={{ color:"var(--wf-muted)", cursor:"grab", flexShrink:0, display:"flex", alignItems:"center" }}>
+            <DotsSixVertical size={16} />
+          </span>
+        )}
         {/* Amber tag */}
         <span style={{
           flexShrink:0, fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.08em",
@@ -589,6 +1038,7 @@ function GigCard({ gig, currencySymbol, onDelete, isDark }: {
         <button
           onClick={() => setIsOpen(o => !o)}
           onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setGigCtx({ x: e.clientX, y: e.clientY, target: { type:"gig" } }); }}
+          className="fv-gig-label-btn"
           style={{ display:"flex", alignItems:"center", gap:8, flex:1, textAlign:"left", background:"none", border:"none", cursor:"pointer", minWidth:0 }}
         >
           {isOpen
@@ -669,9 +1119,25 @@ function GigCard({ gig, currencySymbol, onDelete, isDark }: {
               {/* Expense items */}
               {items.map(item => (
                 <div key={item.id}
+                  ref={(el) => { if (el) gigExpenseItemRefs.current.set(item.id, el); }}
+                  draggable
+                  onDragStart={() => handleGigItemDragStart(item.id)}
+                  onDragOver={(e) => handleGigItemDragOver(e, item.id)}
+                  onDrop={() => handleGigItemDrop(item.id)}
                   onContextMenu={(e) => { e.preventDefault(); setGigCtx({ x: e.clientX, y: e.clientY, target: { type:"gigItem", id: item.id } }); }}
-                  style={{ display:"flex", alignItems:"center", justifyContent:"space-between",
-                  padding:"4px 0", borderBottom:"1px solid var(--wf-border)", gap:8 }}>
+                  style={{
+                    display:"flex", alignItems:"center", justifyContent:"space-between",
+                    padding:"4px 0", borderBottom:"1px solid var(--wf-border)", gap:8,
+                    background: gigItemDragOverId === item.id ? "rgba(245,158,11,0.08)" : "transparent",
+                    borderRadius: gigItemDragOverId === item.id ? 4 : 0,
+                    transition: "background 150ms ease",
+                  }}>
+                  <DragHandle
+                    itemId={item.id}
+                    itemRefs={gigExpenseItemRefs}
+                    onReorder={(fromId, toId) => handleGigItemTouchDrop(fromId, toId)}
+                    size={14}
+                  />
                   <button
                     onClick={() => openEdit(item)}
                     style={{
@@ -841,7 +1307,7 @@ export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProp
   const { currencySymbol, theme } = useBudgetSettingsCtx();
   const isDark = theme === "dark";
   const { periods, reorderPeriods, deletePeriod, updatePeriodMeta } = usePeriods();
-  const { gigs, deleteGig } = useGigs();
+  const { gigs, deleteGig, reorderGigs } = useGigs();
 
   const [openIds, setOpenIds] = useState<Set<string>>(new Set());
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
@@ -849,12 +1315,46 @@ export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProp
   const dragItemId = useRef<string | null>(null);
   const dragOverId = useRef<string | null>(null);
   const [draggingOverId, setDraggingOverId] = useState<string | null>(null);
+  
+  // Refs for touch drag support
+  const periodItemRefs = useRef<Map<string, HTMLElement>>(new Map());
+  const gigItemRefs = useRef<Map<string, HTMLElement>>(new Map());
+  const monthGroupRefs = useRef<Map<string, HTMLElement>>(new Map());
+
+  // Gig drag state
+  const gigDragId = useRef<string | null>(null);
+  const [gigDraggingOverId, setGigDraggingOverId] = useState<string | null>(null);
+
+  // Month group drag state
+  const monthDragKey = useRef<string | null>(null);
+  const [monthDraggingOverKey, setMonthDraggingOverKey] = useState<string | null>(null);
+
+  // Custom month order — persisted to localStorage
+  const [monthOrder, setMonthOrder] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try { return JSON.parse(localStorage.getItem("bt_month_order") ?? "[]"); }
+    catch { return []; }
+  });
+
+  // Sort direction for default ordering (when no custom order) — persisted to localStorage
+  const [sortDir, setSortDir] = useState<"desc" | "asc">(() => {
+    if (typeof window === "undefined") return "desc";
+    try { return (localStorage.getItem("bt_flex_sort_dir") as "desc" | "asc") ?? "desc"; }
+    catch { return "desc"; }
+  });
 
   // Context menu state
   type CtxTarget = { type: "group"; key: string } | { type: "period"; id: string };
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; target: CtxTarget } | null>(null);
   const [renamingPeriodId, setRenamingPeriodId] = useState<string | null>(null);
   const [renameInput, setRenameInput] = useState("");
+
+  // Copy budget modal state
+  const [copyModalOpen, setCopyModalOpen] = useState(false);
+  const [copyModalMode, setCopyModalMode] = useState<"month" | "period">("month");
+  const [copySourceMonthKey, setCopySourceMonthKey] = useState<string | undefined>();
+  const [copySourcePeriodId, setCopySourcePeriodId] = useState<string | undefined>();
+  const [copySourcePeriodLabel, setCopySourcePeriodLabel] = useState<string | undefined>();
 
   const openCtxMenu = useCallback((e: React.MouseEvent, target: CtxTarget) => {
     e.preventDefault();
@@ -934,6 +1434,101 @@ export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProp
     reorderPeriods(reordered);
     dragItemId.current = null; dragOverId.current = null; setDraggingOverId(null);
   };
+  
+  // Touch drag handlers for periods (mobile support)
+  const [touchDragPeriodId, setTouchDragPeriodId] = useState<string | null>(null);
+  const handleTouchPeriodDragStart = (id: string) => { setTouchDragPeriodId(id); };
+  const handleTouchPeriodDrop = (fromId: string, toId: string) => {
+    if (!fromId || fromId === toId) { setTouchDragPeriodId(null); return; }
+    const allIds = periods.map(p => p.id);
+    const fromIdx = allIds.indexOf(fromId);
+    const toIdx = allIds.indexOf(toId);
+    if (fromIdx < 0 || toIdx < 0) { setTouchDragPeriodId(null); return; }
+    const reordered = [...allIds];
+    reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, fromId);
+    reorderPeriods(reordered);
+    setTouchDragPeriodId(null);
+  };
+
+  // Gig drag handlers — reorder gigs within the same month
+  const handleGigDragStart = (id: string) => { gigDragId.current = id; };
+  const handleGigDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    setGigDraggingOverId(id);
+  };
+  const handleGigDrop = (targetId: string, monthKey: string) => {
+    if (!gigDragId.current || gigDragId.current === targetId) {
+      gigDragId.current = null;
+      setGigDraggingOverId(null);
+      return;
+    }
+    // Only reorder within same month
+    const monthGigs = gigs.filter(g => g.monthKey === monthKey);
+    const allIds = monthGigs.map(g => g.id);
+    const fromIdx = allIds.indexOf(gigDragId.current);
+    const toIdx = allIds.indexOf(targetId);
+    if (fromIdx < 0 || toIdx < 0) {
+      gigDragId.current = null;
+      setGigDraggingOverId(null);
+      return;
+    }
+    const reordered = [...allIds];
+    reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, gigDragId.current);
+    // Merge with other month gigs to preserve full order
+    const otherGigs = gigs.filter(g => g.monthKey !== monthKey);
+    reorderGigs([...reordered, ...otherGigs.map(g => g.id)]);
+    gigDragId.current = null;
+    setGigDraggingOverId(null);
+  };
+
+  // Touch drag handlers for gigs (mobile support)
+  const [touchDragGigId, setTouchDragGigId] = useState<string | null>(null);
+  const handleTouchGigDragStart = (id: string) => { setTouchDragGigId(id); };
+  const handleTouchGigDrop = (fromId: string, toId: string, monthKey: string) => {
+    if (!fromId || fromId === toId) { setTouchDragGigId(null); return; }
+    const monthGigs = gigs.filter(g => g.monthKey === monthKey);
+    const allIds = monthGigs.map(g => g.id);
+    const fromIdx = allIds.indexOf(fromId);
+    const toIdx = allIds.indexOf(toId);
+    if (fromIdx < 0 || toIdx < 0) { setTouchDragGigId(null); return; }
+    const reordered = [...allIds];
+    reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, fromId);
+    const otherGigs = gigs.filter(g => g.monthKey !== monthKey);
+    reorderGigs([...reordered, ...otherGigs.map(g => g.id)]);
+    setTouchDragGigId(null);
+  };
+
+  // Month group drag handlers
+  const handleMonthDragStart = (key: string) => { monthDragKey.current = key; };
+  const handleMonthDragOver = (e: React.DragEvent, key: string) => {
+    e.preventDefault();
+    setMonthDraggingOverKey(key);
+  };
+  const handleMonthDrop = (targetKey: string) => {
+    if (!monthDragKey.current || monthDragKey.current === targetKey) {
+      monthDragKey.current = null;
+      setMonthDraggingOverKey(null);
+      return;
+    }
+    const allKeys = groups.sorted.map(([k]) => k);
+    const fromIdx = allKeys.indexOf(monthDragKey.current);
+    const toIdx = allKeys.indexOf(targetKey);
+    if (fromIdx < 0 || toIdx < 0) {
+      monthDragKey.current = null;
+      setMonthDraggingOverKey(null);
+      return;
+    }
+    const reordered = [...allKeys];
+    reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, monthDragKey.current);
+    setMonthOrder(reordered);
+    try { localStorage.setItem("bt_month_order", JSON.stringify(reordered)); } catch {}
+    monthDragKey.current = null;
+    setMonthDraggingOverKey(null);
+  };
 
   // Group periods by monthKey
   const groups = useMemo(() => {
@@ -957,23 +1552,68 @@ export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProp
       }
     }
 
-    // Sort months newest first
-    const sorted = [...monthMap.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+    // Sort months: use custom order if available, otherwise newest first
+    const allKeys = [...monthMap.keys()];
+    let sortedKeys: string[];
+    if (monthOrder.length > 0) {
+      // Use custom order, append any new keys at the end
+      const orderedSet = new Set(monthOrder);
+      const ordered = monthOrder.filter(k => allKeys.includes(k));
+      const newKeys = allKeys.filter(k => !orderedSet.has(k)).sort((a, b) => 
+        sortDir === "desc" ? b.localeCompare(a) : a.localeCompare(b)
+      );
+      sortedKeys = [...ordered, ...newKeys];
+    } else {
+      sortedKeys = allKeys.sort((a, b) => 
+        sortDir === "desc" ? b.localeCompare(a) : a.localeCompare(b)
+      );
+    }
+    const sorted: [string, Period[]][] = sortedKeys.map(k => [k, monthMap.get(k) ?? []]);
     return { sorted, ungrouped };
-  }, [periods, gigs]);
+  }, [periods, gigs, monthOrder, sortDir]);
 
   // Combined buffer for checked periods — needs expense data
   // We calculate this inline per-period using a sub-component
   const CombinedBar = () => {
     const checkedPeriods = periods.filter(p => checkedIds.has(p.id));
+    
+    const toggleSortDir = () => {
+      const newDir = sortDir === "desc" ? "asc" : "desc";
+      setSortDir(newDir);
+      try { localStorage.setItem("bt_flex_sort_dir", newDir); } catch {}
+      // Clear custom order when toggling sort direction so the new order takes effect
+      setMonthOrder([]);
+      try { localStorage.removeItem("bt_month_order"); } catch {}
+    };
+
+    const sortButton = (
+      <button
+        onClick={toggleSortDir}
+        style={{ 
+          background:"none", border:"none", cursor:"pointer", 
+          color:"var(--wf-muted)", padding:"4px 6px", borderRadius:4,
+          display:"flex", alignItems:"center", justifyContent:"center",
+          transition:"background 0.15s",
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = "var(--wf-surface-hover)"}
+        onMouseLeave={e => e.currentTarget.style.background = "none"}
+        title={sortDir === "desc" ? "Newest first — click for oldest first" : "Oldest first — click for newest first"}
+      >
+        {sortDir === "desc" ? <ArrowDown size={16} weight="bold" /> : <ArrowUp size={16} weight="bold" />}
+      </button>
+    );
+
     if (checkedPeriods.length === 0) return (
       <div style={{
         position:"sticky", top:0, zIndex:20,
         background:"var(--wf-surface-glass)", backdropFilter:"blur(12px)",
         borderBottom:"1px solid var(--wf-border)", padding:"8px 24px",
-        fontSize:"0.75rem", color:"var(--wf-muted)", textAlign:"center",
+        display:"flex", alignItems:"center", justifyContent:"space-between",
       }}>
-        Check periods below to see combined buffer
+        <span style={{ fontSize:"0.75rem", color:"var(--wf-muted)" }}>
+          Check periods below to see combined buffer
+        </span>
+        {sortButton}
       </div>
     );
 
@@ -987,7 +1627,10 @@ export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProp
         <span style={{ fontSize:"0.75rem", color:"var(--wf-muted)", fontWeight:600 }}>
           {checkedPeriods.length} period{checkedPeriods.length !== 1 ? "s" : ""} selected
         </span>
-        <CombinedBufferCalc periodIds={[...checkedIds]} sym={currencySymbol} periods={periods} />
+        <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+          <CombinedBufferCalc periodIds={[...checkedIds]} sym={currencySymbol} periods={periods} />
+          {sortButton}
+        </div>
       </div>
     );
   };
@@ -1044,6 +1687,18 @@ export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProp
               },
             },
             {
+              label: "Copy this month's budget",
+              icon: <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.3"/><path d="M10 4V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h1" stroke="currentColor" strokeWidth="1.3"/></svg>,
+              onClick: () => {
+                const k = (ctxMenu.target as { type: "group"; key: string }).key;
+                setCopyModalMode("month");
+                setCopySourceMonthKey(k);
+                setCopySourcePeriodId(undefined);
+                setCopySourcePeriodLabel(undefined);
+                setCopyModalOpen(true);
+              },
+            },
+            {
               label: "Delete all in group",
               danger: true,
               icon: <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3.5h10M5.5 3.5V2.5h3v1M4.5 3.5l.5 8h4l.5-8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>,
@@ -1064,6 +1719,19 @@ export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProp
                 const p = periods.find(p => p.id === id);
                 setRenamingPeriodId(id);
                 setRenameInput(p?.label ?? "");
+              },
+            },
+            {
+              label: "Copy this period's budget",
+              icon: <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.3"/><path d="M10 4V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h1" stroke="currentColor" strokeWidth="1.3"/></svg>,
+              onClick: () => {
+                const id = (ctxMenu.target as { type: "period"; id: string }).id;
+                const p = periods.find(p => p.id === id);
+                setCopyModalMode("period");
+                setCopySourceMonthKey(p?.monthKey);
+                setCopySourcePeriodId(id);
+                setCopySourcePeriodLabel(p?.label);
+                setCopyModalOpen(true);
               },
             },
             {
@@ -1146,17 +1814,58 @@ export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProp
         </Modal>
       )}
 
+      {/* Copy budget modal */}
+      {copyModalOpen && (
+        <CopyBudgetModal
+          mode={copyModalMode}
+          sourceMonthKey={copySourceMonthKey}
+          sourcePeriodId={copySourcePeriodId}
+          sourcePeriodLabel={copySourcePeriodLabel}
+          onClose={() => setCopyModalOpen(false)}
+          onConfirm={(months, dates) => {
+            if (copyModalMode === "month" && copySourceMonthKey) {
+              // Copy month budget to each selected target month
+              for (const targetMonth of months) {
+                copyMonthBudget(copySourceMonthKey, targetMonth);
+              }
+            } else if (copyModalMode === "period" && copySourcePeriodId && dates) {
+              // Copy period budget to selected dates
+              copyPeriodBudget(copySourcePeriodId, dates);
+            }
+            setCopyModalOpen(false);
+          }}
+        />
+      )}
+
       <div style={{ padding:"0 24px" }}>
         {/* Month groups */}
         {groups.sorted.map(([key, groupPeriods]) => (
           <div key={key} style={{ marginTop:24 }}>
             {/* Month header — plain, no card, with hover-reveal edit button */}
             <div
-              style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}
+              ref={(el) => { if (el) monthGroupRefs.current.set(key, el); }}
+              draggable
+              onDragStart={() => handleMonthDragStart(key)}
+              onDragOver={(e) => handleMonthDragOver(e, key)}
+              onDrop={() => handleMonthDrop(key)}
+              style={{
+                display:"flex", alignItems:"center", gap:6, marginBottom:4,
+                background: monthDraggingOverKey === key ? "rgba(34,211,238,0.08)" : "transparent",
+                borderRadius: monthDraggingOverKey === key ? 6 : 0,
+                padding: "4px 0",
+                transition: "background 150ms ease",
+              }}
               onMouseEnter={() => setHoveredGroupKey(key)}
               onMouseLeave={() => setHoveredGroupKey(null)}
               onContextMenu={(e) => openCtxMenu(e, { type:"group", key })}
             >
+              {/* Drag handle - supports both desktop drag and mobile touch */}
+              <DragHandle
+                itemId={key}
+                itemRefs={monthGroupRefs}
+                onReorder={(fromId, toId) => handleMonthDrop(toId)}
+                size={16}
+              />
               {/* Chevron — only toggles collapse */}
               <button
                 onClick={() => { if (editingGroupKey !== key) toggleMonth(key); }}
@@ -1227,12 +1936,28 @@ export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProp
                     onDrop={() => handleDrop(p.id)}
                     isDraggingOver={draggingOverId === p.id}
                     onContextMenu={(e) => openCtxMenu(e, { type:"period", id: p.id })}
+                    onTouchDragStart={() => handleTouchPeriodDragStart(p.id)}
+                    onTouchDrop={(targetId) => handleTouchPeriodDrop(p.id, targetId)}
+                    itemRefs={periodItemRefs}
                   />
                 ))}
 
                 {/* Gig cards for this month */}
                 {gigs.filter(g => g.monthKey === key).map(g => (
-                  <GigCard key={g.id} gig={g} currencySymbol={currencySymbol} onDelete={deleteGig} isDark={isDark} />
+                  <GigCard
+                    key={g.id}
+                    gig={g}
+                    currencySymbol={currencySymbol}
+                    onDelete={deleteGig}
+                    isDark={isDark}
+                    onDragStart={() => handleGigDragStart(g.id)}
+                    onDragOver={(e) => handleGigDragOver(e, g.id)}
+                    onDrop={() => handleGigDrop(g.id, key)}
+                    isDraggingOver={gigDraggingOverId === g.id}
+                    onTouchDragStart={() => handleTouchGigDragStart(g.id)}
+                    onTouchDrop={(targetId) => handleTouchGigDrop(g.id, targetId, key)}
+                    itemRefs={gigItemRefs}
+                  />
                 ))}
 
                 <div style={{ display:"flex", gap:12, marginTop:8, flexWrap:"wrap" }}>
@@ -1295,6 +2020,9 @@ export default function FlexibleView({ onAddPeriod, onAddGig }: FlexibleViewProp
                     onDrop={() => handleDrop(p.id)}
                     isDraggingOver={draggingOverId === p.id}
                     onContextMenu={(e) => openCtxMenu(e, { type:"period", id: p.id })}
+                    onTouchDragStart={() => handleTouchPeriodDragStart(p.id)}
+                    onTouchDrop={(targetId) => handleTouchPeriodDrop(p.id, targetId)}
+                    itemRefs={periodItemRefs}
                   />
                 ))}
               </div>
