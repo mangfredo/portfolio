@@ -1,211 +1,217 @@
-import ProductShowcase from "./ProductShowcase";
+"use client";
 
-const projects = [
-  {
-    title: "Numerra",
-    kind: "Published App",
-    platform: "Microsoft Store",
-    story:
-      "I wanted a calculator that didn't make me switch between five different apps. Standard, Scientific, Programmer, RPN — all in one place. Added measurement and currency converters supporting 180+ currencies with real-time rates — you can type full expressions directly in the converter, it parses and evaluates the input, then converts the result. Includes financial tools, a scientific constants library, and formula references. Programmer mode supports HEX, DEC, OCT, BIN with full bitwise operations.",
-    tags: ["WinUI 3", "C#", "Windows App SDK", "Published"],
-    link: "https://apps.microsoft.com/detail/9npwb2bk246z",
-    screenshots: [
-      { src: "/numerra_1.webp", label: "Scientific", caption: "Trig, logarithms, powers and factorials on one keypad." },
-      { src: "/numerra_2.webp", label: "Programmer", caption: "HEX, DEC, OCT and BIN with full bitwise operations — AND, OR, XOR, NOT and shifts." },
-      { src: "/numerra_3.webp", label: "RPN", caption: "Stack-based entry with ENTER, SWAP and DROP for chained calculations." },
-      { src: "/numerra_4.webp", label: "Converters & tools", caption: "Unit converters plus financial tools — loan, interest, tip, discount, BMI and more." },
-      { src: "/numerra_5.webp", label: "Currency", caption: "180+ currencies with real-time rates. Type a full expression — it evaluates, then converts." },
-    ],
-    featured: true,
-  },
-  {
-    title: "YWCIMS",
-    kind: "Web Platform",
-    platform: "Web Platform",
-    story:
-      "Built the admin and employer-facing sides of an internal management system for YWCI Manpower Services — covering workforce onboarding, attendance tracking, payroll processing, compliance management, and government benefit reporting.",
-    tags: ["Web App", "Admin Panel", "Workforce Management"],
-    link: "https://ywcims.com/home.html",
-    screenshots: undefined,
-    featured: false,
-  },
-  {
-    title: "Zamora Gym Ecosystem",
-    kind: "Mobile App",
-    platform: "Mobile — iOS/Android",
-    story:
-      "A private client needed to replace their paper-based membership system. Built a dual-purpose platform: management dashboard for the owner (membership tracking, revenue), and a training companion for members (custom interval timer, video tutorials, daily checklist). Replaced the entire manual workflow.",
-    tags: ["React Native", "Mobile", "Dashboard", "Fitness"],
-    link: "https://github.com/mangfredo/Zamora-Gym-App",
-    screenshots: undefined,
-    featured: false,
-  },
-  {
-    title: "JOBSearch",
-    kind: "Web Platform",
-    platform: "Web Platform",
-    story:
-      "A recruitment portal built for a client's capstone presentation. Focused on minimizing time-to-apply with an intuitive interface that bridges talent and opportunity.",
-    tags: ["Web App", "UI/UX", "Recruitment"],
-    link: "https://github.com/mangfredo/JOBSearch",
-    screenshots: undefined,
-    featured: false,
-  },
-  {
-    title: "Fix Me: The IT Odyssey",
-    kind: "Simulation",
-    platform: "Interactive Simulation",
-    story:
-      "A narrative-driven simulation where you play as an IT Specialist navigating a corporate headquarters. Diagnose hardware failures, resolve security vulnerabilities, and fix technical bottlenecks under time pressure. A tribute to the unsung heroes of tech support.",
-    tags: ["Simulation", "Gamification", "Capstone"],
-    link: "https://github.com/mangfredo/Fix-Me-Game",
-    screenshots: undefined,
-    featured: false,
-  },
-  {
-    title: "Budget Tracker",
-    kind: "Personal Tool",
-    platform: "Personal Tool",
-    story:
-      "A private budget tracker I built for personal use. Organizes expenses by pay period or month, tracks a running total against a set budget, and shows the remaining balance at a glance. Everything lives in localStorage — no backend, no account, no fuss. Accessible only by direct URL.",
-    tags: ["Next.js", "TypeScript", "localStorage", "Mobile-first"],
-    link: "/budget-tracker",
-    screenshots: undefined,
-    featured: false,
-  },
-  {
-    title: "TaskManagementApp",
-    kind: "Desktop App",
-    platform: "Desktop — Windows",
-    story:
-      "A lightweight, offline-capable task management system built to a client's requirements. Optimized for speed and native Windows integration — no external latency, no cloud dependency.",
-    tags: ["Windows Forms", "C#", "Desktop"],
-    link: "https://github.com/mangfredo/Task-Management-App",
-    screenshots: undefined,
-    featured: false,
-  },
-  {
-    title: "Exotech",
-    kind: "Specialized POS",
-    platform: "Specialized POS",
-    story:
-      "Standard POS systems aren't built for exotic food markets. Exotech handles high-value, rare-stock items with specialized inventory and pricing models that generic retail software can't touch.",
-    tags: ["POS", "Windows Forms", "C#"],
-    link: "https://github.com/mangfredo/Exotech",
-    screenshots: undefined,
-    featured: false,
-  },
+import { useEffect, useRef, useState } from "react";
+import ProductShowcase from "./ProductShowcase";
+import EditorFile, { Mark } from "./ide/EditorFile";
+import FileIcon from "./ide/FileIcon";
+import { slugify } from "./ide/files";
+import { personalProjects } from "@/content/personal-projects";
+import { sections } from "@/content/profile";
+
+type Project = (typeof personalProjects)[number];
+
+function linkLabel(link: string) {
+  return link.startsWith("/")
+    ? "Open ↗"
+    : link.includes("github.com")
+    ? "GitHub ↗"
+    : link.includes("apps.microsoft.com")
+    ? "Store ↗"
+    : "Visit ↗";
+}
+
+function ProjectLink({ link }: { link: string | null }) {
+  if (!link) return null;
+  return (
+    <a
+      href={link}
+      target={link.startsWith("/") ? "_self" : "_blank"}
+      rel={link.startsWith("/") ? undefined : "noopener noreferrer"}
+      className="ide-link"
+    >
+      {linkLabel(link)}
+    </a>
+  );
+}
+
+// Quick Open filters — derived from each project's kind and tags
+const filters: { id: string; label: string; match: (p: Project) => boolean }[] = [
+  { id: "all", label: "All", match: () => true },
+  { id: "published", label: "Published", match: (p) => p.kind === "Published App" },
+  { id: "web", label: "Web", match: (p) => p.kind.includes("Web") || p.tags.includes("Next.js") },
+  { id: "mobile", label: "Mobile", match: (p) => p.tags.includes("React Native") || p.kind === "Mobile App" },
+  { id: "desktop", label: "Desktop", match: (p) => p.tags.some((t) => t === "Windows Forms" || t === "WinUI 3") },
 ];
 
-export default function PersonalProjects() {
-  return (
-    <section id="projects" className="py-20 sm:py-32 px-6 sm:px-10">
-      <div style={{ maxWidth: "1120px", marginInline: "auto" }}>
+const idOf = (p: Project) => `project-${slugify(p.title)}`;
+const initial = personalProjects.find((p) => p.featured) ?? personalProjects[0];
 
-        {/* ── Section divider ── */}
-        <div className="flex items-center gap-0 mb-16" aria-hidden="false">
-          <span style={{ width: "1px", height: "8px", background: "var(--line)", flexShrink: 0 }} />
-          <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
-          <span
-            className="px-3 font-mono"
-            style={{ fontSize: "0.72rem", color: "var(--ink-soft)", letterSpacing: "0.06em", flexShrink: 0 }}
-          >
-            — 03 · projects —
-          </span>
-          <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
-          <span style={{ width: "1px", height: "8px", background: "var(--line)", flexShrink: 0 }} />
+export default function PersonalProjects() {
+  const [selected, setSelected] = useState(idOf(initial));
+  const [filter, setFilter] = useState("all");
+  const [query, setQuery] = useState("");
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const detailRef = useRef<HTMLDivElement>(null);
+
+  const q = query.trim().toLowerCase();
+  const active = filters.find((f) => f.id === filter)!;
+  const list = personalProjects.filter(
+    (p) => active.match(p) && (!q || `${p.title} ${p.kind} ${p.platform} ${p.tags.join(" ")}`.toLowerCase().includes(q))
+  );
+
+  // Explorer / Welcome links point at #project-<slug>: select it and bring the section into view
+  useEffect(() => {
+    const onHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (!personalProjects.some((p) => idOf(p) === id)) return;
+      setSelected(id);
+      setFilter("all");
+      setQuery("");
+      document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  function select(id: string) {
+    setSelected(id);
+    // On phones the detail pane sits under the list — bring it into view
+    if (window.matchMedia("(max-width: 767px)").matches) {
+      requestAnimationFrame(() => detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
+  }
+
+  function onKey(e: React.KeyboardEvent) {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const i = list.findIndex((p) => idOf(p) === selected);
+    const next = list[(i + (e.key === "ArrowDown" ? 1 : -1) + list.length) % list.length];
+    if (!next) return;
+    setSelected(idOf(next));
+    tabRefs.current[idOf(next)]?.focus();
+  }
+
+  return (
+    <EditorFile id="projects" label="Projects">
+      <p className="ln ide-comment mb-3">{"<!-- projects/ -->"}</p>
+      <h2 className="ln ide-h2 mb-4">
+        <Mark>##</Mark>
+        {sections.projects.heading}
+      </h2>
+      <p className="ln ide-lead mb-10">{sections.projects.intro}</p>
+
+      <div className="qo ln">
+        {/* ── Quick Open list ── */}
+        <div className="qo__side">
+          <label className="qo__input">
+            <span className="qo__prompt" aria-hidden="true">
+              &gt;
+            </span>
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search projects by name or stack"
+              aria-label="Search projects"
+            />
+            <kbd aria-hidden="true">Ctrl+P</kbd>
+          </label>
+
+          <div className="qo__filters" role="group" aria-label="Filter projects">
+            {filters.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                className="qo__filter"
+                aria-pressed={filter === f.id}
+                onClick={() => setFilter(f.id)}
+              >
+                {f.label}
+                <span className="qo__count">{personalProjects.filter(f.match).length}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="qo__list" role="tablist" aria-orientation="vertical" aria-label="Projects" onKeyDown={onKey}>
+            {list.map((p) => {
+              const id = idOf(p);
+              const isSel = id === selected;
+              return (
+                <button
+                  key={id}
+                  ref={(el) => {
+                    tabRefs.current[id] = el;
+                  }}
+                  type="button"
+                  role="tab"
+                  id={`${id}-tab`}
+                  aria-selected={isSel}
+                  aria-controls={id}
+                  tabIndex={isSel || (!list.some((x) => idOf(x) === selected) && p === list[0]) ? 0 : -1}
+                  className="qo__item"
+                  onClick={() => select(id)}
+                >
+                  <FileIcon kind="folder" open={isSel} />
+                  <span className="qo__name">{p.title}</span>
+                  <span className="qo__kind">{p.kind}</span>
+                </button>
+              );
+            })}
+            {!list.length && <p className="settings__empty">No matching projects.</p>}
+          </div>
         </div>
 
-        <h2
-          className="mb-4"
-          style={{ fontSize: "clamp(1.5rem, 3vw, 1.75rem)", fontWeight: 500 }}
-        >
-          Client &amp; Personal Work
-        </h2>
-        <p
-          className="mb-16"
-          style={{ color: "var(--ink-soft)", maxWidth: "560px", lineHeight: 1.7, fontSize: "1rem" }}
-        >
-          Freelance builds, published apps, and side projects — each one
-          started because something needed to exist and didn&apos;t.
-        </p>
-
-        {/* ── Project grid ── */}
-        <div className="grid md:grid-cols-2 gap-0 reveal-stagger">
-          {projects.map((p, i) => {
-            const isFeatured = p.featured;
-
+        {/* ── Detail pane — every project stays in the DOM so all text is indexed ── */}
+        <div className="qo__detail" ref={detailRef}>
+          {personalProjects.map((p) => {
+            const id = idOf(p);
+            const slug = slugify(p.title);
             return (
               <article
-                key={p.title}
-                className={`reveal border flex flex-col ${isFeatured ? "md:col-span-2" : ""}`}
-                style={{
-                  borderColor: "var(--line)",
-                  background: "var(--paper-raised)",
-                  /* Collapse adjacent borders */
-                  marginTop: i === 0 ? 0 : "-1px",
-                  marginLeft: !isFeatured && i % 2 !== 0 ? "-1px" : 0,
-                }}
+                key={id}
+                id={id}
+                role="tabpanel"
+                aria-labelledby={`${id}-tab`}
+                hidden={id !== selected}
+                className="qo__panel"
               >
-                {/* Card header: title + micro title-block kind label */}
-                <div
-                  className="flex items-start justify-between gap-3 p-6 sm:p-7 border-b"
-                  style={{ borderColor: "var(--line)" }}
-                >
-                  <h3
-                    className="font-mono"
-                    style={{ fontSize: "1rem", fontWeight: 500, color: "var(--ink)" }}
-                  >
+                <div className="ide-pane__bar">
+                  <FileIcon kind="md" />
+                  <span className="ide-pane__bar-title">{slug}/README.md</span>
+                  <span className="ide-pane__bar-right lang-badge">{p.kind}</span>
+                </div>
+                <div className="ide-pane__body">
+                  <h3 className="ide-h2" style={{ fontSize: "clamp(1.3rem, 2.6vw, 1.75rem)" }}>
+                    <Mark>#</Mark>
                     {p.title}
                   </h3>
-                  {/* Micro title-block label — top-right corner, like a drawing's title block */}
-                  <span className="bp-micro-label flex-shrink-0">{p.kind}</span>
-                </div>
-
-                {/* Body */}
-                <div className="p-6 sm:p-7 flex-1 flex flex-col">
-                  <p
-                    className="text-sm mb-5 flex-1"
-                    style={{ color: "var(--ink-soft)", lineHeight: 1.7 }}
-                  >
+                  {p.platform !== p.kind && (
+                    <p className="mono mt-1" style={{ fontSize: "0.72rem" }}>
+                      <span className="tok-com">{"// "}</span>
+                      <span className="tok-str">{p.platform}</span>
+                    </p>
+                  )}
+                  <p className="proj-card__story mt-4" style={{ fontSize: "0.925rem" }}>
                     {p.story}
                   </p>
 
-                  {/* Screenshots — labeled mode showcase */}
-                  {p.screenshots && p.screenshots.length > 0 && (
-                    <div className="mb-5">
+                  {p.screenshots && p.screenshots.length > 0 && id === selected && (
+                    <div className="qo__preview">
+                      <div className="ide-pane__bar">
+                        <span aria-hidden="true">◫</span>
+                        <span className="ide-pane__bar-title">Preview — {p.title}</span>
+                      </div>
                       <ProductShowcase slides={p.screenshots} title={p.title} />
                     </div>
                   )}
 
-                  {/* BOM chips + link */}
-                  <div className="flex flex-wrap items-center gap-2 mt-auto pt-4 border-t" style={{ borderColor: "var(--line)" }}>
+                  <div className="proj-card__foot">
                     {p.tags.map((t) => (
-                      <span key={t} className="bp-chip">{t}</span>
+                      <span key={t} className="ide-chip">
+                        {t}
+                      </span>
                     ))}
-                    {p.link && (
-                      <a
-                        href={p.link}
-                        target={p.link.startsWith("/") ? "_self" : "_blank"}
-                        rel={p.link.startsWith("/") ? undefined : "noopener noreferrer"}
-                        className="ml-auto font-mono text-xs transition-colors"
-                        style={{
-                          color: "var(--accent)",
-                          fontSize: "0.72rem",
-                          textDecoration: "underline",
-                          textDecorationColor: "var(--line)",
-                          textUnderlineOffset: "3px",
-                        }}
-                      >
-                        {p.link.startsWith("/")
-                          ? "Open ↗"
-                          : p.link.includes("github.com")
-                          ? "GitHub ↗"
-                          : p.link.includes("apps.microsoft.com")
-                          ? "Store ↗"
-                          : "Visit ↗"}
-                      </a>
-                    )}
+                    <ProjectLink link={p.link} />
                   </div>
                 </div>
               </article>
@@ -213,6 +219,6 @@ export default function PersonalProjects() {
           })}
         </div>
       </div>
-    </section>
+    </EditorFile>
   );
 }

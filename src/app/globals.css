@@ -25,17 +25,18 @@
 
 :root[data-theme="light"],
 html:not([data-theme="dark"]) {
-  /* Light "dawn" variant — bone canvas, ink text, deeper amber for contrast */
-  --paper:         oklch(0.965 0.010 80);
-  --paper-raised:  oklch(0.99 0.006 80);
-  --paper-hi:      oklch(0.93 0.012 80);
-  --ink:           oklch(0.22 0.018 260);
-  --ink-soft:      oklch(0.42 0.016 255);
-  --line:          color-mix(in oklch, var(--ink) 12%, transparent);
-  --accent:        oklch(0.58 0.15 55);
+  /* Tokyo Day — hues from Tokyo Night's light variant, deepened for AA contrast */
+  --paper:         #e1e2e7;
+  --paper-raised:  #d0d5e3;
+  --paper-hi:      #c4c8da;
+  --ink:           #28336b;
+  --ink-soft:      #4c5a8f;
+  --line:          color-mix(in oklch, var(--ink) 14%, transparent);
+  --accent:        #2959c4;
   --accent-soft:   color-mix(in oklch, var(--accent) 12%, transparent);
-  --accent-2:      oklch(0.50 0.06 165);
-  --accent-fg:     oklch(0.18 0.02 60);
+  --accent-2:      #3f5a24;
+  --accent-3:      #7847bd;
+  --accent-fg:     #ffffff;
   --shadow-sm:     0 1px 2px rgba(20, 24, 40, 0.08);
   --shadow-md:     0 8px 24px rgba(20, 24, 40, 0.10);
   --highlight-top: inset 0 1px 0 rgba(255, 255, 255, 0.6);
@@ -53,17 +54,18 @@ html:not([data-theme="dark"]) {
 :root,
 html,
 html[data-theme="dark"] {
-  /* Warm dusk — Eva Syntho ink / bone / amber / sage */
-  --paper:         oklch(0.18 0.018 260);
-  --paper-raised:  oklch(0.26 0.018 258);
-  --paper-hi:      oklch(0.31 0.018 256);
-  --ink:           oklch(0.97 0.012 80);
-  --ink-soft:      oklch(0.76 0.012 80);
-  --line:          color-mix(in oklch, oklch(0.76 0.012 80) 10%, transparent);
-  --accent:        oklch(0.74 0.17 60);
+  /* Tokyo Night — storm-blue canvas, lavender text, blue / green accents */
+  --paper:         #1a1b26;
+  --paper-raised:  #24283b;
+  --paper-hi:      #292e42;
+  --ink:           #c0caf5;
+  --ink-soft:      #a9b1d6;
+  --line:          color-mix(in oklch, #a9b1d6 12%, transparent);
+  --accent:        #7aa2f7;
   --accent-soft:   color-mix(in oklch, var(--accent) 14%, transparent);
-  --accent-2:      oklch(0.72 0.07 165);
-  --accent-fg:     oklch(0.18 0.02 60);
+  --accent-2:      #9ece6a;
+  --accent-3:      #bb9af7;
+  --accent-fg:     #1a1b26;
 
   --bg:            var(--paper);
   --fg:            var(--ink);
@@ -102,13 +104,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease, color 0.3s ease;
   overflow-x: hidden;
-
-  /* Eva canvas — faint amber glow upper-left, no patterns */
-  background-image: radial-gradient(ellipse 60% 50% at 15% 0%,
-    color-mix(in oklch, var(--accent) 8%, transparent) 0%,
-    transparent 70%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
 }
 
 /* Portfolio-only wrapper — applies Eva type without affecting the budget tracker */

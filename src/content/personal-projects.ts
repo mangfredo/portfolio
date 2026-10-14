@@ -1,0 +1,97 @@
+export const personalProjects = [
+  {
+    title: "Numerra",
+    kind: "Published App",
+    platform: "Microsoft Store",
+    story:
+      "I wanted a calculator that didn't make me switch between five different apps. Standard, Scientific, Programmer, RPN — all in one place. Added measurement and currency converters supporting 180+ currencies with real-time rates — you can type full expressions directly in the converter, it parses and evaluates the input, then converts the result. Includes financial tools, a scientific constants library, and formula references. Programmer mode supports HEX, DEC, OCT, BIN with full bitwise operations.",
+    tags: ["WinUI 3", "C#", "Windows App SDK", "Published"],
+    link: "https://apps.microsoft.com/detail/9npwb2bk246z",
+    screenshots: [
+      { src: "/numerra_1.webp", label: "Scientific", caption: "Trig, logarithms, powers and factorials on one keypad." },
+      { src: "/numerra_2.webp", label: "Programmer", caption: "HEX, DEC, OCT and BIN with full bitwise operations — AND, OR, XOR, NOT and shifts." },
+      { src: "/numerra_3.webp", label: "RPN", caption: "Stack-based entry with ENTER, SWAP and DROP for chained calculations." },
+      { src: "/numerra_4.webp", label: "Converters & tools", caption: "Unit converters plus financial tools — loan, interest, tip, discount, BMI and more." },
+      { src: "/numerra_5.webp", label: "Currency", caption: "180+ currencies with real-time rates. Type a full expression — it evaluates, then converts." },
+    ],
+    featured: true,
+  },
+  {
+    title: "YWCIMS",
+    kind: "Web Platform",
+    platform: "Web Platform",
+    story:
+      "Built the admin and employer-facing sides of an internal management system for YWCI Manpower Services — covering workforce onboarding, attendance tracking, payroll processing, compliance management, and government benefit reporting.",
+    tags: ["Web App", "Admin Panel", "Workforce Management"],
+    link: "https://ywcims.com/home.html",
+    screenshots: undefined,
+    featured: false,
+  },
+  {
+    title: "Zamora Gym Ecosystem",
+    kind: "Mobile App",
+    platform: "Mobile — iOS/Android",
+    story:
+      "A private client needed to replace their paper-based membership system. Built a dual-purpose platform: management dashboard for the owner (membership tracking, revenue), and a training companion for members (custom interval timer, video tutorials, daily checklist). Replaced the entire manual workflow.",
+    tags: ["React Native", "Mobile", "Dashboard", "Fitness"],
+    link: "https://github.com/mangfredo/Zamora-Gym-App",
+    screenshots: undefined,
+    featured: false,
+  },
+  {
+    title: "JOBSearch",
+    kind: "Web Platform",
+    platform: "Web Platform",
+    story:
+      "A recruitment portal built for a client's capstone presentation. Focused on minimizing time-to-apply with an intuitive interface that bridges talent and opportunity.",
+    tags: ["Web App", "UI/UX", "Recruitment"],
+    link: "https://github.com/mangfredo/JOBSearch",
+    screenshots: undefined,
+    featured: false,
+  },
+  {
+    title: "Fix Me: The IT Odyssey",
+    kind: "Simulation",
+    platform: "Interactive Simulation",
+    story:
+      "A narrative-driven simulation where you play as an IT Specialist navigating a corporate headquarters. Diagnose hardware failures, resolve security vulnerabilities, and fix technical bottlenecks under time pressure. A tribute to the unsung heroes of tech support.",
+    tags: ["Simulation", "Gamification", "Capstone"],
+    link: "https://github.com/mangfredo/Fix-Me-Game",
+    screenshots: undefined,
+    featured: false,
+  },
+  {
+    title: "Budget Tracker",
+    kind: "Personal Tool",
+    platform: "Personal Tool",
+    story:
+      "A private budget tracker I built for personal use. Organizes expenses by pay period or month, tracks a running total against a set budget, and shows the remaining balance at a glance. Everything lives in localStorage — no backend, no account, no fuss. Accessible only by direct URL.",
+    tags: ["Next.js", "TypeScript", "localStorage", "Mobile-first"],
+    link: "/budget-tracker",
+    screenshots: undefined,
+    featured: false,
+  },
+  {
+    title: "TaskManagementApp",
+    kind: "Desktop App",
+    platform: "Desktop — Windows",
+    story:
+      "A lightweight, offline-capable task management system built to a client's requirements. Optimized for speed and native Windows integration — no external latency, no cloud dependency.",
+    tags: ["Windows Forms", "C#", "Desktop"],
+    link: "https://github.com/mangfredo/Task-Management-App",
+    screenshots: undefined,
+    featured: false,
+  },
+  {
+    title: "Exotech",
+    kind: "Specialized POS",
+    platform: "Specialized POS",
+    story:
+      "Standard POS systems aren't built for exotic food markets. Exotech handles high-value, rare-stock items with specialized inventory and pricing models that generic retail software can't touch.",
+    tags: ["POS", "Windows Forms", "C#"],
+    link: "https://github.com/mangfredo/Exotech",
+    screenshots: undefined,
+    featured: false,
+  },
+];
+

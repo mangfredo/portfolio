@@ -340,9 +340,11 @@ interface HistoryLine {
 interface TerminalProps {
   startTyping?: boolean;
   onComplete?: () => void;
+  /** Stretch to the parent's height (docked IDE panel) instead of the 200–350px window */
+  fill?: boolean;
 }
 
-export default function Terminal({ startTyping = true, onComplete }: TerminalProps) {
+export default function Terminal({ startTyping = true, onComplete, fill = false }: TerminalProps) {
   const [themeIndex, setThemeIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
   const [typedChars, setTypedChars] = useState(0);
@@ -704,7 +706,7 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
   }
 
   return (
-    <div ref={outerRef} className="w-full relative">
+    <div ref={outerRef} className={`w-full relative ${fill ? "h-full flex flex-col" : ""}`}>
       {/* Theme toggle button */}
       <button
         onClick={cycleTheme}
@@ -721,7 +723,7 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
       </button>
 
       <div
-        className="overflow-hidden border transition-all duration-300"
+        className={`overflow-hidden border transition-all duration-300 ${fill ? "flex-1 min-h-0 flex flex-col" : ""}`}
         style={{
           background: theme.bodyBg,
           borderColor: theme.border,
@@ -744,7 +746,7 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
         <div
           ref={bodyRef}
           className="p-5 font-mono text-sm leading-relaxed transition-colors duration-300 overflow-y-auto relative terminal-body"
-          style={{ minHeight: "200px", maxHeight: "350px" }}
+          style={fill ? { flex: 1, minHeight: 0 } : { minHeight: "200px", maxHeight: "350px" }}
           onContextMenu={handleContextMenu}
         >
           {/* Initial animated command */}

@@ -1,223 +1,176 @@
-import ScreenshotCarousel from "./ScreenshotCarousel";
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
 import LazyVideo from "./LazyVideo";
+import EditorFile, { Mark } from "./ide/EditorFile";
+import { slugify } from "./ide/files";
+import { projects } from "@/content/projects";
+import { profile, sections } from "@/content/profile";
 
-const projects = [
-  {
-    sheet: "01",
-    title: "The Offer Letter Engine",
-    why: "I was watching a colleague spend an entire afternoon manually converting a Word document into JavaScript. Same structure every time, same rules, same mistakes. I thought: this should take seconds, not hours.",
-    story:
-      "Built a parsing engine in Node.js backed by PostgreSQL that takes a Word document containing contract details, extracts the content, applies strict validation rules, and generates production-ready JavaScript — handling complex edge cases across multiple countries and employment types. Code generation completes in roughly 10 seconds. The full end-to-end process takes under 10 minutes, down from 6 hours.",
-    aftermath:
-      "The company's CTO and Director of Engineering is planning the core logic for integration into the flagship self-service product.",
-    tags: ["Node.js", "Django/DRF", "PostgreSQL", "Parsing Engine", "Validation"],
-    metric: "97%+",
-    metricLabel: "time saved",
-    nda: "Due to confidentiality, only a demonstration of the tool's workflow is shown — illustrating how it converts document specs into production-ready code.",
-    video: "/offer_letter_tool_demo.mp4",
-    link: null,
-  },
-  {
-    sheet: "02",
-    title: "Enterprise Workflow Automation Suite",
-    why: "Every developer on the team was doing the same 15-click dance through Jira, QA tools, and internal systems — multiple times a day. Nobody questioned it because 'that's just how it works.' I questioned it.",
-    story:
-      "Developed a suite of browser-based automation scripts (Tampermonkey) to streamline navigation, automate Jira workflows, and integrate internal tools into a unified workflow. DOM manipulation, event interception, handling lazy-loaded elements and dynamic content — all designed to work with existing enterprise tools without any backend changes.",
-    aftermath:
-      "Independently designed and deployed. Actively used across the team — saving an estimated 2–3 hours of dev time per day when used consistently.",
-    tags: ["JavaScript", "Tampermonkey", "DOM Manipulation", "Browser Automation"],
-    metric: "10+",
-    metricLabel: "tools built",
-    nda: null,
-    video: null,
-    link: { href: "#automation", label: "See all tools" },
-  },
-  {
-    sheet: "03",
-    title: "Smart Quote Replacer — VS Code Extension",
-    why: "Contract files needed specific typographic quotation marks — straight, curly, styled. Getting them wrong caused rendering issues. Getting them right by hand was tedious and error-prone. So I built an extension that does it automatically.",
-    story:
-      "A VS Code extension that intelligently replaces escaped quotes with context-aware typographic equivalents. It evaluates surrounding characters to determine correct opening and closing quotation marks, supports preview mode, and adds right-click context menu actions for quick fixes.",
-    aftermath:
-      "Adopted as a multi-role tool used by both developers and QA engineers, integrated into the team's daily development and review process. Currently on v2.2.",
-    tags: ["VS Code Extension", "JavaScript", "Regex", "Developer Tooling"],
-    metric: "v2.2",
-    metricLabel: "current",
-    nda: null,
-    video: "/smart_quote_replacer_demo.mp4",
-    link: null,
-  },
-];
+type Project = (typeof projects)[number];
 
-const TOTAL = projects.length;
+function Avatar() {
+  return (
+    <span className="pr-avatar" aria-hidden="true">
+      <Image src={profile.photo} alt="" width={28} height={28} />
+    </span>
+  );
+}
+
+// One war story as a merged pull request: problem → change → review
+function PullRequest({ p }: { p: Project }) {
+  const slug = slugify(p.title);
+  const hasFiles = !!(p.video || p.nda);
+  const [tab, setTab] = useState<"conversation" | "files">("conversation");
+  const tabId = (t: string) => `pr-${slug}-${t}`;
+
+  return (
+    <article id={`work-${slug}`} className="pr ln" style={{ scrollMarginTop: "calc(var(--ide-top) + 1rem)" }}>
+      <header className="pr__head">
+        <h3 className="pr__title">
+          {p.title} <span className="pr__num">#{p.sheet}</span>
+        </h3>
+        <div className="pr__meta">
+          <span className="pr__state">
+            <span aria-hidden="true">⑂</span> Merged
+          </span>
+          <span className="pr__check" aria-label={`${p.metric} ${p.metricLabel}`}>
+            <span aria-hidden="true">✓</span> <strong>{p.metric}</strong> {p.metricLabel}
+          </span>
+          <span className="pr__branch" aria-hidden="true">
+            {slug} → main
+          </span>
+        </div>
+      </header>
+
+      {hasFiles && (
+        <div className="pr__tabs" role="tablist" aria-label={`${p.title} pull request`}>
+          {(["conversation", "files"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              role="tab"
+              id={tabId(`${t}-tab`)}
+              aria-selected={tab === t}
+              aria-controls={tabId(t)}
+              className="pr__tab"
+              onClick={() => setTab(t)}
+            >
+              {t === "conversation" ? "Conversation" : "Files changed"}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Both panels stay in the DOM so all text is indexed */}
+      <div
+        id={tabId("conversation")}
+        role={hasFiles ? "tabpanel" : undefined}
+        aria-labelledby={hasFiles ? tabId("conversation-tab") : undefined}
+        hidden={tab !== "conversation"}
+        className="pr__body"
+      >
+        <ol className="pr-thread">
+          <li className="pr-comment">
+            <Avatar />
+            <div className="pr-comment__box">
+              <p className="pr-comment__by">
+                <strong>{profile.name}</strong> opened this · <span className="pr-tag">problem</span>
+              </p>
+              <blockquote className="pr-comment__text pr-comment__text--quote">{p.why}</blockquote>
+            </div>
+          </li>
+          <li className="pr-comment">
+            <Avatar />
+            <div className="pr-comment__box">
+              <p className="pr-comment__by">
+                <strong>{profile.name}</strong> pushed the fix · <span className="pr-tag">solution</span>
+              </p>
+              <p className="pr-comment__text">{p.story}</p>
+            </div>
+          </li>
+          <li className="pr-comment pr-comment--review">
+            <span className="pr-review-icon" aria-hidden="true">
+              ✓
+            </span>
+            <div className="pr-comment__box">
+              <p className="pr-comment__by">
+                <span className="story__label">{sections.work.aftermathLabel}</span>
+                <span className="pr-approved">approved</span>
+              </p>
+              <p className="pr-comment__text">{p.aftermath}</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      {hasFiles && (
+        <div
+          id={tabId("files")}
+          role="tabpanel"
+          aria-labelledby={tabId("files-tab")}
+          hidden={tab !== "files"}
+          className="pr__body"
+        >
+          {p.nda && (
+            <div className="ide-warn mb-4">
+              <span className="ide-warn__icon" aria-hidden="true">
+                ⚠
+              </span>
+              <p>{p.nda}</p>
+            </div>
+          )}
+          {p.video && tab === "files" && (
+            <div className="story__preview" style={{ marginTop: 0 }}>
+              <div className="ide-pane__bar">
+                <span aria-hidden="true">▶</span>
+                <span className="ide-pane__bar-title">Preview</span>
+                <span className="tok-com">{p.video.replace("/", "")}</span>
+              </div>
+              <LazyVideo src={p.video} className="overflow-hidden" />
+            </div>
+          )}
+        </div>
+      )}
+
+      <footer className="pr__foot">
+        <span className="pr__labels-title">Labels</span>
+        {p.tags.map((t) => (
+          <span key={t} className="pr-label">
+            {t}
+          </span>
+        ))}
+        {p.video && tab === "conversation" && (
+          <button type="button" className="ide-link pr__demo" onClick={() => setTab("files")}>
+            ▶ Watch demo
+          </button>
+        )}
+        {p.link && (
+          <a href={p.link.href} className="ide-link pr__demo">
+            {p.link.label} →
+          </a>
+        )}
+      </footer>
+    </article>
+  );
+}
 
 export default function Projects() {
   return (
-    <section id="work" className="py-20 sm:py-32 px-6 sm:px-10">
-      <div style={{ maxWidth: "1120px", marginInline: "auto" }}>
+    <EditorFile id="work" label="Work">
+      <p className="ln ide-comment mb-3">
+        <span className="tok-kw" style={{ fontStyle: "normal" }}>$</span> gh pr list --state merged
+      </p>
+      <h2 className="ln ide-h2 mb-4">
+        <Mark>##</Mark>
+        {sections.work.heading}
+      </h2>
+      <p className="ln ide-lead mb-12">{sections.work.intro}</p>
 
-        {/* ── Section divider ── */}
-        <div className="flex items-center gap-0 mb-16" aria-hidden="false">
-          <span style={{ width: "1px", height: "8px", background: "var(--line)", flexShrink: 0 }} />
-          <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
-          <span
-            className="px-3 font-mono"
-            style={{ fontSize: "0.72rem", color: "var(--ink-soft)", letterSpacing: "0.06em", flexShrink: 0 }}
-          >
-            — 02 · work —
-          </span>
-          <span style={{ flex: 1, height: "1px", background: "var(--line)" }} />
-          <span style={{ width: "1px", height: "8px", background: "var(--line)", flexShrink: 0 }} />
-        </div>
-
-        <h2
-          className="mb-4"
-          style={{ fontSize: "clamp(1.5rem, 3vw, 1.75rem)", fontWeight: 500 }}
-        >
-          War Stories
-        </h2>
-        <p
-          className="mb-16"
-          style={{
-            color: "var(--ink-soft)",
-            maxWidth: "560px",
-            lineHeight: 1.7,
-            fontSize: "1rem",
-          }}
-        >
-          Not a list of features. These are the problems I found, the systems I
-          built to solve them, and what happened after.
-        </p>
-
-        <div className="space-y-0">
-          {projects.map((p, idx) => (
-            <article
-              key={p.sheet}
-              className="reveal border p-8 sm:p-10"
-              style={{
-                borderColor: "var(--line)",
-                background: "var(--paper-raised)",
-                marginBottom: idx < projects.length - 1 ? "1px" : 0,
-              }}
-            >
-              {/* Header row: circled ref flag + leader + title + leader-line callout */}
-              <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
-                <div className="flex-1">
-                  {/* §8-C: Circled reference flag connecting to case-study title */}
-                  <div className="flex items-center gap-0 mb-3">
-                    <div className="bp-ref-flag">
-                      <div className="bp-ref-flag__circle">
-                        <span className="bp-ref-flag__num">{p.sheet}</span>
-                      </div>
-                      <span
-                        className="bp-ref-flag__caption"
-                        aria-label={`Sheet ${p.sheet} of ${TOTAL}`}
-                      >
-                        SHEET {p.sheet} OF {String(TOTAL).padStart(2, "0")}
-                      </span>
-                    </div>
-                    {/* Short leader from circle into heading */}
-                    <div className="bp-ref-leader hidden sm:flex">
-                      <div className="bp-ref-leader__line" />
-                    </div>
-                  </div>
-                  <h3
-                    className="font-mono"
-                    style={{ fontSize: "clamp(1.1rem, 2.2vw, 1.4rem)", fontWeight: 500, color: "var(--ink)" }}
-                  >
-                    {p.title}
-                  </h3>
-                </div>
-
-                {/* Leader-line callout for the metric */}
-                <div
-                  className="flex items-center flex-shrink-0"
-                  aria-label={`${p.metric} ${p.metricLabel}`}
-                >
-                  <span className="bp-leader-line" aria-hidden="true" />
-                  <span className="bp-leader-dot" aria-hidden="true" />
-                  <span className="bp-leader-value">{p.metric}</span>
-                  <span className="bp-leader-label">{p.metricLabel}</span>
-                </div>
-              </div>
-
-              {/* Motivation quote */}
-              <blockquote
-                className="border-l-2 pl-5 mb-6 text-base italic"
-                style={{
-                  borderColor: "var(--accent)",
-                  color: "var(--ink-soft)",
-                  lineHeight: 1.75,
-                }}
-              >
-                {p.why}
-              </blockquote>
-
-              {/* Story */}
-              <p
-                className="text-base mb-4"
-                style={{ color: "var(--ink-soft)", lineHeight: 1.75 }}
-              >
-                {p.story}
-              </p>
-
-              {/* Aftermath */}
-              <p className="text-base mb-6" style={{ lineHeight: 1.75 }}>
-                <span
-                  className="font-mono mr-2"
-                  style={{
-                    fontSize: "0.68rem",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    color: "var(--accent-2)",
-                  }}
-                >
-                  Aftermath:
-                </span>
-                <span style={{ color: "var(--ink-soft)" }}>{p.aftermath}</span>
-              </p>
-
-              {/* NDA notice */}
-              {p.nda && (
-                <div className="bp-nda mb-6">
-                  <span style={{ flexShrink: 0 }} aria-hidden="true">🔒</span>
-                  <p>{p.nda}</p>
-                </div>
-              )}
-
-              {/* Video */}
-              {p.video && (
-                <div className="mb-6 border" style={{ borderColor: "var(--line)" }}>
-                  <LazyVideo src={p.video} className="overflow-hidden" />
-                </div>
-              )}
-
-              {/* BOM chips + link */}
-              <div className="flex flex-wrap items-center gap-2">
-                {p.tags.map((t) => (
-                  <span key={t} className="bp-chip">{t}</span>
-                ))}
-                {p.link && (
-                  <a
-                    href={p.link.href}
-                    className="ml-auto font-mono text-xs transition-colors"
-                    style={{
-                      color: "var(--accent)",
-                      letterSpacing: "0.06em",
-                      fontSize: "0.72rem",
-                      textDecoration: "underline",
-                      textDecorationColor: "var(--line)",
-                      textUnderlineOffset: "3px",
-                    }}
-                  >
-                    {p.link.label} →
-                  </a>
-                )}
-              </div>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
+      {projects.map((p) => (
+        <PullRequest key={p.sheet} p={p} />
+      ))}
+    </EditorFile>
   );
 }

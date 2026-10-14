@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
+import { Moon, Sun } from "@phosphor-icons/react";
 
-export default function ThemeToggle() {
+// "bulb" is the pull-cord lamp; "icon" is a compact button for the IDE title bar
+export default function ThemeToggle({ variant = "bulb" }: { variant?: "bulb" | "icon" }) {
   const [dark, setDark] = useState(true);
   const [pulling, setPulling] = useState(false);
   const [animating, setAnimating] = useState(false);
@@ -104,6 +106,26 @@ export default function ThemeToggle() {
       }
     }, 280);
   }, [dark, animating]);
+
+  if (variant === "icon") {
+    return (
+      <button
+        ref={bulbRef}
+        onClick={toggle}
+        type="button"
+        className="ide-icon-btn"
+        aria-label={`Switch to ${dark ? "light" : "dark"} mode`}
+        title={`Switch to ${dark ? "light" : "dark"} mode`}
+      >
+        <span
+          className="inline-grid place-items-center transition-transform duration-300"
+          style={{ transform: pulling ? "rotate(-30deg) scale(0.85)" : "none" }}
+        >
+          {dark ? <Moon size={15} weight="regular" /> : <Sun size={15} weight="regular" />}
+        </span>
+      </button>
+    );
+  }
 
   return (
     <button

@@ -1,4 +1,4 @@
-import Navbar from "@/components/Navbar";
+import IdeShell from "@/components/ide/IdeShell";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Experience from "@/components/Experience";
@@ -6,22 +6,20 @@ import Projects from "@/components/Projects";
 import PersonalProjects from "@/components/PersonalProjects";
 import Decalogue from "@/components/Decalogue";
 import Footer from "@/components/Footer";
-import RevealObserver from "@/components/RevealObserver";
+import "./ide.css";
+import "./ide-views.css";
+import "./ide-sections.css";
 
 export default function Home() {
   return (
-    <div className="eva-root">
-      <RevealObserver />
-      <Navbar />
-      <main className="flex-1">
-        <Hero />
-        <About />
-        <Experience />
-        <Projects />
-        <PersonalProjects />
-        <Decalogue />
-      </main>
+    <IdeShell>
+      <Hero />
+      <About />
+      <Experience />
+      <Projects />
+      <PersonalProjects />
+      <Decalogue />
       <Footer />
-    </div>
+    </IdeShell>
   );
 }
