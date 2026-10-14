@@ -1,4 +1,4 @@
-import ScreenshotCarousel from "./ScreenshotCarousel";
+import ProductShowcase from "./ProductShowcase";
 
 const projects = [
   {
@@ -10,11 +10,11 @@ const projects = [
     tags: ["WinUI 3", "C#", "Windows App SDK", "Published"],
     link: "https://apps.microsoft.com/detail/9npwb2bk246z",
     screenshots: [
-      "/numerra_1.webp",
-      "/numerra_2.webp",
-      "/numerra_3.webp",
-      "/numerra_4.webp",
-      "/numerra_5.webp",
+      { src: "/numerra_1.webp", label: "Scientific", caption: "Trig, logarithms, powers and factorials on one keypad." },
+      { src: "/numerra_2.webp", label: "Programmer", caption: "HEX, DEC, OCT and BIN with full bitwise operations — AND, OR, XOR, NOT and shifts." },
+      { src: "/numerra_3.webp", label: "RPN", caption: "Stack-based entry with ENTER, SWAP and DROP for chained calculations." },
+      { src: "/numerra_4.webp", label: "Converters & tools", caption: "Unit converters plus financial tools — loan, interest, tip, discount, BMI and more." },
+      { src: "/numerra_5.webp", label: "Currency", caption: "180+ currencies with real-time rates. Type a full expression — it evaluates, then converts." },
     ],
     featured: true,
   },
@@ -134,7 +134,6 @@ export default function PersonalProjects() {
         <div className="grid md:grid-cols-2 gap-0 reveal-stagger">
           {projects.map((p, i) => {
             const isFeatured = p.featured;
-            const figCount = p.screenshots?.length ?? 0;
 
             return (
               <article
@@ -172,29 +171,10 @@ export default function PersonalProjects() {
                     {p.story}
                   </p>
 
-                  {/* Screenshots with Fig. captions */}
+                  {/* Screenshots — labeled mode showcase */}
                   {p.screenshots && p.screenshots.length > 0 && (
                     <div className="mb-5">
-                      <ScreenshotCarousel
-                        screenshots={p.screenshots}
-                        title={p.title}
-                      />
-                      {/* Figure captions */}
-                      <div
-                        className="grid mt-0"
-                        style={{ gridTemplateColumns: `repeat(${Math.min(figCount, 5)}, 1fr)`, gap: "0" }}
-                        aria-hidden="true"
-                      >
-                        {p.screenshots.map((_, fi) => (
-                          <p
-                            key={fi}
-                            className="bp-fig-caption"
-                            style={{ fontSize: "0.6rem" }}
-                          >
-                            Fig. {fi + 1}
-                          </p>
-                        ))}
-                      </div>
+                      <ProductShowcase slides={p.screenshots} title={p.title} />
                     </div>
                   )}
 
