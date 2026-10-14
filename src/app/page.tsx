@@ -7,14 +7,11 @@ import PersonalProjects from "@/components/PersonalProjects";
 import Decalogue from "@/components/Decalogue";
 import Footer from "@/components/Footer";
 import RevealObserver from "@/components/RevealObserver";
-import SheetFrame from "@/components/SheetFrame";
 
 export default function Home() {
   return (
-    <>
+    <div className="eva-root">
       <RevealObserver />
-      {/* Sheet-frame corner registration ticks — decorative, hidden < 600px */}
-      <SheetFrame />
       <Navbar />
       <main className="flex-1">
         <Hero />
@@ -25,6 +22,6 @@ export default function Home() {
         <Decalogue />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

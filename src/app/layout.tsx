@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { IBM_Plex_Sans, Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
+// Budget tracker inherits the body font, so Plex Sans stays as the base
 const plexSans = IBM_Plex_Sans({
   variable: "--font-plex-sans",
   subsets: ["latin"],
@@ -9,10 +10,24 @@ const plexSans = IBM_Plex_Sans({
   display: "swap",
 });
 
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
+// Display serif for the hero headline
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  display: "swap",
+});
+
+const evaSans = Inter({
+  variable: "--font-eva-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const evaMono = JetBrains_Mono({
+  variable: "--font-eva-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
   display: "swap",
 });
 
@@ -77,7 +92,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plexSans.variable} ${plexMono.variable} h-full`}
+      className={`${plexSans.variable} ${evaSans.variable} ${evaMono.variable} ${playfair.variable} h-full`}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
     >

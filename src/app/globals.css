@@ -1,23 +1,44 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-plex-sans);
-  --font-mono: var(--font-plex-mono);
+  --font-sans: var(--font-eva-sans);
+  --font-mono: var(--font-eva-mono);
 }
 
-/* ── BLUEPRINT DESIGN TOKENS ─────────────────────────────────── */
+/* ── EVA SYNTHO DESIGN TOKENS ────────────────────────────────── */
+/* Shared scale — radius, shadow, motion (both themes) */
+:root {
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   18px;
+  --radius-xl:   28px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.32);
+  --highlight-top: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  --ease-soft: cubic-bezier(0.32, 0.72, 0.24, 1);
+  --dur-fast:  120ms;
+  --dur-base:  200ms;
+}
 
 :root[data-theme="light"],
 html:not([data-theme="dark"]) {
-  /* Whiteprint — pale drafting paper */
-  --paper:         #EDEFE9;
-  --paper-raised:  #E4E7DF;
-  --ink:           #17324A;
-  --ink-soft:      #4B6072;
-  --line:          rgba(23, 50, 74, 0.16);
-  --accent:        #BF4C2C;
-  --accent-soft:   rgba(191, 76, 44, 0.10);
-  --accent-2:      #2B6E63;
+  /* Light "dawn" variant — bone canvas, ink text, deeper amber for contrast */
+  --paper:         oklch(0.965 0.010 80);
+  --paper-raised:  oklch(0.99 0.006 80);
+  --paper-hi:      oklch(0.93 0.012 80);
+  --ink:           oklch(0.22 0.018 260);
+  --ink-soft:      oklch(0.42 0.016 255);
+  --line:          color-mix(in oklch, var(--ink) 12%, transparent);
+  --accent:        oklch(0.58 0.15 55);
+  --accent-soft:   color-mix(in oklch, var(--accent) 12%, transparent);
+  --accent-2:      oklch(0.50 0.06 165);
+  --accent-fg:     oklch(0.18 0.02 60);
+  --shadow-sm:     0 1px 2px rgba(20, 24, 40, 0.08);
+  --shadow-md:     0 8px 24px rgba(20, 24, 40, 0.10);
+  --highlight-top: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 
   /* Legacy aliases — keep older JSX working during migration */
   --bg:            var(--paper);
@@ -32,15 +53,17 @@ html:not([data-theme="dark"]) {
 :root,
 html,
 html[data-theme="dark"] {
-  /* Cyanotype — Prussian-blue ground */
-  --paper:         #0E1E2E;
-  --paper-raised:  #142943;
-  --ink:           #E7EEF3;
-  --ink-soft:      #8FA5B8;
-  --line:          rgba(231, 238, 243, 0.14);
-  --accent:        #E08A52;
-  --accent-soft:   rgba(224, 138, 82, 0.14);
-  --accent-2:      #5FBFA9;
+  /* Warm dusk — Eva Syntho ink / bone / amber / sage */
+  --paper:         oklch(0.18 0.018 260);
+  --paper-raised:  oklch(0.26 0.018 258);
+  --paper-hi:      oklch(0.31 0.018 256);
+  --ink:           oklch(0.97 0.012 80);
+  --ink-soft:      oklch(0.76 0.012 80);
+  --line:          color-mix(in oklch, oklch(0.76 0.012 80) 10%, transparent);
+  --accent:        oklch(0.74 0.17 60);
+  --accent-soft:   color-mix(in oklch, var(--accent) 14%, transparent);
+  --accent-2:      oklch(0.72 0.07 165);
+  --accent-fg:     oklch(0.18 0.02 60);
 
   --bg:            var(--paper);
   --fg:            var(--ink);
@@ -51,10 +74,11 @@ html[data-theme="dark"] {
   --accent-bright: var(--accent-2);
 }
 
-/* ── HARD RESETS — the two structural rules ──────────────────── */
-*,
-*::before,
-*::after {
+/* ── HARD RESETS — budget tracker only (portfolio uses Eva radii/shadows) ── */
+.wf-root,
+.wf-root *,
+.wf-root *::before,
+.wf-root *::after {
   border-radius: 0 !important;
   box-shadow: none !important;
 }
@@ -71,7 +95,7 @@ html, body {
 }
 
 body {
-  font-family: var(--font-sans), 'IBM Plex Sans', system-ui, sans-serif;
+  font-family: var(--font-plex-sans), 'IBM Plex Sans', system-ui, sans-serif;
   font-size: 1rem;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
@@ -79,35 +103,41 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
   overflow-x: hidden;
 
-  /* ── §8-A: graph-paper ground ─────────────────────────────
-   * Two grid layers:
-   *   80px module lines  — barely-there, registers consciously
-   *    8px fine grid     — ~40% opacity, almost subliminal
-   * Both use --line so they inherit theme color automatically.
-   * ───────────────────────────────────────────────────────── */
-  background-image:
-    repeating-linear-gradient(0deg,   var(--line) 0 1px, transparent 1px 80px),
-    repeating-linear-gradient(90deg,  var(--line) 0 1px, transparent 1px 80px),
-    repeating-linear-gradient(0deg,   color-mix(in srgb, var(--line) 45%, transparent) 0 1px, transparent 1px 8px),
-    repeating-linear-gradient(90deg,  color-mix(in srgb, var(--line) 45%, transparent) 0 1px, transparent 1px 8px);
-  background-size: 80px 80px, 80px 80px, 8px 8px, 8px 8px;
+  /* Eva canvas — faint amber glow upper-left, no patterns */
+  background-image: radial-gradient(ellipse 60% 50% at 15% 0%,
+    color-mix(in oklch, var(--accent) 8%, transparent) 0%,
+    transparent 70%);
+  background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+/* Portfolio-only wrapper — applies Eva type without affecting the budget tracker */
+.eva-root {
+  display: contents;
+  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
 }
 
 /* ── SCROLLBAR ───────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--paper); }
-::-webkit-scrollbar-thumb { background: var(--line); }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: var(--radius-full); }
 
 /* ── SELECTION ───────────────────────────────────────────────── */
 ::selection      { background: var(--accent-soft); color: var(--ink); }
 ::-moz-selection { background: var(--accent-soft); color: var(--ink); }
 
 /* ── TYPOGRAPHY ROLES ────────────────────────────────────────── */
+/* Sans for headings and chrome; mono reserved for code-like artifacts */
 h1, h2, h3, h4, h5, h6,
-.font-mono, .mono,
 nav, .nav-tab, .label, .tag, .chip {
-  font-family: var(--font-mono), 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.font-mono, .mono {
+  font-family: var(--font-mono), 'JetBrains Mono', ui-monospace, monospace;
   color: var(--ink);
 }
 
@@ -126,7 +156,14 @@ nav, .nav-tab, .label, .tag, .chip {
 .bp-panel {
   border: 1px solid var(--line);
   background: var(--paper-raised);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm), var(--highlight-top);
   padding: 2rem;
+  transition: box-shadow var(--dur-base) var(--ease-soft);
+}
+
+.bp-panel:hover {
+  box-shadow: var(--shadow-md), var(--highlight-top);
 }
 
 /* ── BOM CHIP (replaces rounded tag/pill) ────────────────────── */
@@ -134,13 +171,14 @@ nav, .nav-tab, .label, .tag, .chip {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper-hi);
   padding: 0.25rem 0.625rem;
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.78rem;
   line-height: 1.4;
-  letter-spacing: 0.02em;
   color: var(--ink-soft);
-  transition: border-color 120ms ease, background 120ms ease;
+  transition: border-color var(--dur-fast) var(--ease-soft), background var(--dur-fast) var(--ease-soft);
   cursor: default;
 }
 
@@ -156,36 +194,43 @@ nav, .nav-tab, .label, .tag, .chip {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border: 1.5px solid var(--ink);
-  padding: 0.75rem 1.5rem;
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1.25rem;
+  font-family: var(--font-sans), 'Inter', sans-serif;
   font-size: 0.875rem;
+  font-weight: 500;
   line-height: 1;
-  background: transparent;
+  background: var(--paper-hi);
   color: var(--ink);
+  box-shadow: var(--highlight-top);
   cursor: pointer;
-  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+  transition: background var(--dur-fast) var(--ease-soft),
+              box-shadow var(--dur-base) var(--ease-soft),
+              transform var(--dur-fast) var(--ease-soft);
   text-decoration: none;
 }
 
+.bp-btn:active { transform: scale(0.98); }
+
 .bp-btn:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid color-mix(in oklch, var(--accent) 50%, transparent);
   outline-offset: 2px;
 }
 
 .bp-btn--primary {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--accent-fg);
+  box-shadow: 0 0 24px color-mix(in oklch, var(--accent) 18%, transparent), var(--highlight-top);
 }
 
 .bp-btn--primary:hover {
-  background: var(--ink-soft);
-  border-color: var(--ink-soft);
+  box-shadow: 0 0 36px color-mix(in oklch, var(--accent) 28%, transparent), var(--highlight-top);
 }
 
 .bp-btn--outline:hover {
-  border-color: var(--accent);
-  color: var(--ink);
+  background: var(--paper-raised);
 }
 
 /* ── DIMENSION-LINE SECTION DIVIDER ─────────────────────────── */
@@ -194,7 +239,7 @@ nav, .nav-tab, .label, .tag, .chip {
   align-items: center;
   gap: 12px;
   color: var(--ink-soft);
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   margin: 0;
@@ -245,7 +290,7 @@ nav, .nav-tab, .label, .tag, .chip {
 }
 
 .bp-leader-value {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--accent);
@@ -253,7 +298,7 @@ nav, .nav-tab, .label, .tag, .chip {
 }
 
 .bp-leader-label {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.65rem;
   letter-spacing: 0.1em;
   color: var(--ink-soft);
@@ -266,7 +311,7 @@ nav, .nav-tab, .label, .tag, .chip {
   border: 1px solid var(--line);
   background: var(--paper-raised);
   overflow: hidden;
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.8rem;
 }
 
@@ -280,7 +325,7 @@ nav, .nav-tab, .label, .tag, .chip {
 }
 
 .bp-term-path {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.68rem;
   color: var(--ink-soft);
   letter-spacing: 0.01em;
@@ -304,7 +349,7 @@ nav, .nav-tab, .label, .tag, .chip {
 }
 
 .bp-legend-heading {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.68rem;
   letter-spacing: 0.12em;
   color: var(--ink-soft);
@@ -343,7 +388,7 @@ nav, .nav-tab, .label, .tag, .chip {
   align-items: center;
   padding: 0 1.25rem;
   border-right: 1px solid var(--line);
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.72rem;
   color: var(--ink-soft);
   white-space: nowrap;
@@ -359,7 +404,7 @@ nav, .nav-tab, .label, .tag, .chip {
   align-items: center;
   padding: 0 1rem;
   border-right: 1px solid var(--line);
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.72rem;
   color: var(--ink-soft);
   text-decoration: none;
@@ -536,7 +581,7 @@ nav, .nav-tab, .label, .tag, .chip {
 
 /* ── KEYBOARD FOCUS (global) ─────────────────────────────────── */
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid color-mix(in oklch, var(--accent) 50%, transparent);
   outline-offset: 2px;
 }
 
@@ -596,7 +641,7 @@ nav, .nav-tab, .label, .tag, .chip {
 
 /* ── SHEET LABEL (SHEET X OF Y) ─────────────────────────────── */
 .bp-sheet-label {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.65rem;
   letter-spacing: 0.12em;
   color: var(--ink-soft);
@@ -604,7 +649,7 @@ nav, .nav-tab, .label, .tag, .chip {
 
 /* ── FIGURE CAPTION ──────────────────────────────────────────── */
 .bp-fig-caption {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.65rem;
   color: var(--ink-soft);
   letter-spacing: 0.04em;
@@ -615,7 +660,7 @@ nav, .nav-tab, .label, .tag, .chip {
 
 /* ── MICRO TITLE BLOCK (card corner label) ───────────────────── */
 .bp-micro-label {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.6rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -678,7 +723,7 @@ img, svg, button, video {
 
 /* ── ANNOTATION LABEL ────────────────────────────────────────── */
 .annotation {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   color: var(--ink-soft);
@@ -694,7 +739,7 @@ img, svg, button, video {
 }
 
 .dim__label {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.68rem;
   color: var(--ink-soft);
   letter-spacing: 0.04em;
@@ -707,6 +752,157 @@ img, svg, button, video {
   /* width is set inline per string length */
   height: 14px;
   overflow: visible;
+}
+
+/* ── HERO BUTTONS (pre-blueprint) ───────────────────────────── */
+.magnetic-btn {
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sel-btn.sel-btn-active,
+.sel-btn.sel-btn-active * {
+  background: var(--fg) !important;
+  color: var(--accent) !important;
+  border-color: var(--fg) !important;
+}
+
+.sel-btn-outline.sel-btn-active,
+.sel-btn-outline.sel-btn-active * {
+  background: transparent !important;
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+
+/* ── PRODUCT SHOWCASE (Numerra) ───────────────────────────────── */
+.showcase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-block: 1rem;
+}
+
+/* Segmented mode tabs — mirrors the app's own mode switcher */
+.showcase-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--paper-hi);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.showcase-tab {
+  flex-shrink: 0;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease-soft), color var(--dur-fast) var(--ease-soft);
+}
+
+.showcase-tab:hover { color: var(--ink); }
+
+.showcase-tab[aria-selected="true"] {
+  background: var(--paper-raised);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm), var(--highlight-top);
+}
+
+/* Fixed-ratio frame — images stack and crossfade, nothing moves */
+.showcase-frame {
+  position: relative;
+  width: min(100%, 420px);
+  aspect-ratio: 833 / 942;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
+  background: #1f1f1f;
+  touch-action: pan-y;
+}
+
+.showcase-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 280ms var(--ease-soft);
+  user-select: none;
+}
+
+.showcase-img[data-active="true"] { opacity: 1; }
+
+.showcase-caption {
+  max-width: 420px;
+  min-height: 2.6em;
+  text-align: center;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-img { transition: none; }
+}
+
+/* ── HEISENBERG MARK (hero) ──────────────────────────────────── */
+.hb-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  animation: hbFloat 6s ease-in-out infinite;
+}
+
+.hb-hat {
+  transform-box: fill-box;
+  transform-origin: 20% 100%;
+  transition: transform var(--dur-base) var(--ease-soft);
+}
+
+.hb-mark:hover .hb-hat {
+  transform: translateY(-4px) rotate(-6deg);
+}
+
+.hb-glint {
+  animation: hbGlint 5s var(--ease-soft) infinite;
+}
+
+.hb-caption {
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-soft);
+}
+
+.hb-mark:hover .hb-caption { opacity: 1; }
+
+@keyframes hbFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+@keyframes hbGlint {
+  0%, 60% { transform: skewX(-20deg) translateX(0); }
+  100%    { transform: skewX(-20deg) translateX(90px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-mark, .hb-glint { animation: none; }
+  .hb-hat { transition: none; }
 }
 
 /* ── §8-E: STAMP BADGE ───────────────────────────────────────── */
@@ -728,7 +924,7 @@ img, svg, button, video {
 }
 
 .bp-stamp__line1 {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.18em;
@@ -738,7 +934,7 @@ img, svg, button, video {
 }
 
 .bp-stamp__line2 {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.55rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -768,7 +964,7 @@ img, svg, button, video {
 }
 
 .bp-ref-flag__num {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--ink);
@@ -776,7 +972,7 @@ img, svg, button, video {
 }
 
 .bp-ref-flag__caption {
-  font-family: var(--font-mono), 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
   font-size: 0.58rem;
   letter-spacing: 0.08em;
   color: var(--ink-soft);
