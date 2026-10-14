@@ -4,53 +4,13 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 const themes = [
   {
-    id: "blueprint",
-    label: "Blueprint",
-    headerBg: "color-mix(in srgb, var(--ink) 4%, var(--paper-raised))",
-    headerBorder: "var(--line)",
-    bodyBg: "var(--paper-raised)",
-    border: "var(--line)",
-    radius: "0",
-    titleBar: (
-      <div className="flex items-center gap-2">
-        {/* Blueprint chrome: status dot only, no traffic lights */}
-        <span
-          className="font-mono text-[0.65rem] tracking-[0.04em]"
-          style={{ color: "var(--ink-soft)" }}
-        >
-          ~/rivalhr/scripts — zsh
-        </span>
-      </div>
-    ),
-    titleText: "",
-    titleRight: (
-      <span
-        style={{
-          width: "6px",
-          height: "6px",
-          background: "var(--accent-2)",
-          display: "inline-block",
-          flexShrink: 0,
-        }}
-        title="success"
-        aria-label="Success"
-      />
-    ),
-    prompt: "$",
-    promptColor: "var(--accent-2)",
-    textColor: "var(--ink-soft)",
-    successColor: "var(--accent-2)",
-    arrowColor: "var(--accent)",
-    errorColor: "var(--accent)",
-  },
-  {
     id: "macos",
     label: "macOS",
     headerBg: "var(--card-bg)",
     headerBorder: "var(--card-border)",
     bodyBg: "var(--card-bg)",
     border: "var(--card-border)",
-    radius: "0",
+    radius: "0.5rem",
     titleBar: (
       <div className="flex items-center gap-2">
         <span className="w-3 h-3 rounded-full" style={{ background: "#ff5f57" }} />
@@ -73,7 +33,7 @@ const themes = [
     headerBorder: "#404040",
     bodyBg: "#1a1a2e",
     border: "#404040",
-    radius: "0",
+    radius: "0.5rem",
     titleBar: (
       <div className="flex items-center gap-1.5">
         <span className="w-2.5 h-2.5 rounded-sm border" style={{ borderColor: "#666", background: "transparent" }} />
@@ -96,7 +56,7 @@ const themes = [
     headerBorder: "#012456",
     bodyBg: "#012456",
     border: "#1a3a6a",
-    radius: "0",
+    radius: "0.5rem",
     titleBar: (
       <div className="flex items-center gap-3">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2">
@@ -140,7 +100,7 @@ const themes = [
     headerBorder: "#5c2d4f",
     bodyBg: "#300a24",
     border: "#5c2d4f",
-    radius: "0",
+    radius: "0.75rem",
     titleBar: (
       <div className="flex items-center gap-2">
         <span className="w-3 h-3 rounded-full" style={{ background: "#e95420" }} />
@@ -398,7 +358,6 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
   const cancelRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
-  const userInteractedRef = useRef(false);
   const terminalVisibleRef = useRef(true);
   const outerRef = useRef<HTMLDivElement>(null);
 
@@ -522,14 +481,18 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
     setCursorPos(0);
   }
 
-  // Track terminal visibility — only run demo when visible
-  // Track terminal visibility — used for scroll-away cleanup only
+  // Track terminal visibility — reset interactive state when scrolled away
   useEffect(() => {
     const el = outerRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         terminalVisibleRef.current = entry.isIntersecting;
+        if (!entry.isIntersecting) {
+          setUserInput("");
+          setCursorPos(0);
+          setHistory([]);
+        }
       },
       { threshold: 0.3 }
     );
@@ -743,14 +706,13 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
   return (
     <div ref={outerRef} className="w-full relative">
       {/* Theme toggle button */}
-      {/* Theme cycle button — positioned top-right of terminal */}
       <button
         onClick={cycleTheme}
-        className="absolute -top-3 -right-3 z-10 px-2.5 py-1 font-mono text-[0.6rem] uppercase tracking-wider border transition-colors cursor-pointer select-none"
+        className="absolute -top-3 -right-3 z-10 px-2.5 py-1 rounded-full font-mono text-[0.6rem] uppercase tracking-wider border transition-all hover:scale-105 cursor-pointer select-none"
         style={{
-          background: "var(--paper-raised)",
-          borderColor: "var(--line)",
-          color: "var(--ink-soft)",
+          background: "var(--card-bg)",
+          borderColor: "var(--card-border)",
+          color: "var(--fg-muted)",
         }}
         aria-label="Switch terminal theme"
         title={`Current: ${theme.label}. Click to switch.`}
@@ -769,18 +731,13 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between gap-3 px-4 py-2.5 border-b transition-all duration-300"
+          className="flex items-center gap-3 px-4 py-2.5 border-b transition-all duration-300"
           style={{ background: theme.headerBg, borderColor: theme.headerBorder }}
         >
-          <div className="flex items-center gap-3 min-w-0">
-            {theme.titleBar}
-            {theme.titleText && (
-              <span className="ml-1 font-mono text-xs truncate transition-colors duration-300" style={{ color: theme.textColor }}>
-                {theme.titleText}
-              </span>
-            )}
-          </div>
-          {"titleRight" in theme && theme.titleRight}
+          {theme.titleBar}
+          <span className="ml-1 font-mono text-xs truncate transition-colors duration-300" style={{ color: theme.textColor }}>
+            {theme.titleText}
+          </span>
         </div>
 
         {/* Body */}
@@ -893,18 +850,16 @@ export default function Terminal({ startTyping = true, onComplete }: TerminalPro
             </p>
           )}
 
-          {/* Fake demo cursor — removed from scrollable body, placed here won't work either */}
-
           {/* Right-click context menu */}
           {contextMenu && (
             <div
-              className="absolute z-50 border py-1 font-mono text-xs min-w-[160px]"
+              className="absolute z-50 rounded-md border shadow-lg py-1 font-mono text-xs min-w-[160px]"
               style={{
                 left: contextMenu.x,
                 top: contextMenu.y,
-                background: "var(--paper-raised)",
-                borderColor: "var(--line)",
-                color: "var(--ink-soft)",
+                background: "var(--card-bg)",
+                borderColor: "var(--card-border)",
+                color: "var(--fg-muted)",
               }}
               onClick={(e) => e.stopPropagation()}
             >
