@@ -4,11 +4,12 @@ import { useRef, useState } from "react";
 import {
   ChartBar, CreditCard, PiggyBank,
   Sun, Moon, ArrowCounterClockwise, X, DownloadSimple, UploadSimple, ArrowLeft,
-  List,
+  List, Cloud,
 } from "@phosphor-icons/react";
 import { exportData, importData } from "@/lib/budgetBackup";
 import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
 import { CURRENCIES } from "@/hooks/useBudgetSettings";
+import StorageModal from "./StorageModal";
 import type { ActiveTab } from "./Sidebar";
 import type { ToastType } from "@/hooks/useToast";
 
@@ -39,6 +40,7 @@ export default function TopNav({
   const isDark = theme === "dark";
   const fileRef = useRef<HTMLInputElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [storageOpen, setStorageOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [mobileCurrencyOpen, setMobileCurrencyOpen] = useState(false);
 
@@ -218,6 +220,9 @@ export default function TopNav({
             </button>
             <button onClick={() => fileRef.current?.click()} className="wf-icon-btn" title="Import data">
               <UploadSimple size={14}/>
+            </button>
+            <button onClick={() => setStorageOpen(true)} className="wf-icon-btn" title="Data storage">
+              <Cloud size={14}/>
             </button>
             <input ref={fileRef} type="file" accept=".json,application/json" style={{ display:"none" }} onChange={handleImport}/>
           </div>
@@ -452,6 +457,12 @@ export default function TopNav({
               </button>
             </div>
 
+            {/* Data storage */}
+            <button onClick={() => { setMenuOpen(false); setStorageOpen(true); }}
+              style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"10px 0", marginBottom:12, borderRadius:10, background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)", border: isDark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(0,0,0,0.10)", color: isDark ? "#94A3B8" : "#64748B", fontWeight:600, fontSize:"0.8rem", cursor:"pointer" }}>
+              <Cloud size={14}/> Data Storage
+            </button>
+
             {/* Back to portfolio */}
             <button onClick={() => { setMenuOpen(false); onBack(); }}
               style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"12px 0", borderRadius:10, background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)", border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.08)", color: isDark ? "#94A3B8" : "#64748B", fontWeight:600, fontSize:"0.875rem", cursor:"pointer" }}>
@@ -462,6 +473,8 @@ export default function TopNav({
           <style>{`@keyframes wf-slide-up { from { transform: translateY(100%); opacity:0; } to { transform: translateY(0); opacity:1; } }`}</style>
         </>
       )}
+
+      {storageOpen && <StorageModal onClose={() => setStorageOpen(false)} onToast={onToast} />}
     </>
   );
 }
