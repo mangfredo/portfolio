@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Desktop, Cloud, CheckCircle, GoogleLogo, SignOut, CopySimple } from "@phosphor-icons/react";
 import Modal from "./Modal";
+import FirebaseSetupGuide from "./FirebaseSetupGuide";
 import {
   parseFirebaseConfig, loadFirebaseConfig, saveFirebaseConfig, clearFirebaseConfig,
   type FirebaseWebConfig,
@@ -36,6 +37,7 @@ export default function StorageModal({ onClose, onToast }: StorageModalProps) {
   const [user, setUser] = useState<FirebaseUserInfo | null | undefined>(undefined);
   const [authBusy, setAuthBusy] = useState(false);
   const [authError, setAuthError] = useState("");
+  const [showGuide, setShowGuide] = useState(false);
 
   // Follow sign-in state for the saved project (loads the Firebase SDK on demand)
   useEffect(() => {
@@ -150,6 +152,24 @@ export default function StorageModal({ onClose, onToast }: StorageModalProps) {
     color: "var(--wf-text)",
   });
 
+  const guideLinkStyle: React.CSSProperties = {
+    background: "none", border: "none", padding: 0, cursor: "pointer",
+    color: "var(--wf-cyan)", fontWeight: 600, fontSize: "0.75rem",
+  };
+
+  if (showGuide) {
+    return (
+      <Modal title="Firebase setup guide" onClose={onClose}>
+        <FirebaseSetupGuide
+          projectId={saved?.projectId}
+          onBack={() => setShowGuide(false)}
+          onFinish={() => { setShowGuide(false); setMode("firebase"); }}
+          onToast={onToast}
+        />
+      </Modal>
+    );
+  }
+
   return (
     <Modal title="Data Storage" onClose={onClose}>
       <div className="space-y-4">
@@ -258,6 +278,11 @@ export default function StorageModal({ onClose, onToast }: StorageModalProps) {
               </p>
             )}
 
+            <p style={{ fontSize: "0.75rem", color: "var(--wf-muted)", margin: 0 }}>
+              Stuck on a step?{" "}
+              <button type="button" onClick={() => setShowGuide(true)} style={guideLinkStyle}>Open the setup guide</button>
+            </p>
+
             <details style={{ fontSize: "0.75rem", color: "var(--wf-muted)" }}>
               <summary style={{ cursor: "pointer" }}>Firestore security rules</summary>
               <p style={{ margin: "6px 0", lineHeight: 1.5 }}>
@@ -299,6 +324,10 @@ export default function StorageModal({ onClose, onToast }: StorageModalProps) {
             <p id="bt-fb-help" style={{ fontSize: "0.75rem", color: "var(--wf-muted)", margin: 0, lineHeight: 1.5 }}>
               Firebase console → Project settings → Your apps → Web app → SDK setup and configuration.
               This config is public by design; your Firestore rules keep the data private.
+            </p>
+            <p style={{ fontSize: "0.75rem", color: "var(--wf-muted)", margin: 0 }}>
+              New to Firebase?{" "}
+              <button type="button" onClick={() => setShowGuide(true)} style={guideLinkStyle}>Follow the setup guide</button>
             </p>
             <div className="flex gap-3 pt-1">
               <button onClick={onClose} className="wf-btn-ghost flex-1 py-2.5">Cancel</button>
