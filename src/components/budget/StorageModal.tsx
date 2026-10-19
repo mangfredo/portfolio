@@ -69,22 +69,31 @@ export default function StorageModal({ onClose, onToast }: StorageModalProps) {
   // Before linking: count what's in the cloud so the user can pick a direction
   const [remoteCount, setRemoteCount] = useState<number | undefined>(undefined);
   const [syncError, setSyncError] = useState("");
-  const [startBusy, setStartBusy] = useState(false);
+  const [startDir, setStartDir] = useState<"upload" | "download" | null>(null);
+  const startBusy = startDir !== null;
+  // Set when the Firestore check has run long — usually no database or unpublished rules
+  const [slowCheckKey, setSlowCheckKey] = useState("");
+  const checkKey = saved && user ? `${saved.projectId}:${user.uid}` : "";
   // Currency is auto-saved on first visit, so it doesn't count as "having data"
   const isDataKey = (k: string) => k !== "bt_currency";
   const localCount = typeof window !== "undefined" ? localAppKeys().filter(isDataKey).length : 0;
   useEffect(() => {
     if (!saved || !user || linked) return;
     let cancelled = false;
+    const key = `${saved.projectId}:${user.uid}`;
+    const slowTimer = setTimeout(() => { if (!cancelled) setSlowCheckKey(key); }, 15000);
     fetchRemote(saved, user.uid)
       .then((m) => { if (!cancelled) { setRemoteCount([...m.keys()].filter(isDataKey).length); setSyncError(""); } })
-      .catch((err) => { if (!cancelled) setSyncError(describeSyncError(err)); });
-    return () => { cancelled = true; };
+      .catch((err) => { if (!cancelled) setSyncError(describeSyncError(err)); })
+      .finally(() => clearTimeout(slowTimer));
+    return () => { cancelled = true; clearTimeout(slowTimer); };
   }, [saved, user, linked]);
+  const checking = remoteCount === undefined && !syncError;
+  const slowCheck = checking && slowCheckKey === checkKey;
 
   async function handleStart(direction: "upload" | "download") {
     if (!saved || !user) return;
-    setStartBusy(true);
+    setStartDir(direction);
     setSyncError("");
     try {
       if (direction === "upload") await uploadLocal(saved, user.uid);
@@ -93,7 +102,7 @@ export default function StorageModal({ onClose, onToast }: StorageModalProps) {
     } catch (err) {
       setSyncError(describeSyncError(err));
     } finally {
-      setStartBusy(false);
+      setStartDir(null);
     }
   }
 
@@ -201,14 +210,16 @@ export default function StorageModal({ onClose, onToast }: StorageModalProps) {
             </div>
 
             {user === undefined && (
-              <p style={{ fontSize: "0.8rem", color: "var(--wf-muted)", margin: 0 }}>Checking sign-in…</p>
+              <p style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.8rem", color: "var(--wf-muted)", margin: 0 }}>
+                <span className="wf-spinner" aria-hidden="true" /> Checking sign-in…
+              </p>
             )}
 
             {user === null && (
-              <button onClick={handleSignIn} disabled={authBusy} className="wf-btn-primary w-full py-2.5"
-                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                <GoogleLogo size={16} weight="bold" />
-                {authBusy ? "Signing in…" : "Sign in with Google"}
+              <button onClick={handleSignIn} disabled={authBusy} aria-busy={authBusy} className="wf-btn-primary w-full py-2.5"
+                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, ...(authBusy ? { opacity: 0.85 } : {}) }}>
+                {authBusy ? <span className="wf-spinner" aria-hidden="true" /> : <GoogleLogo size={16} weight="bold" />}
+                {authBusy ? "Waiting for Google…" : "Sign in with Google"}
               </button>
             )}
 
@@ -232,8 +243,18 @@ export default function StorageModal({ onClose, onToast }: StorageModalProps) {
             {user && !linked && (
               <div className="space-y-2">
                 <p style={{ fontSize: "0.8rem", color: "var(--wf-text)", margin: 0, fontWeight: 600 }}>Start syncing</p>
-                {remoteCount === undefined && !syncError && (
-                  <p style={{ fontSize: "0.75rem", color: "var(--wf-muted)", margin: 0 }}>Checking your Firestore…</p>
+                {checking && (
+                  <div className="space-y-2" role="status">
+                    <p style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.75rem", color: "var(--wf-muted)", margin: 0 }}>
+                      <span className="wf-spinner" aria-hidden="true" /> Checking your Firestore…
+                    </p>
+                    <div className="wf-progress" aria-hidden="true" />
+                    {slowCheck && (
+                      <p style={{ fontSize: "0.75rem", color: "var(--wf-muted)", margin: 0, lineHeight: 1.5 }}>
+                        Taking longer than usual. Make sure the Firestore database is created and the rules below are published, then reopen this dialog.
+                      </p>
+                    )}
+                  </div>
                 )}
                 {remoteCount !== undefined && (
                   <>
@@ -243,24 +264,31 @@ export default function StorageModal({ onClose, onToast }: StorageModalProps) {
                     </p>
                     <div className="flex gap-3">
                       {(localCount > 0 || remoteCount === 0) && (
-                        <button onClick={() => handleStart("upload")} disabled={startBusy} className="wf-btn-primary flex-1 py-2.5">
-                          {remoteCount > 0 ? "Use this browser's data" : "Upload & sync"}
+                        <button onClick={() => handleStart("upload")} disabled={startBusy} aria-busy={startDir === "upload"}
+                          className="wf-btn-primary flex-1 py-2.5"
+                          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, ...(startDir === "upload" ? { opacity: 0.85 } : {}) }}>
+                          {startDir === "upload" && <span className="wf-spinner" aria-hidden="true" />}
+                          {startDir === "upload" ? "Uploading…" : remoteCount > 0 ? "Use this browser's data" : "Upload & sync"}
                         </button>
                       )}
                       {remoteCount > 0 && (
-                        <button onClick={() => handleStart("download")} disabled={startBusy}
-                          className={localCount > 0 ? "wf-btn-ghost flex-1 py-2.5" : "wf-btn-primary flex-1 py-2.5"}>
-                          {localCount > 0 ? "Use cloud data" : "Download & sync"}
+                        <button onClick={() => handleStart("download")} disabled={startBusy} aria-busy={startDir === "download"}
+                          className={localCount > 0 ? "wf-btn-ghost flex-1 py-2.5" : "wf-btn-primary flex-1 py-2.5"}
+                          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, ...(startDir === "download" ? { opacity: 0.85 } : {}) }}>
+                          {startDir === "download" && <span className="wf-spinner" aria-hidden="true" />}
+                          {startDir === "download" ? "Downloading…" : localCount > 0 ? "Use cloud data" : "Download & sync"}
                         </button>
                       )}
                     </div>
+                    {startBusy && <div className="wf-progress" aria-hidden="true" />}
                   </>
                 )}
               </div>
             )}
 
             {linked && (
-              <p style={{ fontSize: "0.75rem", margin: 0, color: syncStatus.state === "error" ? "var(--wf-pink)" : "var(--wf-muted)" }} aria-live="polite">
+              <p style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.75rem", margin: 0, color: syncStatus.state === "error" ? "var(--wf-pink)" : "var(--wf-muted)" }} aria-live="polite">
+                {(syncStatus.state === "syncing" || syncStatus.state === "off") && <span className="wf-spinner" aria-hidden="true" />}
                 {syncStatus.state === "syncing" && "Syncing…"}
                 {syncStatus.state === "synced" && `Synced${syncStatus.at ? ` at ${new Date(syncStatus.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""} — changes upload automatically.`}
                 {syncStatus.state === "error" && syncStatus.error}

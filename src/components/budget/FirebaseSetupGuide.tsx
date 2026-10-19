@@ -58,12 +58,14 @@ function buildSteps(projectId: string | undefined, host: string): Step[] {
       link: project ? { href: `${project}/authentication/providers`, label: "Open Authentication" } : undefined,
     },
     {
-      title: "Create the Firestore database",
+      title: "Create the database (Cloud Firestore)",
       items: [
+        <>LaanFlow uses <b>Cloud Firestore</b>. Don&apos;t pick <b>Realtime Database</b> — it&apos;s a different product and won&apos;t be used.</>,
         <>Click the <b>search icon</b> at the top of the sidebar, type <b>Firestore</b>, and open <b>Firestore Database</b>.</>,
         <>Click <b>Create database</b>. If asked for an edition, choose <b>Standard</b> and keep the ID <code>(default)</code>.</>,
-        <>Pick a <b>location</b> near you — it can&apos;t be changed later.</>,
-        <>Choose <b>Start in production mode</b> and click <b>Create</b>.</>,
+        <>Pick a <b>location</b> near you, e.g. <code>asia-southeast1 (Singapore)</code> — it can&apos;t be changed later.</>,
+        <>Choose <b>Start in production mode</b> and click <b>Create</b>. The rules in the next step open it up just for you.</>,
+        <>When it&apos;s ready you&apos;ll see an empty <b>Data</b> tab — that&apos;s expected.</>,
       ],
       link: project ? { href: `${project}/firestore`, label: "Open Firestore" } : undefined,
     },

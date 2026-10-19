@@ -530,6 +530,47 @@ a.wf-glass:hover {
   to   { opacity: 1; }
 }
 
+/* Inline spinner — inherits text color */
+@keyframes wf-spin { to { transform: rotate(360deg); } }
+.wf-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  /* globals.css squares every corner inside .wf-root — a spinner must stay round */
+  border-radius: 50% !important;
+  animation: wf-spin 700ms linear infinite;
+}
+
+/* Indeterminate progress bar — a segment sliding across the track */
+@keyframes wf-progress-slide {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(250%); }
+}
+.wf-progress {
+  position: relative;
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--wf-border);
+}
+.wf-progress::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  border-radius: 2px;
+  background: var(--wf-cyan);
+  animation: wf-progress-slide 1.1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wf-spinner { animation-duration: 2s; }
+  .wf-progress::after { animation: none; width: 100%; opacity: 0.5; }
+}
+
 /* =========================================================================
    FLEXIBLE VIEW — PERIOD ACCORDION HEADER
    ========================================================================= */
