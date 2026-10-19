@@ -9,7 +9,7 @@
  *   bt_currency                    — currency preference
  */
 
-function isAppKey(k: string): boolean {
+export function isAppKey(k: string): boolean {
   return (
     k === "bt_periods"   ||
     k === "bt_loans"     ||

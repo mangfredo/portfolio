@@ -11,6 +11,7 @@ import { useBudgetSettings } from "@/hooks/useBudgetSettings";
 import { BudgetSettingsContext } from "@/context/BudgetSettingsContext";
 import { SPLASH_KEY } from "@/components/budget/BudgetSplash";
 import { useToast } from "@/hooks/useToast";
+import { useFirebaseSync } from "@/hooks/useFirebaseSync";
 
 interface BudgetShellProps {
   children: React.ReactNode;
@@ -38,6 +39,14 @@ export default function BudgetShell({ children }: BudgetShellProps) {
   const [leaving, setLeaving] = useState(false);
 
   const activeTab = pathToTab(pathname ?? "");
+
+  // Cloud data replaced localStorage — reload stores and the synced currency
+  useFirebaseSync(() => {
+    const savedCurrency = localStorage.getItem("bt_currency");
+    if (savedCurrency) settings.setCurrency(savedCurrency);
+    settings.bumpReload();
+    window.dispatchEvent(new Event("bt_reload"));
+  });
 
   const [hasData, setHasData] = useState(false);
   useEffect(() => {
