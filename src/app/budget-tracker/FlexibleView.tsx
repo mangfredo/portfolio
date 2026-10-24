@@ -1,11 +1,11 @@
 "use client";
 
 import "./budget.css";
-import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback, Fragment } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, CaretDown, CaretRight, Wallet, DotsSixVertical, ArrowUp, ArrowDown, PiggyBank } from "@phosphor-icons/react";
-import { usePeriods, useExpenses, useGigs, useGigItems, type Period, type Expense, type Gig, copyMonthBudget, copyPeriodBudget } from "@/hooks/useBudgetStore";
+import { usePeriods, useExpenses, useGigs, useGigItems, type Period, type Expense, type Gig, type SubItem, copyMonthBudget, copyPeriodBudget } from "@/hooks/useBudgetStore";
 import { useSavings } from "@/hooks/useSavingsStore";
 import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
 import Modal from "@/components/budget/Modal";
@@ -373,6 +373,119 @@ function ContextMenu({
 
 // ── Period accordion (one entry) ──────────────────────────────────────────
 
+// ── Sub-items (one level, under an Avg spending or gig expense) ──────────
+
+function SubItemsCaret({ open, onClick }: { open: boolean; onClick: () => void }) {
+  return (
+    <button onClick={onClick} title={open ? "Hide sub-items" : "Show sub-items"}
+      style={{ background:"none", border:"none", cursor:"pointer", color:"var(--wf-muted)", padding:0, display:"flex", flexShrink:0 }}>
+      {open ? <CaretDown size={12} weight="bold"/> : <CaretRight size={12} weight="bold"/>}
+    </button>
+  );
+}
+
+function SubItemList({ parent, currencySymbol, onToggle, onEdit, onAdd }: {
+  parent: { amount: number; subItems?: SubItem[] };
+  currencySymbol: string;
+  onToggle: (subId: string) => void;
+  onEdit: (sub: SubItem) => void;
+  onAdd: () => void;
+}) {
+  const subs = parent.subItems ?? [];
+  // Parent amount is the cap; sub-items spend against it
+  const left = parent.amount - subs.reduce((sum, x) => sum + x.amount, 0);
+  return (
+    <div style={{ padding:"2px 0 6px 30px", borderBottom:"1px solid var(--wf-border)" }}>
+      {subs.map(x => (
+        <div key={x.id} style={{ display:"flex", alignItems:"center", gap:8, padding:"3px 0" }}>
+          <button onClick={() => onEdit(x)}
+            style={{
+              textAlign:"left", background:"none", border:"none", cursor:"pointer", flex:1, fontSize:"0.8rem",
+              color: x.paid ? "var(--wf-muted)" : "var(--wf-text)",
+              textDecoration: x.paid ? "line-through" : "none",
+              opacity: x.paid ? 0.55 : 1,
+            }}>
+            {x.name}
+          </button>
+          <button onClick={() => onToggle(x.id)} title={x.paid ? "Mark as unpaid" : "Mark as paid"}
+            style={{
+              background:"none", cursor:"pointer", flexShrink:0,
+              fontSize:"0.6rem", fontWeight:600, padding:"1px 5px", borderRadius:4,
+              color: x.paid ? "var(--wf-emerald)" : "var(--wf-muted)",
+              border: `1px solid ${x.paid ? "rgba(16,185,129,0.4)" : "var(--wf-border)"}`,
+            }}>
+            {x.paid ? "✓ Paid" : "Paid?"}
+          </button>
+          <span className="wf-data" style={{
+            fontSize:"0.8rem", flexShrink:0,
+            color: x.paid ? "var(--wf-muted)" : "var(--wf-text)",
+            textDecoration: x.paid ? "line-through" : "none",
+            opacity: x.paid ? 0.55 : 1,
+          }}>
+            {currencySymbol}{fmt(x.amount)}
+          </span>
+        </div>
+      ))}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, marginTop:2 }}>
+        <button onClick={onAdd}
+          style={{ fontSize:"0.7rem", color:"var(--wf-muted)", background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:4, fontWeight:600 }}>
+          <Plus size={10} weight="bold"/> Add sub-item
+        </button>
+        <span className="wf-data" style={{ fontSize:"0.72rem", fontWeight:600, color: left < 0 ? "var(--wf-pink)" : "var(--wf-muted)" }}>
+          {left < 0 ? "-" : ""}{currencySymbol}{fmt(Math.abs(left))} left of {currencySymbol}{fmt(parent.amount)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function SubItemModal({ sub, parentName, currencySymbol, onSave, onDelete, onClose }: {
+  sub: SubItem | null; // null = adding a new sub-item
+  parentName: string;
+  currencySymbol: string;
+  onSave: (name: string, amount: number) => void;
+  onDelete?: () => void;
+  onClose: () => void;
+}) {
+  const [name, setName] = useState(sub?.name ?? "");
+  const [amount, setAmount] = useState(sub ? String(sub.amount) : "");
+  const handleSave = () => {
+    const val = parseNumeric(amount);
+    if (!name.trim() || isNaN(val) || val < 0) return;
+    onSave(name, val);
+  };
+  return (
+    <Modal title={sub ? "Edit Sub-item" : "Add Sub-item"} onClose={onClose}>
+      <div className="space-y-4">
+        <p className="text-xs" style={{ color:"var(--wf-muted)", marginTop:-8 }}>Part of {parentName}</p>
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color:"var(--wf-muted)" }}>Item</label>
+          <input type="text" value={name} onChange={e => setName(e.target.value)}
+            placeholder="e.g. Market" autoFocus className="wf-input"/>
+        </div>
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color:"var(--wf-muted)" }}>Amount ({currencySymbol})</label>
+          <NumericInput value={amount} onChange={e => setAmount(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") handleSave(); }}
+            placeholder="0.00" className="wf-input wf-input-data"/>
+        </div>
+        {onDelete && (
+          <button onClick={onDelete}
+            style={{ color:"var(--wf-pink)", fontSize:"0.8rem", fontWeight:600, background:"none", border:"none", cursor:"pointer" }}>
+            Delete this sub-item
+          </button>
+        )}
+        <div className="flex gap-3 pt-1">
+          <button onClick={onClose} className="wf-btn-ghost flex-1 py-2.5">Cancel</button>
+          <button onClick={handleSave} disabled={!name.trim() || !amount.trim()} className="wf-btn-primary flex-1 py-2.5">
+            {sub ? "Update" : "Add"}
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 function PeriodAccordion({
   period, isOpen, isChecked, onToggleOpen, onToggleCheck, currencySymbol,
   onDragStart, onDragOver, onDrop, isDraggingOver, onContextMenu,
@@ -393,7 +506,8 @@ function PeriodAccordion({
   onTouchDrop?: (targetId: string) => void;
   itemRefs?: React.MutableRefObject<Map<string, HTMLElement>>;
 }) {
-  const { expenses, addExpense, updateExpense, deleteExpense, togglePaid, reorderExpenses, s1Expenses, bufferExpenses, s1Total, bufferAllocated } = useExpenses(period.id);
+  const { expenses, addExpense, updateExpense, deleteExpense, togglePaid, reorderExpenses, s1Expenses, bufferExpenses, s1Total, bufferAllocated,
+    addSubItem, updateSubItem, deleteSubItem, toggleSubItemPaid } = useExpenses(period.id);
   const { periods, updateBudget, updatePeriodMeta } = usePeriods();
   const { goals } = useSavings();
   const goalName = (goalId?: string) => goals.find(g => g.id === goalId)?.name;
@@ -414,6 +528,20 @@ function PeriodAccordion({
   const [itemAmount, setItemAmount] = useState("");
   const [itemGoalId, setItemGoalId] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  // Sub-items: which parents are expanded, and the sub-item modal
+  const [openSubs, setOpenSubs] = useState<Set<string>>(new Set());
+  const [subModal, setSubModal] = useState<{ parentId: string; sub: SubItem | null } | null>(null);
+  const toggleSubs = (id: string) => setOpenSubs(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  const openSubModal = (parentId: string, sub: SubItem | null) => {
+    setOpenSubs(prev => new Set(prev).add(parentId));
+    setSubModal({ parentId, sub });
+  };
+  const editingHasSubs = !!expenses.find(x => x.id === editingId)?.subItems?.length;
 
   // Budget edit
   const [showBudget, setShowBudget] = useState(false);
@@ -698,8 +826,8 @@ function PeriodAccordion({
                 </div>
 
                 {s1Expenses.map(e => (
+                  <Fragment key={e.id}>
                   <div
-                    key={e.id}
                     ref={(el) => { if (el) expenseItemRefs.current.set(e.id, el); }}
                     draggable
                     onDragStart={() => handleExpenseDragStart(e.id)}
@@ -719,6 +847,9 @@ function PeriodAccordion({
                       onReorder={(fromId, toId) => handleExpenseTouchDrop(fromId, toId, "s1")}
                       size={14}
                     />
+                    {!!e.subItems?.length && (
+                      <SubItemsCaret open={openSubs.has(e.id)} onClick={() => toggleSubs(e.id)}/>
+                    )}
                     <button
                       onClick={() => openEdit(e)}
                       style={{
@@ -753,6 +884,13 @@ function PeriodAccordion({
                       {currencySymbol}{fmt(e.amount)}
                     </span>
                   </div>
+                  {!!e.subItems?.length && openSubs.has(e.id) && (
+                    <SubItemList parent={e} currencySymbol={currencySymbol}
+                      onToggle={subId => toggleSubItemPaid(e.id, subId)}
+                      onEdit={sub => openSubModal(e.id, sub)}
+                      onAdd={() => openSubModal(e.id, null)}/>
+                  )}
+                  </Fragment>
                 ))}
 
                 <button
@@ -786,7 +924,7 @@ function PeriodAccordion({
                 ) : (
                   <button
                     onClick={() => startLabelEdit("buffer")}
-                    style={{ fontSize:"0.85rem", fontWeight:700, color:"var(--wf-emerald)", background:"none", border:"none", cursor:"pointer", textDecoration:"underline dotted", flex:1, textAlign:"left" }}
+                    style={{ fontSize:"0.85rem", fontWeight:700, color: bufferAmount < 0 ? "var(--wf-pink)" : "var(--wf-emerald)", background:"none", border:"none", cursor:"pointer", textDecoration:"underline dotted", flex:1, textAlign:"left" }}
                     title="Click to rename"
                   >
                     {bufLabel}
@@ -867,7 +1005,7 @@ function PeriodAccordion({
 
                 <button
                   onClick={() => openAdd("buffer")}
-                  style={{ marginTop:4, fontSize:"0.75rem", color:"var(--wf-emerald)", background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:4, fontWeight:600 }}
+                  style={{ marginTop:4, fontSize:"0.75rem", color: bufferAmount < 0 ? "var(--wf-pink)" : "var(--wf-emerald)", background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:4, fontWeight:600 }}
                 >
                   <Plus size={12} weight="bold"/> Add buffer item
                 </button>
@@ -913,6 +1051,8 @@ function PeriodAccordion({
                 onKeyDown={e => { if (e.key === "Enter") handleSaveItem(); }}
                 placeholder="0.00" className="wf-input wf-input-data"/>
             </div>
+            {/* Savings items stay whole: no goal once an item has sub-items */}
+            {!editingHasSubs && (
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color:"var(--wf-muted)" }}>Savings goal</label>
               {goals.length === 0 ? (
@@ -929,6 +1069,15 @@ function PeriodAccordion({
                 </select>
               )}
             </div>
+            )}
+            {editingId && addSection === "s1" && !itemGoalId && (
+              <button
+                onClick={() => { const parentId = editingId; handleSaveItem(); openSubModal(parentId, null); }}
+                disabled={!itemName.trim() || !itemAmount.trim()}
+                style={{ color:"var(--wf-cyan)", fontSize:"0.8rem", fontWeight:600, background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:4 }}>
+                <Plus size={12} weight="bold"/> Add sub-item
+              </button>
+            )}
             {editingId && (
               <button onClick={() => { deleteExpense(editingId); setEditingId(null); setShowAdd(false); }}
                 style={{ color:"var(--wf-pink)", fontSize:"0.8rem", fontWeight:600, background:"none", border:"none", cursor:"pointer" }}>
@@ -943,6 +1092,22 @@ function PeriodAccordion({
             </div>
           </div>
         </Modal>
+      )}
+
+      {/* Sub-item modal */}
+      {subModal && (
+        <SubItemModal
+          sub={subModal.sub}
+          parentName={expenses.find(x => x.id === subModal.parentId)?.name ?? ""}
+          currencySymbol={currencySymbol}
+          onSave={(name, amount) => {
+            if (subModal.sub) updateSubItem(subModal.parentId, subModal.sub.id, name, amount);
+            else addSubItem(subModal.parentId, name, amount);
+            setSubModal(null);
+          }}
+          onDelete={subModal.sub ? () => { deleteSubItem(subModal.parentId, subModal.sub!.id); setSubModal(null); } : undefined}
+          onClose={() => setSubModal(null)}
+        />
       )}
     </>
   );
@@ -963,12 +1128,26 @@ function GigCard({ gig, currencySymbol, onDelete, isDark, onDragStart, onDragOve
   onTouchDrop?: (targetId: string) => void;
   itemRefs?: React.MutableRefObject<Map<string, HTMLElement>>;
 }) {
-  const { items, addItem, updateItem, deleteItem, togglePaid, reorderItems, total } = useGigItems(gig.id);
+  const { items, addItem, updateItem, deleteItem, togglePaid, reorderItems, total,
+    addSubItem, updateSubItem, deleteSubItem, toggleSubItemPaid } = useGigItems(gig.id);
   const [isOpen, setIsOpen] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
   const [itemName, setItemName] = useState("");
   const [itemAmount, setItemAmount] = useState("");
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
+  // Sub-items: which expenses are expanded, and the sub-item modal
+  const [openSubs, setOpenSubs] = useState<Set<string>>(new Set());
+  const [subModal, setSubModal] = useState<{ parentId: string; sub: SubItem | null } | null>(null);
+  const toggleSubs = (id: string) => setOpenSubs(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  const openSubModal = (parentId: string, sub: SubItem | null) => {
+    setOpenSubs(prev => new Set(prev).add(parentId));
+    setSubModal({ parentId, sub });
+  };
 
   // Income edit — same pattern as period budget
   const [showIncome, setShowIncome] = useState(false);
@@ -1184,7 +1363,8 @@ function GigCard({ gig, currencySymbol, onDelete, isDark, onDragStart, onDragOve
 
               {/* Expense items */}
               {items.map(item => (
-                <div key={item.id}
+                <Fragment key={item.id}>
+                <div
                   ref={(el) => { if (el) gigExpenseItemRefs.current.set(item.id, el); }}
                   draggable
                   onDragStart={() => handleGigItemDragStart(item.id)}
@@ -1204,6 +1384,9 @@ function GigCard({ gig, currencySymbol, onDelete, isDark, onDragStart, onDragOve
                     onReorder={(fromId, toId) => handleGigItemTouchDrop(fromId, toId)}
                     size={14}
                   />
+                  {!!item.subItems?.length && (
+                    <SubItemsCaret open={openSubs.has(item.id)} onClick={() => toggleSubs(item.id)}/>
+                  )}
                   <button
                     onClick={() => openEdit(item)}
                     style={{
@@ -1230,6 +1413,13 @@ function GigCard({ gig, currencySymbol, onDelete, isDark, onDragStart, onDragOve
                     opacity: item.paid ? 0.55 : 1,
                   }}>{currencySymbol}{fmt(item.amount)}</span>
                 </div>
+                {!!item.subItems?.length && openSubs.has(item.id) && (
+                  <SubItemList parent={item} currencySymbol={currencySymbol}
+                    onToggle={subId => toggleSubItemPaid(item.id, subId)}
+                    onEdit={sub => openSubModal(item.id, sub)}
+                    onAdd={() => openSubModal(item.id, null)}/>
+                )}
+                </Fragment>
               ))}
 
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:6 }}>
@@ -1266,6 +1456,14 @@ function GigCard({ gig, currencySymbol, onDelete, isDark, onDragStart, onDragOve
                 placeholder="0.00" className="wf-input wf-input-data"/>
             </div>
             {editingItemId && (
+              <button
+                onClick={() => { const parentId = editingItemId; handleSaveItem(); openSubModal(parentId, null); }}
+                disabled={!itemName.trim() || !itemAmount.trim()}
+                style={{ color:"var(--wf-amber, #F59E0B)", fontSize:"0.8rem", fontWeight:600, background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:4 }}>
+                <Plus size={12} weight="bold"/> Add sub-item
+              </button>
+            )}
+            {editingItemId && (
               <button onClick={() => { deleteItem(editingItemId); setEditingItemId(null); setShowAddItem(false); }}
                 style={{ color:"var(--wf-pink)", fontSize:"0.8rem", fontWeight:600, background:"none", border:"none", cursor:"pointer" }}>
                 Delete this item
@@ -1279,6 +1477,22 @@ function GigCard({ gig, currencySymbol, onDelete, isDark, onDragStart, onDragOve
             </div>
           </div>
         </Modal>
+      )}
+
+      {/* Sub-item modal */}
+      {subModal && (
+        <SubItemModal
+          sub={subModal.sub}
+          parentName={items.find(x => x.id === subModal.parentId)?.name ?? ""}
+          currencySymbol={currencySymbol}
+          onSave={(name, amount) => {
+            if (subModal.sub) updateSubItem(subModal.parentId, subModal.sub.id, name, amount);
+            else addSubItem(subModal.parentId, name, amount);
+            setSubModal(null);
+          }}
+          onDelete={subModal.sub ? () => { deleteSubItem(subModal.parentId, subModal.sub!.id); setSubModal(null); } : undefined}
+          onClose={() => setSubModal(null)}
+        />
       )}
 
       {/* Set Income modal */}

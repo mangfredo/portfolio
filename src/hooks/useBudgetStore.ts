@@ -24,6 +24,38 @@ export interface Expense {
   sectionKey?: "s1" | "buffer"; // default "s1" — backwards compatible
   sortOrder?: number; // manual sort order for drag-and-drop
   savingsGoalId?: string; // paid → logs a deposit to this savings goal
+  subItems?: SubItem[];   // spending against this item's amount (Avg spending only)
+}
+
+// ── Sub-item (one level, under an Avg spending or gig expense) ────────────
+
+export interface SubItem {
+  id: string;
+  name: string;
+  amount: number;
+  paid?: boolean;
+}
+
+type WithSubItems = { id: string; paid?: boolean; subItems?: SubItem[] };
+
+/** Change one parent's sub-items; the parent is paid once all of them are. */
+function changeSubItems<T extends WithSubItems>(list: T[], parentId: string, fn: (subs: SubItem[]) => SubItem[]): T[] {
+  return list.map((i) => {
+    if (i.id !== parentId) return i;
+    const subItems = fn(i.subItems ?? []);
+    return { ...i, subItems, paid: subItems.length > 0 ? subItems.every((x) => x.paid) : i.paid };
+  });
+}
+
+/** Paying / unpaying a parent does the same to all its sub-items. */
+function togglePaidWithSubItems<T extends WithSubItems>(i: T): T {
+  const paid = !i.paid;
+  return { ...i, paid, subItems: i.subItems?.map((x) => ({ ...x, paid })) };
+}
+
+/** Copied sub-items get new ids and start unpaid. */
+function copySubItems(subItems?: SubItem[]): SubItem[] | undefined {
+  return subItems?.map((x) => ({ ...x, id: crypto.randomUUID(), paid: false }));
 }
 
 // ── Gig (side income stream) ───────────────────────────────────────────────
@@ -43,6 +75,7 @@ export interface GigItem {
   amount: number;
   paid?: boolean;
   sortOrder?: number; // manual sort order for drag-and-drop
+  subItems?: SubItem[];
 }
 
 const PERIODS_KEY = "bt_periods";
@@ -252,13 +285,30 @@ export function useExpenses(periodId: string) {
       else logExpenseDeposit(item.savingsGoalId, id, item.amount, depositNote());
     }
     setExpenses((prev) => {
-      const next = prev.map((e) =>
-        e.id === id ? { ...e, paid: !e.paid } : e
-      );
+      const next = prev.map((e) => (e.id === id ? togglePaidWithSubItems(e) : e));
       save(itemsKey(periodId), next);
       return next;
     });
   };
+
+  // ── Sub-items ──
+  const updateSubItems = (parentId: string, fn: (subs: SubItem[]) => SubItem[]) => {
+    setExpenses((prev) => {
+      const next = changeSubItems(prev, parentId, fn);
+      save(itemsKey(periodId), next);
+      return next;
+    });
+  };
+  const addSubItem = (parentId: string, name: string, amount: number) => {
+    const sub: SubItem = { id: crypto.randomUUID(), name: name.trim(), amount };
+    updateSubItems(parentId, (subs) => [...subs, sub]);
+  };
+  const updateSubItem = (parentId: string, subId: string, name: string, amount: number) =>
+    updateSubItems(parentId, (subs) => subs.map((x) => (x.id === subId ? { ...x, name: name.trim(), amount } : x)));
+  const deleteSubItem = (parentId: string, subId: string) =>
+    updateSubItems(parentId, (subs) => subs.filter((x) => x.id !== subId));
+  const toggleSubItemPaid = (parentId: string, subId: string) =>
+    updateSubItems(parentId, (subs) => subs.map((x) => (x.id === subId ? { ...x, paid: !x.paid } : x)));
 
   /** Reorder expenses by setting sortOrder based on provided id array */
   const reorderExpenses = (orderedIds: string[]) => {
@@ -288,7 +338,8 @@ export function useExpenses(periodId: string) {
   const s1Total = s1Expenses.reduce((sum, e) => sum + e.amount, 0);
   const bufferAllocated = bufferExpenses.reduce((sum, e) => sum + e.amount, 0);
 
-  return { expenses, addExpense, updateExpense, deleteExpense, togglePaid, reorderExpenses, total, s1Expenses, bufferExpenses, s1Total, bufferAllocated };
+  return { expenses, addExpense, updateExpense, deleteExpense, togglePaid, reorderExpenses, total, s1Expenses, bufferExpenses, s1Total, bufferAllocated,
+    addSubItem, updateSubItem, deleteSubItem, toggleSubItemPaid };
 }
 
 // ── Gigs ───────────────────────────────────────────────────────────────────
@@ -423,11 +474,30 @@ export function useGigItems(gigId: string) {
 
   const togglePaid = (id: string) => {
     setItems((prev) => {
-      const next = prev.map((i) => (i.id === id ? { ...i, paid: !i.paid } : i));
+      const next = prev.map((i) => (i.id === id ? togglePaidWithSubItems(i) : i));
       save(gigItemsKey(gigId), next);
       return next;
     });
   };
+
+  // ── Sub-items ──
+  const updateSubItems = (parentId: string, fn: (subs: SubItem[]) => SubItem[]) => {
+    setItems((prev) => {
+      const next = changeSubItems(prev, parentId, fn);
+      save(gigItemsKey(gigId), next);
+      return next;
+    });
+  };
+  const addSubItem = (parentId: string, name: string, amount: number) => {
+    const sub: SubItem = { id: crypto.randomUUID(), name: name.trim(), amount };
+    updateSubItems(parentId, (subs) => [...subs, sub]);
+  };
+  const updateSubItem = (parentId: string, subId: string, name: string, amount: number) =>
+    updateSubItems(parentId, (subs) => subs.map((x) => (x.id === subId ? { ...x, name: name.trim(), amount } : x)));
+  const deleteSubItem = (parentId: string, subId: string) =>
+    updateSubItems(parentId, (subs) => subs.filter((x) => x.id !== subId));
+  const toggleSubItemPaid = (parentId: string, subId: string) =>
+    updateSubItems(parentId, (subs) => subs.map((x) => (x.id === subId ? { ...x, paid: !x.paid } : x)));
 
   /** Reorder gig items by setting sortOrder based on provided id array */
   const reorderItems = (orderedIds: string[]) => {
@@ -449,7 +519,8 @@ export function useGigItems(gigId: string) {
     ? [...items].sort((a, b) => (a.sortOrder ?? 999999) - (b.sortOrder ?? 999999))
     : items;
 
-  return { items: sortedItems, addItem, updateItem, deleteItem, togglePaid, reorderItems, total };
+  return { items: sortedItems, addItem, updateItem, deleteItem, togglePaid, reorderItems, total,
+    addSubItem, updateSubItem, deleteSubItem, toggleSubItemPaid };
 }
 
 // ── Copy Utilities ─────────────────────────────────────────────────────────
@@ -514,6 +585,7 @@ export function copyMonthBudget(sourceMonthKey: string, targetMonthKey: string):
       ...e,
       id: crypto.randomUUID(),
       paid: false, // Reset paid status for copied expenses
+      subItems: copySubItems(e.subItems),
     }));
     save(itemsKey(mapping.newId), newExpenses);
   }
@@ -552,6 +624,7 @@ export function copyMonthBudget(sourceMonthKey: string, targetMonthKey: string):
         ...i,
         id: crypto.randomUUID(),
         paid: false, // Reset paid status for copied items
+        subItems: copySubItems(i.subItems),
       }));
       save(gigItemsKey(mapping.newId), newItems);
     }
@@ -625,6 +698,7 @@ export function copyPeriodBudget(
       ...e,
       id: crypto.randomUUID(),
       paid: false, // Reset paid status for copied expenses
+      subItems: copySubItems(e.subItems),
     }));
     save(itemsKey(mapping.newId), newExpenses);
   }
