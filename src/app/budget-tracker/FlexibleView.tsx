@@ -399,8 +399,10 @@ function PeriodAccordion({
   const goalName = (goalId?: string) => goals.find(g => g.id === goalId)?.name;
 
   const budget = period.budget;
-  const bufferAmount = Math.max(budget - s1Total, 0);
+  const bufferAmount = budget - s1Total; // negative when Avg spending is over budget
   const bufferRemaining = bufferAmount - bufferAllocated;
+  const bufferColor = bufferAmount > 0 ? "var(--wf-emerald)" : bufferAmount < 0 ? "var(--wf-pink)" : "var(--wf-muted)";
+  const bufferText = `${bufferAmount < 0 ? "-" : ""}${currencySymbol}${fmt(Math.abs(bufferAmount))}`;
 
   const s1Label = period.section1Label ?? "Avg spending";
   const bufLabel = period.bufferLabel ?? "Buffer";
@@ -630,8 +632,8 @@ function PeriodAccordion({
           </div>
           <div style={{ textAlign:"right" }}>
             <p style={{ color: textMuted, fontSize:"0.65rem", marginBottom:1 }}>{bufLabel}</p>
-            <p className="wf-data" style={{ color: bufferAmount > 0 ? "var(--wf-emerald)" : textMuted, fontWeight:700 }}>
-              {budget > 0 ? `${currencySymbol}${fmt(bufferAmount)}` : "—"}
+            <p className="wf-data" style={{ color: bufferColor, fontWeight:700 }}>
+              {budget > 0 ? bufferText : "—"}
             </p>
           </div>
         </div>
@@ -765,8 +767,8 @@ function PeriodAccordion({
               <div style={{
                 display:"flex", alignItems:"center", gap:10, margin:"12px 0 8px",
                 padding:"8px 12px", borderRadius:8,
-                background: bufferAmount > 0 ? "rgba(16,185,129,0.08)" : "var(--wf-surface-alt)",
-                border: `1px solid ${bufferAmount > 0 ? "rgba(16,185,129,0.20)" : "var(--wf-border)"}`,
+                background: bufferAmount > 0 ? "rgba(16,185,129,0.08)" : bufferAmount < 0 ? "rgba(244,63,94,0.08)" : "var(--wf-surface-alt)",
+                border: `1px solid ${bufferAmount > 0 ? "rgba(16,185,129,0.20)" : bufferAmount < 0 ? "rgba(244,63,94,0.20)" : "var(--wf-border)"}`,
               }}>
                 {editingLabel === "buffer" ? (
                   <input
@@ -790,8 +792,8 @@ function PeriodAccordion({
                     {bufLabel}
                   </button>
                 )}
-                <span className="wf-data" style={{ fontSize:"0.9rem", fontWeight:700, color:"var(--wf-emerald)", flexShrink:0 }}>
-                  {budget > 0 ? `${currencySymbol}${fmt(bufferAmount)}` : "—"}
+                <span className="wf-data" style={{ fontSize:"0.9rem", fontWeight:700, color: bufferAmount < 0 ? "var(--wf-pink)" : "var(--wf-emerald)", flexShrink:0 }}>
+                  {budget > 0 ? bufferText : "—"}
                 </span>
               </div>
 
@@ -2143,7 +2145,7 @@ function CombinedBufferInner({ periodIds, sym, periods, idx, running }: {
   const { s1Total } = useExpenses(id);
 
   const budget = period?.budget ?? 0;
-  const bufferAmount = Math.max(budget - s1Total, 0);
+  const bufferAmount = budget - s1Total; // overspent periods reduce the total
   const newRunning = running + bufferAmount;
 
   if (idx + 1 < periodIds.length) {
@@ -2156,8 +2158,8 @@ function CombinedBufferInner({ periodIds, sym, periods, idx, running }: {
   }
 
   return (
-    <span className="wf-data" style={{ fontSize:"0.875rem", fontWeight:700, color:"var(--wf-emerald)" }}>
-      Combined Buffer: {sym}{newRunning.toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 })}
+    <span className="wf-data" style={{ fontSize:"0.875rem", fontWeight:700, color: newRunning < 0 ? "var(--wf-pink)" : "var(--wf-emerald)" }}>
+      Combined Buffer: {newRunning < 0 ? "-" : ""}{sym}{Math.abs(newRunning).toLocaleString(undefined, { minimumFractionDigits:2, maximumFractionDigits:2 })}
     </span>
   );
 }
