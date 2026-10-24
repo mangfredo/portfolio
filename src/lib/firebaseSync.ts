@@ -104,6 +104,8 @@ export async function uploadLocal(config: FirebaseWebConfig, uid: string): Promi
 let active: { config: FirebaseWebConfig; uid: string } | null = null;
 let suppress = false; // true while applying cloud data, so it isn't echoed back
 const dirty = new Map<string, string | null>();
+let dirtyOwner: string | null = null; // "<projectId>:<uid>" the dirty changes belong to
+let pending: Promise<void> = Promise.resolve(); // last upload; startSync waits for it
 let timer: ReturnType<typeof setTimeout> | null = null;
 let restore: (() => void) | null = null;
 
@@ -129,21 +131,24 @@ function markDirty(key: string, value: string | null) {
   timer = setTimeout(() => { void flush(); }, PUSH_DELAY_MS);
 }
 
-async function flush() {
+function flush(): Promise<void> {
   timer = null;
-  if (!active || dirty.size === 0) return;
+  if (!active || dirty.size === 0) return pending;
   const { config, uid } = active;
   const changes = new Map(dirty);
   dirty.clear();
   setStatus({ state: "syncing" });
-  try {
-    await writeChanges(config, uid, changes);
-    setStatus({ state: "synced", at: Date.now() });
-  } catch (err) {
-    // Put the failed changes back (newer edits win) so the next write retries them
-    for (const [k, v] of changes) if (!dirty.has(k)) dirty.set(k, v);
-    setStatus({ state: "error", error: describeSyncError(err) });
-  }
+  pending = pending.then(async () => {
+    try {
+      await writeChanges(config, uid, changes);
+      if (active) setStatus({ state: "synced", at: Date.now() });
+    } catch (err) {
+      // Put the failed changes back (newer edits win) so the next write retries them
+      for (const [k, v] of changes) if (!dirty.has(k)) dirty.set(k, v);
+      if (active) setStatus({ state: "error", error: describeSyncError(err) });
+    }
+  });
+  return pending;
 }
 
 function onPageHide() { if (dirty.size) void flush(); }
@@ -156,22 +161,31 @@ export async function startSync(config: FirebaseWebConfig, uid: string): Promise
   stopSync();
   setStatus({ state: "syncing" });
   try {
+    // Let edits from the previous session finish uploading, so the pull below
+    // never replaces newer local data with an older cloud copy
+    await pending;
+    if (dirtyOwner !== linkId(config, uid)) dirty.clear(); // failed edits from another account
     const remote = await fetchRemote(config, uid);
     let changed = false;
     suppress = true;
     try {
+      // Edits that still failed to upload keep their local value
       for (const key of localAppKeys()) {
+        if (dirty.has(key)) continue;
         if (!remote.has(key)) { localStorage.removeItem(key); changed = true; }
       }
       for (const [key, value] of remote) {
+        if (dirty.has(key)) continue;
         if (localStorage.getItem(key) !== value) { localStorage.setItem(key, value); changed = true; }
       }
     } finally {
       suppress = false;
     }
     active = { config, uid };
+    dirtyOwner = linkId(config, uid);
     patchStorage();
     window.addEventListener("pagehide", onPageHide);
+    if (dirty.size) timer = setTimeout(() => { void flush(); }, PUSH_DELAY_MS); // retry them
     setStatus({ state: "synced", at: Date.now() });
     return changed;
   } catch (err) {
@@ -182,7 +196,7 @@ export async function startSync(config: FirebaseWebConfig, uid: string): Promise
 
 export function stopSync() {
   if (timer) { clearTimeout(timer); timer = null; }
-  dirty.clear();
+  void flush(); // upload pending edits instead of dropping them (e.g. when switching tabs)
   active = null;
   restore?.();
   window.removeEventListener("pagehide", onPageHide);
