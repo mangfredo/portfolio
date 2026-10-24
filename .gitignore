@@ -43,6 +43,7 @@ next-env.d.ts
 # AI assistant config
 CLAUDE.md
 AGENTS.md
+.claude/
 
 # Docs (design notes, not part of deployment)
 /docs
