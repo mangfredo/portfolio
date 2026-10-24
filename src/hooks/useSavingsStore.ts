@@ -21,6 +21,7 @@ export interface SavingsDeposit {
   date: string;   // ISO date string
   amount: number;
   note?: string;
+  sourceExpenseId?: string; // set when logged by marking a spending item as paid
 }
 
 // ── localStorage keys ──────────────────────────────────────────────────────
@@ -42,6 +43,50 @@ function load<T>(key: string, fallback: T): T {
 
 function save<T>(key: string, value: T): void {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* quota */ }
+}
+
+// ── Deposits logged from spending items ───────────────────────────────────
+
+function notifyReload(): void {
+  setTimeout(() => {
+    if (typeof window !== "undefined") window.dispatchEvent(new Event("bt_reload"));
+  }, 0);
+}
+
+function goalExists(goalId: string): boolean {
+  return load<SavingsGoal[]>(SAVINGS_KEY, []).some((g) => g.id === goalId);
+}
+
+/** Log (or replace) the deposit for a spending item marked as paid. Dated today. */
+export function logExpenseDeposit(goalId: string, expenseId: string, amount: number, note?: string): void {
+  if (!goalExists(goalId)) return;
+  const deposit: SavingsDeposit = {
+    id: crypto.randomUUID(),
+    date: new Date().toISOString().slice(0, 10),
+    amount,
+    note,
+    sourceExpenseId: expenseId,
+  };
+  const next = [...load<SavingsDeposit[]>(depositsKey(goalId), []).filter((d) => d.sourceExpenseId !== expenseId), deposit]
+    .sort((a, b) => a.date.localeCompare(b.date));
+  save(depositsKey(goalId), next);
+  notifyReload();
+}
+
+/** Update the amount of a spending item's deposit, if it still exists. */
+export function updateExpenseDeposit(goalId: string, expenseId: string, amount: number): void {
+  const list = load<SavingsDeposit[]>(depositsKey(goalId), []);
+  if (!list.some((d) => d.sourceExpenseId === expenseId)) return;
+  save(depositsKey(goalId), list.map((d) => (d.sourceExpenseId === expenseId ? { ...d, amount } : d)));
+  notifyReload();
+}
+
+/** Remove a spending item's deposit (when the item is marked unpaid or unlinked). */
+export function removeExpenseDeposit(goalId: string, expenseId: string): void {
+  const list = load<SavingsDeposit[]>(depositsKey(goalId), []);
+  if (!list.some((d) => d.sourceExpenseId === expenseId)) return;
+  save(depositsKey(goalId), list.filter((d) => d.sourceExpenseId !== expenseId));
+  notifyReload();
 }
 
 // ── Savings projection calculations ───────────────────────────────────────
@@ -190,6 +235,13 @@ export function useSavingsDeposits(goalId: string) {
 
   useEffect(() => {
     setDeposits(load<SavingsDeposit[]>(depositsKey(goalId), []));
+  }, [goalId]);
+
+  // Also listen for bt_reload (deposits logged from spending items)
+  useEffect(() => {
+    const handler = () => setDeposits(load<SavingsDeposit[]>(depositsKey(goalId), []));
+    window.addEventListener("bt_reload", handler);
+    return () => window.removeEventListener("bt_reload", handler);
   }, [goalId]);
 
   const addDeposit = (date: string, amount: number, note?: string) => {

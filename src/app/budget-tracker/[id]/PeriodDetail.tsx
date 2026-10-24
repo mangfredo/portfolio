@@ -3,13 +3,15 @@
 import "../budget.css";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Pencil, Trash, Plus, ArrowLeft, ChartBar, Tag } from "@phosphor-icons/react";
+import { Pencil, Trash, Plus, ArrowLeft, ChartBar, Tag, PiggyBank } from "@phosphor-icons/react";
 import {
   AreaChart, Area, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Legend,
 } from "recharts";
 import { usePeriods, useExpenses } from "@/hooks/useBudgetStore";
+import { useSavings } from "@/hooks/useSavingsStore";
 import { useSwipeToClose } from "@/hooks/useSwipeToClose";
 import { useCountUp } from "@/hooks/useCountUp";
 import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
@@ -76,6 +78,8 @@ export function PeriodDetailInner({ id, onBack }: Props & { onBack?: () => void 
   const { currencySymbol } = useBudgetSettingsCtx();
   const { periods, updateBudget, deletePeriod, mounted } = usePeriods();
   const { expenses, addExpense, updateExpense, deleteExpense, togglePaid, total } = useExpenses(id);
+  const { goals } = useSavings();
+  const goalName = (goalId?: string) => goals.find(g => g.id === goalId)?.name;
 
   useSwipeToClose("/budget-tracker");
 
@@ -104,6 +108,7 @@ export function PeriodDetailInner({ id, onBack }: Props & { onBack?: () => void 
   const [budgetInput, setBudgetInput]           = useState("");
   const [itemName, setItemName]                 = useState("");
   const [itemAmount, setItemAmount]             = useState("");
+  const [itemGoalId, setItemGoalId]             = useState("");
 
   const handleSetBudget = () => {
     const val = parseNumeric(budgetInput);
@@ -116,17 +121,29 @@ export function PeriodDetailInner({ id, onBack }: Props & { onBack?: () => void 
     const name   = itemName.trim();
     const amount = parseNumeric(itemAmount);
     if (!name || isNaN(amount) || amount < 0) return;
-    if (editingId) { updateExpense(editingId, name, amount); setEditingId(null); }
-    else { addExpense(name, amount); }
-    setItemName(""); setItemAmount(""); setShowItemModal(false);
+    const goalId = itemGoalId || undefined;
+    if (editingId) { updateExpense(editingId, name, amount, goalId); setEditingId(null); }
+    else { addExpense(name, amount, undefined, goalId); }
+    setItemName(""); setItemAmount(""); setItemGoalId(""); setShowItemModal(false);
   };
 
-  const openEdit = (e: { id: string; name: string; amount: number }) => {
+  const openEdit = (e: { id: string; name: string; amount: number; savingsGoalId?: string }) => {
     setItemName(e.name); setItemAmount(String(e.amount));
+    setItemGoalId(goalName(e.savingsGoalId) ? e.savingsGoalId! : "");
     setEditingId(e.id); setShowItemModal(true);
   };
   const closeItemModal = () => {
-    setShowItemModal(false); setItemName(""); setItemAmount(""); setEditingId(null);
+    setShowItemModal(false); setItemName(""); setItemAmount(""); setItemGoalId(""); setEditingId(null);
+  };
+  // Picking a goal fills the Item name with "Savings - <goal>" when it's empty
+  // or still the auto-filled name for the previous goal (None clears it)
+  const handleGoalChange = (goalId: string) => {
+    const prevName = goalName(itemGoalId);
+    const isAutoName = !itemName.trim() || (prevName !== undefined && itemName === `Savings - ${prevName}`);
+    setItemGoalId(goalId);
+    if (!isAutoName) return;
+    const name = goalName(goalId);
+    setItemName(name ? `Savings - ${name}` : "");
   };
 
   const waterfallData = buildWaterfall(budget, expenses);
@@ -333,6 +350,11 @@ export function PeriodDetailInner({ id, onBack }: Props & { onBack?: () => void 
                       style={{ color: e.paid ? "#475569" : "var(--wf-text)",
                         textDecoration: e.paid ? "line-through" : "none" }}>
                       {e.name}
+                      {goalName(e.savingsGoalId) && (
+                        <span className="inline-flex items-center gap-1 ml-2 text-xs" style={{ color:"var(--wf-cyan)" }}>
+                          <PiggyBank size={11} weight="fill"/> {goalName(e.savingsGoalId)}
+                        </span>
+                      )}
                     </span>
                     <span className="wf-data text-sm text-right"
                       style={{ color: e.paid ? "#475569" : "var(--wf-text)",
@@ -409,6 +431,22 @@ export function PeriodDetailInner({ id, onBack }: Props & { onBack?: () => void 
               <NumericInput value={itemAmount} onChange={e=>setItemAmount(e.target.value)}
                 onKeyDown={e=>{ if(e.key==="Enter")handleAddItem(); }}
                 placeholder="0.00" className="wf-input wf-input-data"/>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color:"var(--wf-muted)" }}>Savings goal</label>
+              {goals.length === 0 ? (
+                <p className="text-xs" style={{ color:"var(--wf-muted)" }}>
+                  No savings goals available. Add one in the{" "}
+                  <Link href="/budget-tracker/savings" style={{ color:"var(--wf-cyan)", fontWeight:600 }}>Savings tab</Link>.
+                </p>
+              ) : (
+                <select value={itemGoalId} onChange={e=>handleGoalChange(e.target.value)} className="wf-input">
+                  <option value="" style={{ background:"var(--wf-surface)", color:"var(--wf-text)" }}>None</option>
+                  {goals.map(g => (
+                    <option key={g.id} value={g.id} style={{ background:"var(--wf-surface)", color:"var(--wf-text)" }}>{g.name}</option>
+                  ))}
+                </select>
+              )}
             </div>
             {editingId && (
               <div className="flex flex-col gap-1 pt-1">

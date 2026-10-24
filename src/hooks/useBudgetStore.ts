@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
+import { logExpenseDeposit, updateExpenseDeposit, removeExpenseDeposit } from "@/hooks/useSavingsStore";
 
 export interface Period {
   id: string;
@@ -22,6 +23,7 @@ export interface Expense {
   paid?: boolean;
   sectionKey?: "s1" | "buffer"; // default "s1" — backwards compatible
   sortOrder?: number; // manual sort order for drag-and-drop
+  savingsGoalId?: string; // paid → logs a deposit to this savings goal
 }
 
 // ── Gig (side income stream) ───────────────────────────────────────────────
@@ -183,6 +185,12 @@ export function usePeriods() {
 export function useExpenses(periodId: string) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
+  // Note for deposits logged from this period, e.g. "From November 15"
+  const depositNote = () => {
+    const label = load<Period[]>(PERIODS_KEY, []).find((p) => p.id === periodId)?.label;
+    return label ? `From ${label}` : undefined;
+  };
+
   useEffect(() => {
     setExpenses(load<Expense[]>(itemsKey(periodId), []));
   }, [periodId]);
@@ -194,12 +202,13 @@ export function useExpenses(periodId: string) {
     return () => window.removeEventListener("bt_reload", handler);
   }, [periodId]);
 
-  const addExpense = (name: string, amount: number, sectionKey: "s1" | "buffer" = "s1") => {
+  const addExpense = (name: string, amount: number, sectionKey: "s1" | "buffer" = "s1", savingsGoalId?: string) => {
     const expense: Expense = {
       id: crypto.randomUUID(),
       name: name.trim(),
       amount,
       sectionKey,
+      savingsGoalId,
     };
     setExpenses((prev) => {
       const next = [...prev, expense];
@@ -208,10 +217,19 @@ export function useExpenses(periodId: string) {
     });
   };
 
-  const updateExpense = (id: string, name: string, amount: number) => {
+  const updateExpense = (id: string, name: string, amount: number, savingsGoalId?: string) => {
+    // Keep a paid item's deposit in sync with its new amount / goal
+    const old = expenses.find((e) => e.id === id);
+    if (old?.paid) {
+      if (old.savingsGoalId && old.savingsGoalId !== savingsGoalId) removeExpenseDeposit(old.savingsGoalId, id);
+      if (savingsGoalId) {
+        if (old.savingsGoalId === savingsGoalId) updateExpenseDeposit(savingsGoalId, id, amount);
+        else logExpenseDeposit(savingsGoalId, id, amount, depositNote());
+      }
+    }
     setExpenses((prev) => {
       const next = prev.map((e) =>
-        e.id === id ? { ...e, name: name.trim(), amount } : e
+        e.id === id ? { ...e, name: name.trim(), amount, savingsGoalId } : e
       );
       save(itemsKey(periodId), next);
       return next;
@@ -227,6 +245,12 @@ export function useExpenses(periodId: string) {
   };
 
   const togglePaid = (id: string) => {
+    // Linked savings item: paid logs a deposit, unpaid removes it
+    const item = expenses.find((e) => e.id === id);
+    if (item?.savingsGoalId) {
+      if (item.paid) removeExpenseDeposit(item.savingsGoalId, id);
+      else logExpenseDeposit(item.savingsGoalId, id, item.amount, depositNote());
+    }
     setExpenses((prev) => {
       const next = prev.map((e) =>
         e.id === id ? { ...e, paid: !e.paid } : e

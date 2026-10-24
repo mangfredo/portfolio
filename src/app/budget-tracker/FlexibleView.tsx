@@ -2,9 +2,11 @@
 
 import "./budget.css";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, CaretDown, CaretRight, Wallet, DotsSixVertical, ArrowUp, ArrowDown } from "@phosphor-icons/react";
+import { Plus, CaretDown, CaretRight, Wallet, DotsSixVertical, ArrowUp, ArrowDown, PiggyBank } from "@phosphor-icons/react";
 import { usePeriods, useExpenses, useGigs, useGigItems, type Period, type Expense, type Gig, copyMonthBudget, copyPeriodBudget } from "@/hooks/useBudgetStore";
+import { useSavings } from "@/hooks/useSavingsStore";
 import { useBudgetSettingsCtx } from "@/context/BudgetSettingsContext";
 import Modal from "@/components/budget/Modal";
 import { CopyBudgetModal } from "./CopyBudgetModal";
@@ -393,6 +395,8 @@ function PeriodAccordion({
 }) {
   const { expenses, addExpense, updateExpense, deleteExpense, togglePaid, reorderExpenses, s1Expenses, bufferExpenses, s1Total, bufferAllocated } = useExpenses(period.id);
   const { periods, updateBudget, updatePeriodMeta } = usePeriods();
+  const { goals } = useSavings();
+  const goalName = (goalId?: string) => goals.find(g => g.id === goalId)?.name;
 
   const budget = period.budget;
   const bufferAmount = Math.max(budget - s1Total, 0);
@@ -406,6 +410,7 @@ function PeriodAccordion({
   const [addSection, setAddSection] = useState<"s1" | "buffer">("s1");
   const [itemName, setItemName] = useState("");
   const [itemAmount, setItemAmount] = useState("");
+  const [itemGoalId, setItemGoalId] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
 
   // Budget edit
@@ -469,12 +474,13 @@ function PeriodAccordion({
 
   const openAdd = (section: "s1" | "buffer") => {
     setAddSection(section);
-    setItemName(""); setItemAmount(""); setEditingId(null);
+    setItemName(""); setItemAmount(""); setItemGoalId(""); setEditingId(null);
     setShowAdd(true);
   };
 
   const openEdit = (e: Expense) => {
     setItemName(e.name); setItemAmount(String(e.amount));
+    setItemGoalId(goalName(e.savingsGoalId) ? e.savingsGoalId! : "");
     setEditingId(e.id);
     setAddSection((e.sectionKey ?? "s1") as "s1" | "buffer");
     setShowAdd(true);
@@ -484,14 +490,32 @@ function PeriodAccordion({
     const name = itemName.trim();
     const amount = parseNumeric(itemAmount);
     if (!name || isNaN(amount) || amount < 0) return;
+    const goalId = itemGoalId || undefined;
     if (editingId) {
-      updateExpense(editingId, name, amount);
+      updateExpense(editingId, name, amount, goalId);
       setEditingId(null);
     } else {
-      addExpense(name, amount, addSection);
+      addExpense(name, amount, addSection, goalId);
     }
-    setItemName(""); setItemAmount(""); setShowAdd(false);
+    setItemName(""); setItemAmount(""); setItemGoalId(""); setShowAdd(false);
   };
+
+  // Picking a goal fills the Item name with "Savings - <goal>" when it's empty
+  // or still the auto-filled name for the previous goal (None clears it)
+  const handleGoalChange = (goalId: string) => {
+    const prevName = goalName(itemGoalId);
+    const isAutoName = !itemName.trim() || (prevName !== undefined && itemName === `Savings - ${prevName}`);
+    setItemGoalId(goalId);
+    if (!isAutoName) return;
+    const name = goalName(goalId);
+    setItemName(name ? `Savings - ${name}` : "");
+  };
+
+  const goalMarker = (goalId?: string) => goalName(goalId) && (
+    <span style={{ display:"inline-flex", alignItems:"center", gap:3, marginLeft:6, fontSize:"0.7rem", color:"var(--wf-cyan)", textDecoration:"none" }}>
+      <PiggyBank size={11} weight="fill"/> {goalName(goalId)}
+    </span>
+  );
 
   const handleSaveBudget = () => {
     const val = parseNumeric(budgetInput);
@@ -704,6 +728,7 @@ function PeriodAccordion({
                       }}
                     >
                       {e.name}
+                      {goalMarker(e.savingsGoalId)}
                     </button>
                     <button
                       onClick={() => togglePaid(e.id)}
@@ -796,11 +821,34 @@ function PeriodAccordion({
                     />
                     <button
                       onClick={() => openEdit(e)}
-                      style={{ textAlign:"left", background:"none", border:"none", cursor:"pointer", color: textMain, fontSize:"0.85rem", flex:1 }}
+                      style={{
+                        textAlign:"left", background:"none", border:"none", cursor:"pointer", flex:1,
+                        color: e.paid ? textMuted : textMain,
+                        fontSize:"0.85rem",
+                        textDecoration: e.paid ? "line-through" : "none",
+                        opacity: e.paid ? 0.55 : 1,
+                      }}
                     >
                       {e.name}
+                      {goalMarker(e.savingsGoalId)}
                     </button>
-                    <span className="wf-data" style={{ color: textMuted, fontSize:"0.85rem", flexShrink:0 }}>
+                    <button
+                      onClick={() => togglePaid(e.id)}
+                      title={e.paid ? "Mark as unpaid" : "Mark as paid"}
+                      style={{
+                        background:"none", cursor:"pointer", flexShrink:0, marginRight:8,
+                        fontSize:"0.65rem", fontWeight:600, padding:"2px 6px", borderRadius:4,
+                        color: e.paid ? "var(--wf-emerald)" : textMuted,
+                        border: `1px solid ${e.paid ? "rgba(16,185,129,0.4)" : "var(--wf-border)"}`,
+                      }}
+                    >
+                      {e.paid ? "✓ Paid" : "Paid?"}
+                    </button>
+                    <span className="wf-data" style={{
+                      color: textMuted, fontSize:"0.85rem", flexShrink:0,
+                      textDecoration: e.paid ? "line-through" : "none",
+                      opacity: e.paid ? 0.55 : 1,
+                    }}>
                       {currencySymbol}{fmt(e.amount)}
                     </span>
                   </div>
@@ -862,6 +910,22 @@ function PeriodAccordion({
               <NumericInput value={itemAmount} onChange={e => setItemAmount(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter") handleSaveItem(); }}
                 placeholder="0.00" className="wf-input wf-input-data"/>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color:"var(--wf-muted)" }}>Savings goal</label>
+              {goals.length === 0 ? (
+                <p className="text-xs" style={{ color:"var(--wf-muted)" }}>
+                  No savings goals available. Add one in the{" "}
+                  <Link href="/budget-tracker/savings" style={{ color:"var(--wf-cyan)", fontWeight:600 }}>Savings tab</Link>.
+                </p>
+              ) : (
+                <select value={itemGoalId} onChange={e => handleGoalChange(e.target.value)} className="wf-input">
+                  <option value="" style={{ background:"var(--wf-surface)", color:"var(--wf-text)" }}>None</option>
+                  {goals.map(g => (
+                    <option key={g.id} value={g.id} style={{ background:"var(--wf-surface)", color:"var(--wf-text)" }}>{g.name}</option>
+                  ))}
+                </select>
+              )}
             </div>
             {editingId && (
               <button onClick={() => { deleteExpense(editingId); setEditingId(null); setShowAdd(false); }}
