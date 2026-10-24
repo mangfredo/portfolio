@@ -14,6 +14,8 @@ import {
 import BudgetShell from "@/components/budget/BudgetShell";
 import Modal from "@/components/budget/Modal";
 import { ConfirmModal } from "@/components/budget/BudgetModal";
+import GoalFormModal from "@/components/budget/GoalFormModal";
+import { GOAL_ICONS } from "@/components/budget/GoalIconPicker";
 import NumericInput, { parseNumeric } from "@/components/budget/NumericInput";
 
 interface Props { id: string; }
@@ -62,11 +64,12 @@ function SavingsDetailInner({ id }: Props) {
   const textMuted = isDark ? "#94A3B8" : "#415A77";
   const teal      = isDark ? "#2DD4BF" : "#0D9488";
 
-  const { goals, deleteGoal } = useSavings();
+  const { goals, updateGoal, deleteGoal } = useSavings();
   const { deposits, addDeposit, deleteDeposit } = useSavingsDeposits(id);
   const goal = goals.find((g) => g.id === id);
 
   const [showDeleteGoal, setShowDeleteGoal]     = useState(false);
+  const [showEditGoal, setShowEditGoal]         = useState(false);
   const [showAddDeposit, setShowAddDeposit]     = useState(false);
   const [depAmount, setDepAmount]               = useState("");
   const [depDate, setDepDate]                   = useState(new Date().toISOString().slice(0, 10));
@@ -155,6 +158,9 @@ function SavingsDetailInner({ id }: Props) {
               All Goals
             </button>
             <div className="flex items-center gap-3">
+              <span style={{ width:26, height:26, display:"block", color: teal, flexShrink:0 }}>
+                {(GOAL_ICONS[goal.icon ?? ""] ?? GOAL_ICONS.piggybank).svg}
+              </span>
               <h2 className="font-bold text-2xl tracking-tight" style={{ color:"var(--wf-text)" }}>{goal.name}</h2>
               <span
                 className="text-[0.65rem] font-semibold px-2 py-0.5 rounded-full"
@@ -169,6 +175,17 @@ function SavingsDetailInner({ id }: Props) {
               </p>
             )}
           </div>
+          <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowEditGoal(true)}
+            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+            style={{ color:"var(--wf-cyan)", background:"color-mix(in srgb, var(--wf-cyan) 10%, transparent)", border:"1px solid color-mix(in srgb, var(--wf-cyan) 25%, transparent)" }}
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M8.5 1.5l2 2L4 10H2V8l6.5-6.5z" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Edit
+          </button>
           <button
             onClick={() => setShowDeleteGoal(true)}
             className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
@@ -179,6 +196,7 @@ function SavingsDetailInner({ id }: Props) {
             </svg>
             Delete
           </button>
+          </div>
         </div>
 
         {/* Progress bar */}
@@ -350,6 +368,17 @@ function SavingsDetailInner({ id }: Props) {
             </div>
           </div>
         </Modal>
+      )}
+
+      {/* Edit goal */}
+      {showEditGoal && (
+        <GoalFormModal
+          goal={goal}
+          depositsTotal={deposits.reduce((s, d) => s + d.amount, 0)}
+          currencySymbol={currencySymbol}
+          onSubmit={(data) => { updateGoal(goal.id, data); setShowEditGoal(false); }}
+          onClose={() => setShowEditGoal(false)}
+        />
       )}
 
       {/* Delete deposit confirm */}

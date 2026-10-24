@@ -11,9 +11,9 @@ import {
   useSavings, useSavingsDeposits, calcSavingsMetrics,
   type SavingsGoal, type GoalStatus,
 } from "@/hooks/useSavingsStore";
-import GoalIconPicker, { GOAL_ICONS } from "@/components/budget/GoalIconPicker";
+import { GOAL_ICONS } from "@/components/budget/GoalIconPicker";
+import GoalFormModal from "@/components/budget/GoalFormModal";
 import BudgetShell from "@/components/budget/BudgetShell";
-import Modal from "@/components/budget/Modal";
 import NumericInput, { parseNumeric } from "@/components/budget/NumericInput";
 
 const fmt = (n: number) =>
@@ -76,30 +76,6 @@ function SavingsHomeInner() {
   const { currencySymbol } = useBudgetSettingsCtx();
   const { goals, addGoal } = useSavings();
   const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({
-    name:"", targetAmount:"", currentAmount:"0", targetDate:"", monthlyContribution:"", icon:"piggybank",
-  });
-
-  const resetForm = () => setForm({ name:"", targetAmount:"", currentAmount:"0", targetDate:"", monthlyContribution:"", icon:"piggybank" });
-
-  const handleAdd = () => {
-    const target  = parseNumeric(form.targetAmount);
-    const current = parseNumeric(form.currentAmount) || 0;
-    if (!form.name.trim() || isNaN(target) || target <= 0) return;
-    const goal = addGoal({
-      name: form.name.trim(), targetAmount: target, currentAmount: current,
-      icon: form.icon || "piggybank",
-      targetDate: form.targetDate || undefined,
-      monthlyContribution: form.monthlyContribution ? parseNumeric(form.monthlyContribution) : undefined,
-    });
-    resetForm(); setShowAdd(false);
-    router.push(`/budget-tracker/savings/${goal.id}`);
-  };
-
-  const fp = (key: keyof typeof form) => ({
-    value: form[key],
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => setForm(f => ({ ...f, [key]: e.target.value })),
-  });
 
   // Aggregate
   const totalTarget = goals.reduce((s, g) => s + g.targetAmount, 0);
@@ -247,37 +223,15 @@ function SavingsHomeInner() {
 
       {/* Add Goal Modal */}
       {showAdd && (
-        <Modal title="Create New Goal" onClose={() => { setShowAdd(false); resetForm(); }}>
-          <div className="space-y-4">
-            {[
-              { label:"Goal Name", el:
-                <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-                  <GoalIconPicker
-                    selected={form.icon}
-                    onChange={(key) => setForm(f => ({ ...f, icon: key }))}
-                    color="var(--wf-cyan)"
-                  />
-                  <input type="text" {...fp("name")} placeholder="e.g. Emergency Fund" autoFocus className="wf-input" style={{ flex:1 }}
-                    onKeyDown={e=>{if(e.key==="Enter")handleAdd();}}/>
-                </div>
-              },
-              { label:`Target Amount (${currencySymbol})`, el:<NumericInput {...fp("targetAmount")} placeholder="0.00" className="wf-input wf-input-data"/> },
-              { label:`Already Saved (${currencySymbol})`, el:<NumericInput {...fp("currentAmount")} placeholder="0.00" className="wf-input wf-input-data"/> },
-              { label:"Target Date (optional)", el:<input type="date" {...fp("targetDate")} className="wf-input"/> },
-              { label:`Monthly Contribution (${currencySymbol}, optional)`, el:<NumericInput {...fp("monthlyContribution")} placeholder="0.00" className="wf-input wf-input-data"/> },
-            ].map(({ label, el }) => (
-              <div key={label}>
-                <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color:"var(--wf-muted)" }}>{label}</label>
-                {el}
-              </div>
-            ))}
-            <div className="flex gap-3 pt-1">
-              <button onClick={() => { setShowAdd(false); resetForm(); }} className="wf-btn-ghost flex-1 py-2.5">Cancel</button>
-              <button onClick={handleAdd} disabled={!form.name.trim()||!form.targetAmount}
-                className="wf-btn-primary flex-1 py-2.5">Add Goal</button>
-            </div>
-          </div>
-        </Modal>
+        <GoalFormModal
+          currencySymbol={currencySymbol}
+          onSubmit={(data) => {
+            const goal = addGoal(data);
+            setShowAdd(false);
+            router.push(`/budget-tracker/savings/${goal.id}`);
+          }}
+          onClose={() => setShowAdd(false)}
+        />
       )}
     </div>
   );
