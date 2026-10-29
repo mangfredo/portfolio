@@ -17,18 +17,17 @@ export const hero = {
     { words: ["that", "build", "the"], accent: false },
     { words: ["product."], accent: true },
   ],
-  // Rendered as: before + <strong>highlight</strong> + after
-  intro: {
-    before:
-      "5+ years turning complex business problems into clean, fast systems. One recent project cut a 6-hour manual process down to under 10 minutes — a ",
-    highlight: "97% efficiency gain",
-    after: " that freed the team to focus on work that actually matters.",
-  },
+  // One paragraph per entry; **text** is rendered highlighted
+  intro: [
+    "**Modernizing legacy enterprise software with AI and automation.**",
+    "I built an AI agent that works directly inside a legacy HR platform, creating forms, managing form versions, configuring fields, mapping PDF templates, and automating multi-step workflows. It can inspect the live interface, find layout issues, and preview UI improvements, with approval controls built in.",
+    "In testing, it cut a form-creation workflow from **7–8 hours to under 15 minutes**. My Offer Letter Engine reduced a separate manual process from **6 hours to under 10 minutes**.",
+  ],
   ctas: [
     { href: "#work", label: "See the work", primary: true },
     { href: "#automation", label: "Automation suite", primary: false },
   ],
-  terminalNote: "↑ this used to take 6 hours by hand",
+  terminalNote: "↑ Offer Letter Engine: this used to take 6 hours by hand",
   terminalHint: "try typing \"help\" ↑",
 };
 

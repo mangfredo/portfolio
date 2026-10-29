@@ -3,12 +3,22 @@
 import { useState } from "react";
 import Image from "next/image";
 import LazyVideo from "./LazyVideo";
+import BeforeAfter from "./BeforeAfter";
 import EditorFile, { Mark } from "./ide/EditorFile";
 import { slugify } from "./ide/files";
 import { projects } from "@/content/projects";
 import { profile, sections } from "@/content/profile";
+import { splitEmphasis } from "@/lib/emphasis";
 
 type Project = (typeof projects)[number];
+
+function Emphasis({ text }: { text: string }) {
+  return (
+    <>
+      {splitEmphasis(text).map((s, i) => (s.em ? <strong key={i}>{s.text}</strong> : s.text))}
+    </>
+  );
+}
 
 function Avatar() {
   return (
@@ -21,7 +31,7 @@ function Avatar() {
 // One war story as a merged pull request: problem → change → review
 function PullRequest({ p }: { p: Project }) {
   const slug = slugify(p.title);
-  const hasFiles = !!(p.video || p.nda);
+  const hasFiles = !!(p.video || p.nda || p.writeup);
   const [tab, setTab] = useState<"conversation" | "files">("conversation");
   const tabId = (t: string) => `pr-${slug}-${t}`;
 
@@ -90,6 +100,17 @@ function PullRequest({ p }: { p: Project }) {
               <p className="pr-comment__text">{p.story}</p>
             </div>
           </li>
+          {p.compare && (
+            <li className="pr-comment">
+              <Avatar />
+              <div className="pr-comment__box">
+                <p className="pr-comment__by">
+                  <strong>{profile.name}</strong> attached a screenshot · <span className="pr-tag">before / after</span>
+                </p>
+                <BeforeAfter before={p.compare.before} after={p.compare.after} title={p.title} />
+              </div>
+            </li>
+          )}
           <li className="pr-comment pr-comment--review">
             <span className="pr-review-icon" aria-hidden="true">
               ✓
@@ -131,6 +152,37 @@ function PullRequest({ p }: { p: Project }) {
               <LazyVideo src={p.video} className="overflow-hidden" />
             </div>
           )}
+          {p.writeup && (
+            <div className="story__preview" style={p.nda ? undefined : { marginTop: 0 }}>
+              <div className="ide-pane__bar">
+                <span aria-hidden="true">📄</span>
+                <span className="ide-pane__bar-title">HOW_I_BUILT_IT.md</span>
+              </div>
+              <div className="pr-writeup">
+                <h4>How I Built {p.title.replace(/^The /, "the ")}</h4>
+                {p.writeup.map((sec) => (
+                  <section key={sec.heading}>
+                    <h5>{sec.heading}</h5>
+                    {sec.blocks.map((b, i) =>
+                      Array.isArray(b) ? (
+                        <ul key={i}>
+                          {b.map((item) => (
+                            <li key={item}>
+                              <Emphasis text={item} />
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p key={i}>
+                          <Emphasis text={b} />
+                        </p>
+                      )
+                    )}
+                  </section>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -144,6 +196,11 @@ function PullRequest({ p }: { p: Project }) {
         {p.video && tab === "conversation" && (
           <button type="button" className="ide-link pr__demo" onClick={() => setTab("files")}>
             ▶ Watch demo
+          </button>
+        )}
+        {p.writeup && tab === "conversation" && (
+          <button type="button" className="ide-link pr__demo" onClick={() => setTab("files")}>
+            📄 Read the write-up
           </button>
         )}
         {p.link && (

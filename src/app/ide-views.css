@@ -159,6 +159,8 @@ button.ide-status__item:hover { background: color-mix(in oklab, var(--accent-fg)
   line-height: 1.75;
 }
 
+.welcome__lead p + p { margin-top: 0.75rem; }
+
 .welcome__h {
   margin: 2.25rem 0 0.6rem;
   font-family: var(--font-sans), sans-serif;

@@ -9,6 +9,7 @@ export const experience = [
     description:
       "Develop and maintain production systems across frontend and backend environments. Build dynamic form logic, automation scripts, and internal tooling to improve operational efficiency.",
     highlights: [
+      "Built an AI-powered Chrome extension integrating Claude Code, a local Node.js bridge, and custom MCP tools to automate legacy HR platform workflows, including form creation, version management, PDF field mapping, and UI modernization, with approval controls for sensitive changes. Reduced one tested form-creation workflow from 7–8 hours to under 15 minutes.",
       "Engineered a Node.js automation tool that converts Word specifications into executable JavaScript — reducing development time from 6 hours to 10 minutes",
       "Developed 11+ internal automation tools integrated into Jira-based workflows",
       "Built a VS Code extension to automate formatting and improve output consistency",

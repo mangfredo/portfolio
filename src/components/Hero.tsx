@@ -9,6 +9,7 @@ import { hero, profile } from "@/content/profile";
 import { projects } from "@/content/projects";
 import { personalProjects } from "@/content/personal-projects";
 import { experience } from "@/content/experience";
+import { splitEmphasis } from "@/lib/emphasis";
 
 const NBSP = String.fromCharCode(160);
 
@@ -75,13 +76,21 @@ export default function Hero() {
             ))}
           </h1>
 
-          <p className="welcome__lead hero-fadein" data-on={revealed} style={{ transitionDelay: "600ms" }}>
-            {hero.intro.before}
-            <span className="font-medium" style={{ color: "var(--ink)" }}>
-              {hero.intro.highlight}
-            </span>
-            {hero.intro.after}
-          </p>
+          <div className="welcome__lead hero-fadein" data-on={revealed} style={{ transitionDelay: "600ms" }}>
+            {hero.intro.map((para, i) => (
+              <p key={i}>
+                {splitEmphasis(para).map((s, j) =>
+                  s.em ? (
+                    <span key={j} className="font-medium" style={{ color: "var(--ink)" }}>
+                      {s.text}
+                    </span>
+                  ) : (
+                    s.text
+                  )
+                )}
+              </p>
+            ))}
+          </div>
 
           <div className="hero-fadein" data-on={revealed} style={{ transitionDelay: "800ms" }}>
             <h2 className="welcome__h">Start</h2>

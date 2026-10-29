@@ -429,6 +429,110 @@
 .pr__demo { margin-left: auto; cursor: pointer; }
 .pr__demo + .pr__demo { margin-left: 0.75rem; }
 
+/* Before / after screenshot: "before" clipped over "after", range input on top */
+.ba {
+  position: relative;
+  aspect-ratio: 2512 / 1290;
+  overflow: hidden;
+  background: var(--ide-chrome-hi);
+  user-select: none;
+}
+
+.ba img { object-fit: cover; object-position: left top; }
+
+.ba__before {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 calc(100% - var(--ba-pos)) 0 0);
+}
+
+.ba__divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--ba-pos);
+  width: 2px;
+  transform: translateX(-1px);
+  background: var(--accent);
+  pointer-events: none;
+}
+
+.ba__handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.35);
+}
+
+.ba__label {
+  position: absolute;
+  bottom: 0.6rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  background: rgb(0 0 0 / 0.6);
+  color: #fff;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.ba__label--before { left: 0.6rem; }
+.ba__label--after { right: 0.6rem; }
+
+.ba__range {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
+
+.ba:has(.ba__range:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* HOW_I_BUILT_IT.md write-up in the Files changed tab */
+.pr-writeup {
+  padding: 1rem 1.1rem 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+
+.ide-root .pr-writeup h4 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.ide-root .pr-writeup h5 {
+  margin: 1.4rem 0 0.4rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.pr-writeup p + p,
+.pr-writeup ul + p,
+.pr-writeup p + ul { margin-top: 0.6rem; }
+
+.pr-writeup ul { padding-left: 1.2rem; list-style: disc; }
+.pr-writeup li + li { margin-top: 0.25rem; }
+.pr-writeup strong { color: var(--ink); font-weight: 600; }
+
 /* ── PROJECTS: Quick Open switcher ─────────────────────────────── */
 .qo {
   display: grid;
